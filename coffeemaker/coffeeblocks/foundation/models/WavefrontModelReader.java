@@ -135,8 +135,12 @@ public class WavefrontModelReader implements ModelReader{
 	
 	private void interpretTexCoord(String coord){
 		List<Float> coords = new ArrayList<>();
-		for(String value : coord.substring(3, coord.length()).split(" "))
-			coords.add(Float.valueOf(value));
+		for(String value : coord.substring(3, coord.length()).split(" ")){
+			if(coords.size()==1)
+				coords.add(1f-Float.valueOf(value));
+			else
+				coords.add(Float.valueOf(value));
+		}
 		texCoords.add(coords);
 	}
 	private void interpretVert(String vert){

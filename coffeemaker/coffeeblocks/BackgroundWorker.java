@@ -49,9 +49,11 @@ public class BackgroundWorker implements Runnable,CoffeeRendererListener {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
-		testFiles.add("/home/havard/test5.obj");
-		testFiles.add("/home/havard/test_uv.obj");
+		testFiles.add("/home/havard/test4.obj");
+//		testFiles.add("/home/havard/test.obj");
+//		testFiles.add("/home/havard/test5.obj");
+//		testFiles.add("/home/havard/test_uv.obj");
+//		testFiles.add("/home/havard/test_uv2.obj");
 		
 		for(String filename : testFiles)
 			loadObject(filename);

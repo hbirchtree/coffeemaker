@@ -11,7 +11,7 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.foundation.models.ModelContainer;
 
 public class ShaderHelper {
-	public static ShaderBuilder compileShaders(ModelContainer object){
+	public static ShaderBuilder compileShaders(ModelContainer object,int textureUnit,boolean textureLoaded){
 		ShaderBuilder shader = new ShaderBuilder();
 		shader.buildShader(object.getVertShader(), object.getFragShader());
 		object.setShader(shader);
@@ -21,6 +21,7 @@ public class ShaderHelper {
 		shader.getUniform("camera");
 		
 		shader.getUniform("model");
+		
 		shader.getUniform("materialTex");
 		shader.getUniform("materialShininess");
 		shader.getUniform("materialSpecularColor");
@@ -34,15 +35,17 @@ public class ShaderHelper {
 		shader.getAttrib("vertTexCoord");
 		shader.getAttrib("vertNormal");
 		
-		object.glTextureUnit = GL13.GL_TEXTURE0;
+		object.glTextureUnit = textureUnit;
 		
-		int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
+		if(!textureLoaded){
+			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
+			object.textureHandle = texture;
+		}
+		
 		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"));
-		
-		object.textureHandle = texture;
 		object.vaoHandle = vao;
 		
-		shader.setUniform("materialTex", texture);
+//		shader.setUniform("materialTex", texture);
 
 		GL20.glUseProgram(0);
 		

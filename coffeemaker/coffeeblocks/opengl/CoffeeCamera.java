@@ -45,6 +45,35 @@ public class CoffeeCamera {
 		normalizeAngles();
 	}
 	
+	public void offsetOrientation(float rightAngle,float upAngle){
+		horizAngle += rightAngle;
+		vertiAngle += upAngle;
+		normalizeAngles();
+	}
+	
+	public void moveCameraForward(float scalar){
+		Vector3f direction = getForward();
+		Vector3f displace = new Vector3f();
+		displace.x = direction.x*scalar;
+		displace.y = direction.y*scalar;
+		displace.z = direction.z*scalar;
+		Vector3f.add(getCameraPos(), displace, displace);
+		setCameraPos(displace);
+	}
+	public void moveCameraRight(float scalar){
+		Vector3f direction = getRight();
+		Vector3f displace = new Vector3f();
+		displace.x = direction.x*scalar;
+		displace.y = direction.y*scalar;
+		displace.z = direction.z*scalar;
+		Vector3f.add(getCameraPos(), displace, displace);
+		setCameraPos(displace);
+	}
+	
+	public void offsetPosition(Vector3f offset){
+		setCameraPos(Vector3f.add(getCameraPos(), offset, null));
+	}
+	
 	public Matrix4f getOrientation(){
 		Matrix4f result = new Matrix4f();
 		Matrix4f.rotate((float)Math.toRadians(vertiAngle), new Vector3f(1,0,0), result, result);

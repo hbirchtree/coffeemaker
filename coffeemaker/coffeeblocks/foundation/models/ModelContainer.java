@@ -44,9 +44,9 @@ public class ModelContainer extends PhysicsObject {
 		return vertShader;
 	}
 	
+	public int glTextureUnit = 0;
 	public int vaoHandle = 0;
 	public int textureHandle = 0;
-	public int glTextureUnit = 0;
 	public int vertLocation = 0;
 	public int vertTexCoordLocation = 0;
 	

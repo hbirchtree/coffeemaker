@@ -6,7 +6,6 @@ import java.util.List;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.input.CoffeeInputHandler;
-import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.opengl.CoffeeRenderer;
 import static org.lwjgl.glfw.GLFW.*;
 
