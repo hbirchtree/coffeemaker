@@ -6,8 +6,8 @@ import java.util.List;
 import org.lwjgl.BufferUtils;
 
 import coffeeblocks.foundation.physics.PhysicsObject;
-import coffeeblocks.opengl.ShaderBuilder;
-import coffeeblocks.opengl.CoffeeMaterial;
+import coffeeblocks.opengl.components.CoffeeMaterial;
+import coffeeblocks.opengl.components.ShaderBuilder;
 
 public class ModelContainer extends PhysicsObject {
 	private boolean objectBaked = false;
@@ -42,6 +42,14 @@ public class ModelContainer extends PhysicsObject {
 	}
 	public String getVertShader(){
 		return vertShader;
+	}
+	
+	private boolean billboard = true; //Vil alltid orientere seg mot kamera
+	public boolean isBillboard() {
+		return billboard;
+	}
+	public void setBillboard(boolean billboard) {
+		this.billboard = billboard;
 	}
 	
 	public int glTextureUnit = 0;

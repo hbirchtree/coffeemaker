@@ -7,6 +7,10 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.foundation.models.ModelContainer;
+import coffeeblocks.general.VectorTools;
+import coffeeblocks.opengl.components.CoffeeCamera;
+import coffeeblocks.opengl.components.LimeLight;
+import coffeeblocks.opengl.components.ShaderHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -17,9 +21,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 public class CoffeeRenderer implements Runnable {
@@ -33,7 +35,6 @@ public class CoffeeRenderer implements Runnable {
 	
 
 	private Stack<Integer> textureUnits = new Stack<>();
-	private Map<String,String> textureUnitMapping = new HashMap<>();
 
 	// The window handle
 	private long window;
@@ -153,6 +154,11 @@ public class CoffeeRenderer implements Runnable {
 			draw=!draw;
 			controlDelay = glfwGetTime()+0.2;
 		}
+
+		for(CoffeeGlfwInputListener listener : inputListeners)
+			for(int key : listener.getRegisteredKeys())
+				if(glfwGetKey(window,key)==1)
+					listener.coffeeReceiveKeyPress(key);
 	}
 	
 	private boolean draw = true;
@@ -180,9 +186,7 @@ public class CoffeeRenderer implements Runnable {
 		camera = new CoffeeCamera();
 		
 		light_sun = new LimeLight();
-		light_sun.setPosition(new Vector3f(0f,10f,0f));
-		light_sun.setAmbientCoefficient(0.01f);
-		light_sun.setIntensities(1f, 1f, 1f);
+		light_sun.setIntensities(1f, 0.6f, 0.8f);
 		
 		camera.setCameraPos(new Vector3f(3,0,5));
 		camera.lookAt(new Vector3f(0,0,0));
@@ -191,6 +195,7 @@ public class CoffeeRenderer implements Runnable {
 		
 		double fpsTimer = glfwGetTime()+1d;
 		long framecount = 0;
+		
 		while ( glfwWindowShouldClose(window) == GL_FALSE ){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			if(fpscounter){
@@ -202,7 +207,7 @@ public class CoffeeRenderer implements Runnable {
 				}
 			}
 			
-			light_sun.setPosition(camera.getCameraPos());
+			light_sun.setPosition(Vector3f.add(camera.getCameraPos(), VectorTools.vectorMul(camera.getForward(), 4f), null));
 			
 			loopHandleMouseInput();
 			loopHandleKeyboardInput();
@@ -221,10 +226,6 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	private void loopCheckListeners(){
-		for(CoffeeGlfwInputListener listener : inputListeners)
-			for(int key : listener.getRegisteredKeys())
-				if(glfwGetKey(window,key)==1)
-					listener.coffeeReceiveKeyPress(key);
 		for(CoffeeRendererListener listener : listeners){
 			listener.onGlfwFrameTick();
 		}
@@ -236,20 +237,13 @@ public class CoffeeRenderer implements Runnable {
 				continue;
 			if(!object.isObjectBaked()){
 				int textureUnit = textureUnits.pop();
-//				boolean textureLoaded = false;
-//				if(textureUnitMapping.containsKey(object.getMaterial().getDiffuseTexture())){
-//					textureUnit = Integer.valueOf(textureUnitMapping.get(object.getMaterial().getDiffuseTexture()).split(",")[0]);
-//				}else{
-//					
-//					textureLoaded = true;
-//				}
 				ShaderHelper.compileShaders(object,textureUnit,false);
-//				if(!textureLoaded){
-//					textureUnitMapping.put(object.getMaterial().getDiffuseTexture(), Integer.toString(textureUnit)+","+Integer.toString(object.textureHandle));
-//				}else
-//					object.textureHandle = Integer.valueOf(textureUnitMapping.get(object.getMaterial().getDiffuseTexture().split(",")[1]));
 			}
 			GL20.glUseProgram(object.getShader().getProgramId());
+			
+			if(object.isBillboard()){
+				object.rotation = camera.getForward();
+			}
 
 			object.getShader().setUniform("camera", camera.matrix());
 			

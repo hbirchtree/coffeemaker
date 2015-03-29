@@ -1,4 +1,4 @@
-package coffeeblocks.opengl;
+package coffeeblocks.opengl.components;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;

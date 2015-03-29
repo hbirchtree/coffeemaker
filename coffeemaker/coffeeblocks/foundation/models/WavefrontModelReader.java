@@ -6,7 +6,7 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector3f;
 
 import coffeeblocks.general.FileImporter;
-import coffeeblocks.opengl.CoffeeMaterial;
+import coffeeblocks.opengl.components.CoffeeMaterial;
 
 public class WavefrontModelReader implements ModelReader{
 	

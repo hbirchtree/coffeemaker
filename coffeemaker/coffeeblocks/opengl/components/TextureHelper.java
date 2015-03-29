@@ -1,4 +1,4 @@
-package coffeeblocks.opengl;
+package coffeeblocks.opengl.components;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;

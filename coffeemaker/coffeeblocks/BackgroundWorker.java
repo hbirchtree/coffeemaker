@@ -3,6 +3,8 @@ package coffeeblocks;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.models.ModelContainer;
@@ -50,10 +52,9 @@ public class BackgroundWorker implements Runnable,CoffeeRendererListener {
 	public void run() {
 		// TODO Auto-generated method stub
 		testFiles.add("/home/havard/test4.obj");
-//		testFiles.add("/home/havard/test.obj");
-//		testFiles.add("/home/havard/test5.obj");
-//		testFiles.add("/home/havard/test_uv.obj");
-//		testFiles.add("/home/havard/test_uv2.obj");
+		testFiles.add("/home/havard/test.obj");
+		testFiles.add("/home/havard/test_uv.obj");
+		testFiles.add("/home/havard/test_uv2.obj");
 		
 		for(String filename : testFiles)
 			loadObject(filename);
@@ -68,6 +69,7 @@ public class BackgroundWorker implements Runnable,CoffeeRendererListener {
 			return;
 //		model.scale.x = model.scale.y = model.scale.z = 0.5f;
 		obj.setGameModel(model);
+		obj.getGameModel().rotationalVelocity = new Vector3f(0f,1f,0f);
 		manager.addObject(obj);
 	}
 

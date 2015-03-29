@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="org"/>
+	<classpathentry kind="src" path="coffeemaker"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/jar/lwjgl.jar" sourcepath="lwjgl/src.zip">
 		<attributes>

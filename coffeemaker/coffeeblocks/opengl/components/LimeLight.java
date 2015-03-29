@@ -1,4 +1,4 @@
-package coffeeblocks.opengl;
+package coffeeblocks.opengl.components;
 
 import org.lwjgl.util.vector.Vector3f;
 

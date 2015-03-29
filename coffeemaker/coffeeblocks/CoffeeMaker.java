@@ -39,7 +39,9 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		backgroundWorker.setRenderer(renderer);
 		backgroundWorker.setManager(objManager);
 		backgroundWorkerThread = new Thread(backgroundWorker);
-		backgroundWorkerThread.start();
+		//Denne tråden forårsaker problemer med lasting av modeller. Vi blir nødt til å gjøre dette før vi viser vinduet.
+//		backgroundWorkerThread.start();
+		backgroundWorker.run();
 		
 		renderer.addCoffeeListener(this);
 		renderer.addCoffeeListener(objManager);
@@ -47,6 +49,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		renderer.addInputListener(inputHandler);
 		renderingThread = new Thread(renderer);
 		renderingThread.start();
+//		renderer.run();
 	}
 	@Override
 	public void onGlfwQuit() {
