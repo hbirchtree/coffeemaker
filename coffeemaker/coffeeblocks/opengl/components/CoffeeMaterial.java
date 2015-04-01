@@ -1,9 +1,28 @@
 package coffeeblocks.opengl.components;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.util.vector.Vector3f;
 
 public class CoffeeMaterial {
+	private boolean multitextured = false;
+	private List<String> multitexture = new ArrayList<>();
+	public boolean isMultitextured() {
+		return multitextured;
+	}
+	public void setMultitextured(boolean multitextured) {
+		this.multitextured = multitextured;
+	}
+	public List<String> getMultitexture() {
+		return multitexture;
+	}
+	public void addTexture(String textureFile){
+		this.multitexture.add(textureFile);
+	}
+	
 	private float shininess = 100f;
+	private float transparency = 1f;
 	public float dissolution = 0f; //Unimplemented
 	public int illum = 0; //Unimplemented
 	
@@ -39,5 +58,11 @@ public class CoffeeMaterial {
 		specularColor.x = r;
 		specularColor.x = g;
 		specularColor.x = b;
+	}
+	public float getTransparency() {
+		return transparency;
+	}
+	public void setTransparency(float transparency) {
+		this.transparency = transparency;
 	}
 }

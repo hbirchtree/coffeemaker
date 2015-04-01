@@ -11,7 +11,7 @@ public class VAOHelper {
 	public static int genVAO(FloatBuffer vertices, int vertLocation, int vertTexCoordLocation, int vertNormalLocation){
 		int vbo = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STATIC_DRAW);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STREAM_DRAW);
 		
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		

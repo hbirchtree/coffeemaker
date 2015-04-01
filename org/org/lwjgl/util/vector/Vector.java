@@ -42,6 +42,7 @@ import java.nio.FloatBuffer;
  * @version $Revision$
  * $Id$
  */
+@SuppressWarnings("serial")
 public abstract class Vector implements Serializable, ReadableVector {
 
 	/**

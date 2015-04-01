@@ -37,9 +37,11 @@ public class TextureHelper {
 		GL13.glActiveTexture(textureUnit);
 		GL11.glBindTexture(GL_TEXTURE_2D, textureId);
 		
+		GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		GL11.glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		
-		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, tWidth, tHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, img);
+		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, tWidth, tHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, img);
 		GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 		
 		return textureId;

@@ -3,8 +3,6 @@ package coffeeblocks;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.models.ModelContainer;
@@ -36,40 +34,31 @@ public class BackgroundWorker implements Runnable,CoffeeRendererListener {
 		this.manager = manager;
 	}
 	
-	private String assetSource = null;
-	public String getAssetSource() {
-		return assetSource;
-	}
-	public void setAssetSource(String assetSource){
-		this.assetSource = assetSource;
+	private List<String> preload = new ArrayList<>();
+	public void addPreload(String objectFile){
+		if(objectFile!=null)
+			preload.add(objectFile);
 	}
 	
 	private boolean loaded = false;
 	private boolean ready = false;
-	List<String> testFiles = new ArrayList<>();
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		testFiles.add("/home/havard/test4.obj");
-		testFiles.add("/home/havard/test.obj");
-		testFiles.add("/home/havard/test_uv.obj");
-		testFiles.add("/home/havard/test_uv2.obj");
 		
-		for(String filename : testFiles)
+		for(String filename : preload)
 			loadObject(filename);
 		
 		loaded = true;
 	}
 	
 	private void loadObject(String filename){
-		GameObject obj = new GameObject(null);
+		GameObject obj = new GameObject();
 		ModelContainer model = ModelLoader.loadModel(filename);
 		if(model==null)
 			return;
-//		model.scale.x = model.scale.y = model.scale.z = 0.5f;
 		obj.setGameModel(model);
-		obj.getGameModel().rotationalVelocity = new Vector3f(0f,1f,0f);
 		manager.addObject(obj);
 	}
 

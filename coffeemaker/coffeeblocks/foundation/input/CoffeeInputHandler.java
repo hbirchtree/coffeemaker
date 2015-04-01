@@ -2,9 +2,12 @@ package coffeeblocks.foundation.input;
 
 import java.util.ArrayList;
 import java.util.List;
-import static org.lwjgl.glfw.GLFW.*;
 
+import org.lwjgl.util.vector.Vector3f;
+
+import static org.lwjgl.glfw.GLFW.*;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
+import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 
 public class CoffeeInputHandler implements CoffeeGlfwInputListener{
@@ -44,6 +47,42 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 		if(key==GLFW_KEY_DOWN)
 			for(GameObject object : manager.getObjectList())
 				object.getGameModel().rotationalVelocity.y = -0.4f;
+		if(key==GLFW_KEY_W){
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(3f);
+			manager.requestObjectUpdate("player");
+		}
+		if(key==GLFW_KEY_S){
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(-3f);
+			manager.requestObjectUpdate("player");
+		}
+		if(key==GLFW_KEY_A){
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(-3f);
+			manager.requestObjectUpdate("player");
+		}
+		if(key==GLFW_KEY_D){
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(3f);
+			manager.requestObjectUpdate("player");
+		}
+		if(key==GLFW_KEY_SPACE){
+			manager.getObject("player").getGameModel().positionalAcceleration = VectorTools.vectorLimit(VectorTools.vectorMul(new Vector3f(0,1,0), 9.81f), 9.8f);
+			manager.requestObjectUpdate("player");
+		}
+		if(key==GLFW_KEY_KP_0){
+			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
+			manager.requestObjectUpdate("player");
+		}
+//		if(glfwGetKey(window,GLFW_KEY_D)==1)
+//			camera.moveCameraRight(0.1f);
+//		if(glfwGetKey(window,GLFW_KEY_F)==1)
+//			camera.lookAt(new Vector3f(0,0,0));
+//		if(glfwGetKey(window,GLFW_KEY_SPACE)==1)
+//			camera.offsetPosition(new Vector3f(0,0.2f,0));
+//		if(glfwGetKey(window,GLFW_MOD_SHIFT)==1)
+//			camera.offsetPosition(new Vector3f(0,-0.2f,0));
+//		if(glfwGetKey(window,GLFW_KEY_F3)==1&&glfwGetTime()>=controlDelay){
+//			draw=!draw;
+//			controlDelay = glfwGetTime()+0.2;
+//		}
 	}
 	@Override
 	public void coffeeReceiveKeyRelease(int key) {

@@ -35,6 +35,8 @@ public class ShaderBuilder {
 	
 	public int getUniform(String uniformName){
 		int uniform = GL20.glGetUniformLocation(programId,uniformName);
+		if(uniform<0)
+			throw new RuntimeException("Unable to acquire uniform "+uniformName+", are you using the correct shader?");
 		uniforms.put(uniformName, uniform);
 		return uniform;
 	}
@@ -82,19 +84,19 @@ public class ShaderBuilder {
 		glLinkProgram(programId);
 		
 		if(glGetProgrami(programId,GL_LINK_STATUS) == GL11.GL_FALSE)
-			throw new RuntimeException("Failed to link shader:"+glGetProgramInfoLog(programId, 1000));
+			throw new RuntimeException("Failed to link shaders: "+vertShaderFile+" and "+fragShaderFile+" \nLog: "+glGetProgramInfoLog(programId, 1000));
 		
 		glValidateProgram(programId);
 		
 		if(glGetProgrami(programId,GL_VALIDATE_STATUS) == GL11.GL_FALSE)
-			throw new RuntimeException("Failed to link shader:"+glGetProgramInfoLog(programId, 1000));
+			throw new RuntimeException("Failed to validate shaders: "+vertShaderFile+" and "+fragShaderFile+" \nLog: "+glGetProgramInfoLog(programId, 1000));
 	}
 	
 	
 	private int compileShader(String filename,int shaderType){
 		int handle = glCreateShader(shaderType);
 		if(handle==0)
-			throw new RuntimeException("Failed to create shader");
+			throw new RuntimeException("Failed to create shader: "+filename+" \nLog: "+glGetProgramInfoLog(handle, 1000));
 		
 		String code = FileImporter.readFileToString(filename);
 		glShaderSource(handle,code);
@@ -104,8 +106,7 @@ public class ShaderBuilder {
 		int shaderStatus = glGetShaderi(handle,GL20.GL_COMPILE_STATUS);
 		
 		if(shaderStatus == GL11.GL_FALSE){
-			System.out.println(glGetProgramInfoLog(handle, 1000));
-			throw new IllegalStateException("Compilation error for OpenGL shader:");
+			throw new RuntimeException("Failed to compile shader: "+filename+" \nLog: "+glGetProgramInfoLog(handle, 1000));
 		}
 		
 		return handle;

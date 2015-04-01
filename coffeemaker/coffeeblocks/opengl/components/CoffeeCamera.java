@@ -32,16 +32,18 @@ public class CoffeeCamera {
 	private float vertiAngle = 0f;
 	private float vertiAngleMax = 85f;
 	
-	public CoffeeCamera(){
-		
+	public float getHorizAngle() {
+		return horizAngle;
+	}
+	public float getVertiAngle() {
+		return vertiAngle;
 	}
 	
 	public void lookAt(Vector3f targetPos){
-		Vector3f direction = new Vector3f();
-		Vector3f.sub(targetPos, cameraPos, direction);
+		Vector3f direction = Vector3f.sub(targetPos, cameraPos, null);
 		direction.normalise();
-		vertiAngle = (float)Math.toRadians(Math.asin(-direction.y));
-		horizAngle = (float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
+		vertiAngle = -(float)Math.toRadians(Math.asin(-direction.y));
+		horizAngle = -(float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
 		normalizeAngles();
 	}
 	
@@ -60,6 +62,14 @@ public class CoffeeCamera {
 		Vector3f.add(getCameraPos(), displace, displace);
 		setCameraPos(displace);
 	}
+	public Vector3f getCameraForwardVec(float scalar){
+		Vector3f direction = getForward();
+		Vector3f displace = new Vector3f();
+		displace.x = direction.x*scalar;
+		displace.y = direction.y*scalar;
+		displace.z = direction.z*scalar;
+		return displace;
+	}
 	public void moveCameraRight(float scalar){
 		Vector3f direction = getRight();
 		Vector3f displace = new Vector3f();
@@ -68,6 +78,14 @@ public class CoffeeCamera {
 		displace.z = direction.z*scalar;
 		Vector3f.add(getCameraPos(), displace, displace);
 		setCameraPos(displace);
+	}
+	public Vector3f getCameraRightVec(float scalar){
+		Vector3f direction = getRight();
+		Vector3f displace = new Vector3f();
+		displace.x = direction.x*scalar;
+		displace.y = direction.y*scalar;
+		displace.z = direction.z*scalar;
+		return displace;
 	}
 	
 	public void offsetPosition(Vector3f offset){
@@ -184,23 +202,23 @@ public class CoffeeCamera {
 		y.normalise();
 		
 		view.m00 = x.x;
-		view.m10 = x.y;
-		view.m20 = x.z;
-		view.m30 = -Vector3f.dot(x, eye);
+		view.m01 = x.y;
+		view.m02 = x.z;
+		view.m03 = -Vector3f.dot(x, eye);
 		
-		view.m01 = y.x;
+		view.m10 = y.x;
 		view.m11 = y.y;
-		view.m21 = y.z;
-		view.m31 = -Vector3f.dot(y, eye);
+		view.m12 = y.z;
+		view.m13 = -Vector3f.dot(y, eye);
 		
-		view.m02 = z.x;
-		view.m12 = z.y;
+		view.m20 = z.x;
+		view.m21 = z.y;
 		view.m22 = z.z;
-		view.m32 = -Vector3f.dot(z, eye);
+		view.m23 = -Vector3f.dot(z, eye);
 		
-		view.m03 = 0;
-		view.m13 = 0;
-		view.m23 = 0;
+		view.m30 = 0;
+		view.m31 = 0;
+		view.m32 = 0;
 		view.m33 = 1.0f;
 		
 		return view;

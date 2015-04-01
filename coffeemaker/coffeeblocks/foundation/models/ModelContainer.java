@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.util.vector.Vector3f;
 
 import coffeeblocks.foundation.physics.PhysicsObject;
 import coffeeblocks.opengl.components.CoffeeMaterial;
@@ -18,7 +19,7 @@ public class ModelContainer extends PhysicsObject {
 		this.objectBaked = objectBaked;
 	}
 
-	protected ShaderBuilder shader = null;
+	private ShaderBuilder shader = null;
 	public synchronized void setShader(ShaderBuilder shader){
 		this.shader = shader;
 	}
@@ -26,13 +27,13 @@ public class ModelContainer extends PhysicsObject {
 		return shader;
 	}
 	
-	protected CoffeeMaterial material = new CoffeeMaterial();
+	private CoffeeMaterial material = new CoffeeMaterial();
 	public CoffeeMaterial getMaterial() {
 		return material;
 	}
 
-	protected String vertShader = "/home/havard/vsh.txt";
-	protected String fragShader = "/home/havard/fsh.txt";
+	private String vertShader = "";
+	private String fragShader = "";
 	public synchronized void setShaderFiles(String vertShader,String fragShader){
 		this.vertShader = vertShader;
 		this.fragShader = fragShader;
@@ -44,7 +45,7 @@ public class ModelContainer extends PhysicsObject {
 		return vertShader;
 	}
 	
-	private boolean billboard = true; //Vil alltid orientere seg mot kamera
+	private boolean billboard = false; //Vil alltid orientere seg mot kamera
 	public boolean isBillboard() {
 		return billboard;
 	}
@@ -52,13 +53,23 @@ public class ModelContainer extends PhysicsObject {
 		this.billboard = billboard;
 	}
 	
-	public int glTextureUnit = 0;
+	private boolean noDepthRendering = false;
+	public boolean isNoDepthRendering() {
+		return noDepthRendering;
+	}
+	public void setNoDepthRendering(boolean noDepthRendering) {
+		this.noDepthRendering = noDepthRendering;
+	}
+
 	public int vaoHandle = 0;
+	
 	public int textureHandle = 0;
+	public int glTextureUnit = 0;
+	
 	public int vertLocation = 0;
 	public int vertTexCoordLocation = 0;
 	
-	protected List<Float> faces = null;
+	private List<Float> faces = null;
 	public synchronized void setModelFaces(List<Float> faces){
 		//Vi deler automatisk opp lista til 3-dimensjonale punkter
 		if(faces==null)
@@ -86,5 +97,14 @@ public class ModelContainer extends PhysicsObject {
 		
 		result.flip();
 		return result;
+	}
+	private Vector3f physicalInertia = new Vector3f();
+	public void setPhysicalInertia(Vector3f inertia) {
+		// TODO Auto-generated method stub
+		if(inertia!=null)
+			this.physicalInertia = inertia;
+	}
+	public Vector3f getPhysicalInertia(){
+		return physicalInertia;
 	}
 }

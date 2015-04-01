@@ -10,6 +10,13 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/native/linux/x64"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/PNGDecoder.jar"/>
+	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl"/>
+	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/jbullet.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/jbullet/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/PNGDecoder.jar"/>
+	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/vecmath.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

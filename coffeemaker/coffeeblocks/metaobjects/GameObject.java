@@ -7,8 +7,16 @@ public class GameObject{
 	
 	// TODO : legg til spill-relatert metadata
 	
-	public GameObject(String dataSource){
+	public GameObject(){
 		
+	}
+	
+	private String id = null;
+	public synchronized void setObjectId(String id){
+		this.id = id;
+	}
+	public String getObjectId(){
+		return id;
 	}
 	
 	private ModelContainer gameModel = null;

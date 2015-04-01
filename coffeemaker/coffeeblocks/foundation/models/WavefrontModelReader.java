@@ -3,9 +3,8 @@ package coffeeblocks.foundation.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import coffeeblocks.general.FileImporter;
+import coffeeblocks.general.VectorTools;
 import coffeeblocks.opengl.components.CoffeeMaterial;
 
 public class WavefrontModelReader implements ModelReader{
@@ -98,8 +97,10 @@ public class WavefrontModelReader implements ModelReader{
 		for(String line : data){
 //			if(line.startsWith("Ka "))
 //				mtl.ambientColor = parseVector(line.substring(3,line.length()));
+			if(line.startsWith("Ns "))
+				mtl.setShininess(Float.valueOf(line.substring(3,line.length())));
 			if(line.startsWith("Ks "))
-				mtl.setSpecularColor(parseVector(line.substring(3,line.length())));
+				mtl.setSpecularColor(VectorTools.parseStrVector(line.substring(3,line.length())," "));
 			if(line.startsWith("map_Kd "))
 				mtl.setDiffuseTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(7,line.length()));
 //			if(line.startsWith("Kd "))
@@ -107,17 +108,6 @@ public class WavefrontModelReader implements ModelReader{
 //			if(line.startsWith("d "))
 //				mtl.dissolution = Float.valueOf(line.substring(2, line.length()));
 		}
-	}
-	
-	private Vector3f parseVector(String source){
-		Vector3f result = new Vector3f();
-		String[] split = source.split(" ");
-		if(split.length!=3)
-			return result;
-		result.x = Float.valueOf(split[0]);
-		result.y = Float.valueOf(split[1]);
-		result.z = Float.valueOf(split[2]);
-		return result;
 	}
 	
 	private void interpretLine(String data){
