@@ -1,0 +1,76 @@
+{
+	"logic": "scripts/testgame.lua",
+	"scene":{
+		"clearcolor": [0,0,0,0],
+		"camera": {
+			"position": [3,10,5],
+			"look-at": [0,6,5],
+			"fov": 85
+		},
+		"objects": [
+		{
+			"object-id": "terrain",
+			"model": "models/test4.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 4,
+			"physics.mass": 0,
+			"physics.scale": [100,1,100],
+			"physics.rotation": [0,1,0],
+			"physics.friction": 0.6,
+			"physics.restitution": 0
+		},
+		{
+			"object-id": "abes",
+			"model": "models/test_uv.obj",
+			"vshader": "shaders/vsh_billboard.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [5,15,5],
+			"rotation": [0,0,0],
+			"scale": [0.5,0.5,0.5],
+			"physics.shape": 1,
+			"physics.mass": 1,
+			"physics.scale": [1,1,1],
+			"physics.rotation": [0,0,0],
+			"physics.friction": 0.2,
+			"physics.restitution": 0.50
+		},
+		{
+			"object-id": "player",
+			"model": "models/test_uv2.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0,20,0],
+			"rotation": [0.0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 5,
+			"physics.mass": 1,
+			"physics.scale": [1,5,2],
+			"physics.rotation": [0,0,0],
+			"physics.friction": 0.5,
+			"physics.restitution": 0.50
+		},
+		{
+			"object-id": "skybox",
+			"model": "models/skybox.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0.0,5,5],
+			"rotation": [0.0,0,0],
+			"scale": [1,1,1]
+		}
+		],
+		"lights": [
+		{
+			"object-id": "light.sun",
+			"position": [0,10,0],
+			"color": "#ffccff",
+			"attenuation": 0.005,
+			"ambientcoeff": 0.007
+		}
+		]
+	}
+}

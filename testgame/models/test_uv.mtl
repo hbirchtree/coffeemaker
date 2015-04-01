@@ -1,0 +1,12 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Material.001
+Ns 33.333333
+Ka 0.000000 0.000000 0.000000
+Kd 0.327680 0.327680 0.327680
+Ks 0.957055 0.986803 1.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures/scientist.png
