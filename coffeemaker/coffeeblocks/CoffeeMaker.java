@@ -57,6 +57,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		backgroundWorker.setManager(objManager);
 		
 		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.indexOf("/", -1)+1),properties, objManager,renderer);
+		
 	}
 	public void rendererSpawn(){
 		List<Integer> inputKeys = new ArrayList<Integer>();

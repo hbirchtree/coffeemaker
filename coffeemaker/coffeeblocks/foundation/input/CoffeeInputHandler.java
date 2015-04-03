@@ -51,12 +51,12 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(3f);
 			manager.requestObjectUpdate("player");
 		}
-		if(key==GLFW_KEY_S){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(-3f);
-			manager.requestObjectUpdate("player");
-		}
 		if(key==GLFW_KEY_A){
 			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(-3f);
+			manager.requestObjectUpdate("player");
+		}
+		if(key==GLFW_KEY_S){
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(-3f);
 			manager.requestObjectUpdate("player");
 		}
 		if(key==GLFW_KEY_D){
@@ -71,14 +71,6 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
 			manager.requestObjectUpdate("player");
 		}
-//		if(glfwGetKey(window,GLFW_KEY_D)==1)
-//			camera.moveCameraRight(0.1f);
-//		if(glfwGetKey(window,GLFW_KEY_F)==1)
-//			camera.lookAt(new Vector3f(0,0,0));
-//		if(glfwGetKey(window,GLFW_KEY_SPACE)==1)
-//			camera.offsetPosition(new Vector3f(0,0.2f,0));
-//		if(glfwGetKey(window,GLFW_MOD_SHIFT)==1)
-//			camera.offsetPosition(new Vector3f(0,-0.2f,0));
 //		if(glfwGetKey(window,GLFW_KEY_F3)==1&&glfwGetTime()>=controlDelay){
 //			draw=!draw;
 //			controlDelay = glfwGetTime()+0.2;

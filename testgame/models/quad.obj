@@ -1,16 +1,17 @@
 # Blender v2.69 (sub 0) OBJ File: ''
 # www.blender.org
+# Denne quad'en brukes for å vise skjermen. Ikke endre teksturkoordinatene.
 mtllib quad.mtl
 o Plane
-v -0.000001 -1.000000 1.000000
-v 0.000001 1.000000 1.000000
-v -0.000001 -1.000000 -1.000000
-v 0.000001 1.000000 -1.000000
-vt 0.000000 1.000000
-vt 0.000000 0.000000
-vt 1.000000 0.000000
-vt 1.000000 1.000000
+v 0.0 -1.0 1.0
+v 0.0 1.0 1.0
+v 0.0 -1.0 -1.0
+v 0.0 1.0 -1.0
+vt 0.0 0.0
+vt 0.0 1.0
+vt 1.0 1.0
+vt 1.0 0.0
 usemtl Material.001
 s off
-f 2/1 1/2 3/3
 f 4/4 2/1 3/3
+f 2/1 1/2 3/3

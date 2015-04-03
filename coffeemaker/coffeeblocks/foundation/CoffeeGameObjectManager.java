@@ -71,6 +71,5 @@ public class CoffeeGameObjectManager implements CoffeeRendererListener,Collision
 	
 	@Override
 	public void onGlfwFrameTick(){
-		billboard("player", false);
 	}
 }

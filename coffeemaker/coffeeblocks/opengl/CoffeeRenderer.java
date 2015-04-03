@@ -2,13 +2,17 @@ package coffeeblocks.opengl;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.foundation.models.ModelContainer;
+import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.opengl.components.CoffeeCamera;
+import coffeeblocks.opengl.components.CoffeeFramebufferManager;
 import coffeeblocks.opengl.components.LimeLight;
+import coffeeblocks.opengl.components.ShaderBuilder;
 import coffeeblocks.opengl.components.ShaderHelper;
 
 import java.nio.ByteBuffer;
@@ -51,6 +55,10 @@ public class CoffeeRenderer implements Runnable {
 	
 	private int lastOccupiedTextureUnit = -1;
 
+	private double fpsTimer = 0;
+	private long framecount = 0;
+	private double tick = 0;
+	private boolean fpscounter = true;
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
 	private int rendering_swaps = 1;
@@ -58,7 +66,9 @@ public class CoffeeRenderer implements Runnable {
 		this.rendering_swaps = swapping;
 	}
 	
-	private Vector2d rendering_resolution = new Vector2d(1280,720);
+	private Vector2d rendering_resolution = new Vector2d(1024,512);
+	private Vector2d windowres = new Vector2d(1280,720);
+	private float aspect = 1f;
 
 	public float getMouseSensitivity() {
 		return mouseSensitivity;
@@ -121,8 +131,10 @@ public class CoffeeRenderer implements Runnable {
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-		int WIDTH = (int)rendering_resolution.x;
-		int HEIGHT = (int)rendering_resolution.y;
+		int WIDTH = (int)windowres.x;
+		int HEIGHT = (int)windowres.y;
+		
+		aspect = (float)(rendering_resolution.x/rendering_resolution.y);
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Café", NULL, NULL);
@@ -169,13 +181,25 @@ public class CoffeeRenderer implements Runnable {
 		camera.offsetOrientation(mouseSensitivity*(float)x, mouseSensitivity*(float)y);
 		glfwSetCursorPos(window,0,0);
 	}
+	
 	public void loopHandleKeyboardInput(){
 		for(CoffeeGlfwInputListener listener : inputListeners)
 			for(int key : listener.getRegisteredKeys())
 				if(glfwGetKey(window,key)==1)
 					listener.coffeeReceiveKeyPress(key);
 	}
-
+	
+	private void fpsCount(){
+		if(fpscounter){
+			framecount++;
+			if(glfwGetTime()>=fpsTimer){
+				System.out.println("FPS: "+framecount+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
+				framecount = 0;
+				fpsTimer = glfwGetTime()+1;
+			}
+		}
+	}
+	
 	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
@@ -187,51 +211,58 @@ public class CoffeeRenderer implements Runnable {
 		// Set the clear color
 		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+//		GL11.glFogi(GL_FOG_MODE, GL_LINEAR);
+//		GL11.glFogf(GL_FOG_DENSITY, 0.35f);
+//		GL11.glHint(GL_FOG_HINT, GL_DONT_CARE);
+//		GL11.glFogf(GL_FOG_START, 1.0f);
+//		GL11.glFogf(GL_FOG_END, 5.0f);
+//		glEnable(GL_FOG);
+		
+		
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
-		glEnable(GL_COLOR_MATERIAL);
+		
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
-//		glEnable(GL_ALPHA_TEST);
-//		glAlphaFunc(GL_GREATER,0f);
+		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 		for(CoffeeRendererListener listener : listeners)
 			listener.onGlfwReady();
 		
-		boolean fpscounter = true;
+		fpsTimer = glfwGetTime()+1;
 		
-		double fpsTimer = glfwGetTime()+1d;
-		long framecount = 0;
-		double tick = 0;
+		CoffeeFramebufferManager framebuffer = new CoffeeFramebufferManager(0,GL11.GL_RGBA);
+		try{
+			framebuffer.setRenderBuffer(aspect,(int)rendering_resolution.x, (int)rendering_resolution.y);
+		}catch(IllegalStateException e){
+			System.err.println(e.getMessage());
+		}
+		framebuffer.setEnabled(false);
 		
 		while ( glfwWindowShouldClose(window) == GL_FALSE ){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			if(fpscounter){
-				framecount++;
-				if(glfwGetTime()>=fpsTimer){
-					System.out.println("FPS: "+framecount+"\nTick: "+String.format("%2f", tick)+"s");
-					framecount = 0;
-					fpsTimer = glfwGetTime()+1;
-				}
-			}
+			fpsCount(); //Skriver ut FPS og tikke-tid
 			for(CoffeeRendererListener listener : listeners)
-				listener.onGlfwFrameTick();
+				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
 			for(CoffeeRendererListener listener : listeners)
-				listener.onGlfwFrameTick((float)tick);
-			tick = glfwGetTime();
+				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
+			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 			
+			loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende
+			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere
 			
-			loopHandleMouseInput();
-			loopHandleKeyboardInput();
-			
-			loopRenderObjects();
+			framebuffer.storeFramebuffer(rendering_resolution);
+			loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
+			framebuffer.renderFramebuffer(windowres, lights);
 			
 			glfwSwapBuffers(window); // swap the color buffers
 			// Poll for window events. The key callback above will only be
 			// invoked during this call.
-			glfwPollEvents();
+			glfwPollEvents(); //Oppdater handlinger gjort med vinduet osv.
+			tick = glfwGetTime()-tick;
 		}
 		for(ModelContainer object : displayLists){
 			if(object.textureHandle!=0)
@@ -248,24 +279,22 @@ public class CoffeeRenderer implements Runnable {
 				continue;
 			if(!object.isObjectBaked()){
 				int textureUnit = lastOccupiedTextureUnit+1+GL13.GL_TEXTURE0;
-				ShaderHelper.compileShaders(object,textureUnit,false);
+				lastOccupiedTextureUnit++;
+				ShaderHelper.compileShaders(object,textureUnit);
 			}
 			if(object.isNoDepthRendering()){
 				glDisable(GL_DEPTH_TEST);
 			}
-			
 			GL20.glUseProgram(object.getShader().getProgramId());
 
 			object.getShader().setUniform("camera", camera.matrix());
-			
-			if(!object.isBillboard()){
-				object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
-				for(LimeLight light : lights){
-					object.getShader().setUniform("light.position", light.getPosition());
-					object.getShader().setUniform("light.intensities", light.getIntensities());
-					object.getShader().setUniform("light.attenuation", light.getAttenuation());
-					object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
-				}
+
+			object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
+			for(LimeLight light : lights){
+				object.getShader().setUniform("light.position", light.getPosition());
+				object.getShader().setUniform("light.intensities", light.getIntensities());
+				object.getShader().setUniform("light.attenuation", light.getAttenuation());
+				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
 			}
 
 			object.getShader().setUniform("materialTex", object.glTextureUnit-GL13.GL_TEXTURE0);

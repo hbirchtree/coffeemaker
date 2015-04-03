@@ -66,8 +66,8 @@ public class ModelContainer extends PhysicsObject {
 	public int textureHandle = 0;
 	public int glTextureUnit = 0;
 	
-	public int vertLocation = 0;
-	public int vertTexCoordLocation = 0;
+//	public int vertLocation = 0;
+//	public int vertTexCoordLocation = 0;
 	
 	private List<Float> faces = null;
 	public synchronized void setModelFaces(List<Float> faces){

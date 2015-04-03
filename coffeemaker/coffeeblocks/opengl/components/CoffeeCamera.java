@@ -26,7 +26,7 @@ public class CoffeeCamera {
 	private float aspect = 16/9f;
 	private float fieldOfView = 90f;
 	private float zNear = 0.1f;
-	private float zFar = 100f;
+	private float zFar = 200f;
 	
 	private float horizAngle = 0f;
 	private float vertiAngle = 0f;
@@ -124,6 +124,14 @@ public class CoffeeCamera {
 	public FloatBuffer matrix(){
 		Matrix4f matrix = new Matrix4f();
 		Matrix4f.mul(getProjection(), getView(), matrix);
+		FloatBuffer matBuf = BufferUtils.createFloatBuffer(16);
+		matrix.store(matBuf);
+		matBuf.flip();
+		return matBuf;
+	}
+	public FloatBuffer matrixOrtho(){
+		Matrix4f matrix = new Matrix4f();
+		Matrix4f.mul(getProjection(), new Matrix4f(), matrix);
 		FloatBuffer matBuf = BufferUtils.createFloatBuffer(16);
 		matrix.store(matBuf);
 		matBuf.flip();

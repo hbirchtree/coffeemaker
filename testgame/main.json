@@ -15,11 +15,12 @@
 			"fshader": "shaders/fsh.txt",
 			"position": [0.0,0,0.0],
 			"rotation": [0,0,0],
-			"scale": [1,1,1],
+			"scale": [2,2,2],
 			"physics.shape": 4,
 			"physics.mass": 0,
 			"physics.scale": [100,1,100],
 			"physics.rotation": [0,1,0],
+			"physics.linearity": [0,0,0],
 			"physics.friction": 0.6,
 			"physics.restitution": 0
 		},
@@ -39,19 +40,33 @@
 			"physics.restitution": 0.50
 		},
 		{
+			"object-id": "quad.test",
+			"model": "models/quad.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0,15,0],
+			"rotation": [0,0,0],
+			"scale": [2,2,2],
+			"physics.shape": 1,
+			"physics.mass": 1,
+			"physics.scale": [2,2,2],
+			"physics.rotation": [0,0,0]
+		},
+		{
 			"object-id": "player",
 			"model": "models/test_uv2.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0,20,0],
 			"rotation": [0.0,0,0],
-			"scale": [1,1,1],
+			"scale": [1,2,1],
 			"physics.shape": 5,
 			"physics.mass": 1,
-			"physics.scale": [1,5,2],
+			"physics.scale": [1,2,0],
 			"physics.rotation": [0,0,0],
+			"physics.linearity": [0,1,0],
 			"physics.friction": 0.5,
-			"physics.restitution": 0.50
+			"physics.restitution": 0.1
 		},
 		{
 			"object-id": "skybox",
@@ -60,13 +75,13 @@
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0.0,5,5],
 			"rotation": [0.0,0,0],
-			"scale": [1,1,1]
+			"scale": [2,2,2]
 		}
 		],
 		"lights": [
 		{
 			"object-id": "light.sun",
-			"position": [0,10,0],
+			"position": [0,20,0],
 			"color": "#ffccff",
 			"attenuation": 0.005,
 			"ambientcoeff": 0.007

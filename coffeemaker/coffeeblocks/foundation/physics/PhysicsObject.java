@@ -86,7 +86,7 @@ public class PhysicsObject {
 	}
 	
 
-	private Vector3f physicalLinearFactor = new Vector3f();
+	private Vector3f physicalLinearFactor = new Vector3f(1,1,1);
 	public Vector3f getPhysicalLinearFactor() {
 		return physicalLinearFactor;
 	}

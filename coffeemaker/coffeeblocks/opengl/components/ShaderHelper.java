@@ -10,7 +10,7 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.foundation.models.ModelContainer;
 
 public class ShaderHelper {
-	public static ShaderBuilder compileShaders(ModelContainer object,int textureUnit,boolean textureLoaded){
+	public static ShaderBuilder setupShader(ModelContainer object){
 		ShaderBuilder shader = new ShaderBuilder();
 		try{
 			shader.buildShader(object.getVertShader(), object.getFragShader());
@@ -44,15 +44,18 @@ public class ShaderHelper {
 //			System.err.println(e.getMessage());
 		}
 		
-		object.glTextureUnit = textureUnit;
-		
-		if(!textureLoaded){
-			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
-			object.textureHandle = texture;
-		}
 		
 		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"));
 		object.vaoHandle = vao;
+		return shader;
+	}
+	public static ShaderBuilder compileShaders(ModelContainer object,int textureUnit){
+		ShaderBuilder shader = setupShader(object);
+		
+		object.glTextureUnit = textureUnit;
+		
+		int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
+		object.textureHandle = texture;
 
 		GL20.glUseProgram(0);
 		
@@ -65,8 +68,8 @@ public class ShaderHelper {
 		FloatBuffer result = BufferUtils.createFloatBuffer(16);
 		
 		Matrix4f modelMatrix = new Matrix4f();
-		Matrix4f.scale(object.scale, modelMatrix, modelMatrix);
 		Matrix4f.translate(object.getPosition(), modelMatrix, modelMatrix);
+		Matrix4f.scale(object.scale, modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);

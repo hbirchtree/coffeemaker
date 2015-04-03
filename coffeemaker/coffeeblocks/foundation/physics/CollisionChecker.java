@@ -100,8 +100,6 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 //		constInfo.angularDamping = object.getGameModel().getFriction();
 		constInfo.friction = object.getGameModel().getFriction();
 		
-		System.out.println(constInfo.angularDamping);
-		
 		RigidBody body = new RigidBody(constInfo);
 		body.setInvInertiaDiagLocal(VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalLinearFactor()));
 		body.updateInertiaTensor();
@@ -125,7 +123,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			manager.getObject(id).getGameModel().setPosition(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
 			Quat4f rotation = new Quat4f();
 			body.getWorldTransform(new Transform()).getRotation(rotation);
-			manager.getObject(id).getGameModel().setRotation(VectorTools.vmVec3ftoLwjgl(new Vector3f(rotation.x,rotation.y,rotation.z)));
+			manager.getObject(id).getGameModel().setRotation(VectorTools.vmVec3ftoLwjgl(new Vector3f((float)Math.toDegrees(rotation.x),(float)Math.toDegrees(rotation.y),(float)Math.toDegrees(rotation.z))));
 			for(CollisionListener listener : listeners)
 				listener.updateObject(id);
 		}
@@ -150,7 +148,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	@Override
 	public void newGameObjectAdded(GameObject object){
 		try{
-		createCollisionObject(object);
+			createCollisionObject(object);
 		}catch(IllegalArgumentException e){
 			System.err.println(e.getMessage());
 		}
