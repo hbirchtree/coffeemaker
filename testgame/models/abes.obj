@@ -1,6 +1,6 @@
 # Blender v2.69 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib test_uv.mtl
+mtllib abes.mtl
 o Plane
 v 2.261871 1.773584 -0.432578
 v 1.828552 2.297898 -0.657081

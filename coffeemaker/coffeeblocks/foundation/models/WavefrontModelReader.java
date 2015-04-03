@@ -17,6 +17,13 @@ public class WavefrontModelReader implements ModelReader{
 	private List<List<Float>> texCoords = new ArrayList<>();
 	private List<List<Float>> normals = new ArrayList<>();
 	
+	public List<List<Float>> getVertices(){
+		return vertices;
+	}
+	public List<List<Integer>> getIndices(){
+		return faces;
+	}
+	
 	private ModelContainer object = null;
 
 	@Override
@@ -47,7 +54,7 @@ public class WavefrontModelReader implements ModelReader{
 		}
 		for(String mtlfile : mtls)
 			for(String mtl : usedmtl)
-				parseMtlFile(filename.substring(0,filename.lastIndexOf('/'))+"/"+mtlfile,mtl);
+				parseMtlFile(FileImporter.getBasename(filename)+"/"+mtlfile,mtl);
 
 		List<Float> emptyTC0 = new ArrayList<>();
 		emptyTC0.add(0.0f);

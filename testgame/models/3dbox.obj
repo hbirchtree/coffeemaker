@@ -1,6 +1,6 @@
 # Blender v2.69 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib test_uv2.mtl
+mtllib 3dbox.mtl
 o Cube
 v 1.000000 -1.000000 -1.000000
 v 1.000000 -1.000000 1.000000

@@ -4,40 +4,24 @@
 		"clearcolor": [0,0,0,0],
 		"camera": {
 			"position": [3,10,5],
-			"look-at": [0,6,5],
 			"fov": 85
 		},
 		"objects": [
 		{
 			"object-id": "terrain",
-			"model": "models/test4.obj",
+			"model": "models/terrain.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0.0,0,0.0],
 			"rotation": [0,0,0],
 			"scale": [2,2,2],
-			"physics.shape": 4,
+			"physics.shape": 3,
+			"physics.collision": "models/terrain_collide.obj",
 			"physics.mass": 0,
-			"physics.scale": [100,1,100],
-			"physics.rotation": [0,1,0],
-			"physics.linearity": [0,0,0],
+			"physics.scale": [2,2,2],
 			"physics.friction": 0.6,
-			"physics.restitution": 0
-		},
-		{
-			"object-id": "abes",
-			"model": "models/test_uv.obj",
-			"vshader": "shaders/vsh_billboard.txt",
-			"fshader": "shaders/fsh_nolight.txt",
-			"position": [5,15,5],
-			"rotation": [0,0,0],
-			"scale": [0.5,0.5,0.5],
-			"physics.shape": 1,
-			"physics.mass": 1,
-			"physics.scale": [1,1,1],
-			"physics.rotation": [0,0,0],
-			"physics.friction": 0.2,
-			"physics.restitution": 0.50
+			"physics.restitution": 0.3,
+			"physics.rotation": [0,0,0]
 		},
 		{
 			"object-id": "quad.test",
@@ -54,7 +38,7 @@
 		},
 		{
 			"object-id": "player",
-			"model": "models/test_uv2.obj",
+			"model": "models/3dbox.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0,20,0],

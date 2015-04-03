@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileImporter {
+	public static String getBasename(String filename){
+		return filename.substring(0,filename.lastIndexOf('/'));
+	}
 	public static List<String> readFile(String filename){
 		List<String> result = new ArrayList<>();
 		BufferedReader reader;
@@ -44,7 +47,7 @@ public class FileImporter {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+			return null; //For å fjerne feil om "ikke initialisert"
 		}
 		try {
 			while(reader.ready())

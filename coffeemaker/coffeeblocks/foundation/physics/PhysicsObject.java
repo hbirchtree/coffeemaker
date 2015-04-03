@@ -32,6 +32,14 @@ public class PhysicsObject {
 		this.physicsType = type;
 	}
 	
+	private String collisionMeshFile = null;
+	public void setCollisionMeshFile(String collisionMeshFile){
+		this.collisionMeshFile = collisionMeshFile;
+	}
+	public String getCollisionMeshFile(){
+		return collisionMeshFile;
+	}
+	
 	private float physicalMass = 1.0f;
 	public synchronized void setPhysicalMass(float physicalMass){
 		if(physicalMass<0)

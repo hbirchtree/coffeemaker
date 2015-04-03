@@ -212,14 +212,6 @@ public class CoffeeRenderer implements Runnable {
 		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-//		GL11.glFogi(GL_FOG_MODE, GL_LINEAR);
-//		GL11.glFogf(GL_FOG_DENSITY, 0.35f);
-//		GL11.glHint(GL_FOG_HINT, GL_DONT_CARE);
-//		GL11.glFogf(GL_FOG_START, 1.0f);
-//		GL11.glFogf(GL_FOG_END, 5.0f);
-//		glEnable(GL_FOG);
-		
-		
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		
@@ -251,8 +243,8 @@ public class CoffeeRenderer implements Runnable {
 				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 			
-			loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende
-			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere
+			loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
+			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
 			
 			framebuffer.storeFramebuffer(rendering_resolution);
 			loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte

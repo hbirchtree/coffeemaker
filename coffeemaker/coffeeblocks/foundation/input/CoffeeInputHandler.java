@@ -35,6 +35,8 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private float walkingForce = 5f;
 	@Override
 	public void coffeeReceiveKeyPress(int key) {
 		// TODO Auto-generated method stub
@@ -48,19 +50,23 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 			for(GameObject object : manager.getObjectList())
 				object.getGameModel().rotationalVelocity.y = -0.4f;
 		if(key==GLFW_KEY_W){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(3f);
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(walkingForce);
+			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
 			manager.requestObjectUpdate("player");
 		}
 		if(key==GLFW_KEY_A){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(-3f);
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(-walkingForce);
+			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
 			manager.requestObjectUpdate("player");
 		}
 		if(key==GLFW_KEY_S){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(-3f);
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(-walkingForce);
+			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
 			manager.requestObjectUpdate("player");
 		}
 		if(key==GLFW_KEY_D){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(3f);
+			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(walkingForce);
+			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
 			manager.requestObjectUpdate("player");
 		}
 		if(key==GLFW_KEY_SPACE){

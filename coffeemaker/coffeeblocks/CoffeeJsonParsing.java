@@ -9,6 +9,7 @@ import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
+import coffeeblocks.general.FileImporter;
 import coffeeblocks.opengl.CoffeeRenderer;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
@@ -96,6 +97,8 @@ public class CoffeeJsonParsing {
 				gobj.getGameModel().setFriction(Float.valueOf(obj.toString()));
 			}else if(key.equals("physics.shape")&&(obj instanceof Integer)){
 				gobj.getGameModel().setPhysicsType(PhysicsObject.PhysicsType.values()[Integer.valueOf(obj.toString())]);
+			}else if(key.equals("physics.collision")&&(obj instanceof String)){
+				gobj.getGameModel().setCollisionMeshFile(filepath+"/"+(String)obj);
 			}else if(key.equals("textures")&&obj instanceof ArrayList){
 				List<Object> textures = ((ArrayList)obj);
 				for(Object text : textures)
@@ -118,7 +121,7 @@ public class CoffeeJsonParsing {
 				cam.setCameraPos(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("look-at")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				cam.lookAt(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+//				cam.lookAt(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("fov")&&(obj instanceof Integer||obj instanceof Double)){
 				cam.setFieldOfView(Float.valueOf(obj.toString()));
 			}

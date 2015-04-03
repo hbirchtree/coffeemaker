@@ -1,6 +1,6 @@
 # Blender v2.69 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib test4.mtl
+mtllib terrain.mtl
 o Plane.001
 v -2.653659 8.025208 3.274521
 v -2.275536 7.275743 3.275408

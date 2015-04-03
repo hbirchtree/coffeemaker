@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
@@ -33,6 +32,7 @@ import com.bulletphysics.linearmath.Transform;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeGameObjectManagerListener;
 import coffeeblocks.foundation.CoffeeRendererListener;
+import coffeeblocks.general.FileImporter;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 
@@ -71,6 +71,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		CollisionShape shape = null;
 		switch(object.getGameModel().getPhysicsType()){
 		case Complex:
+			shape = TriangleMeshHelper.createMesh(object.getGameModel().getCollisionMeshFile(),VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalScale()));
 			break;
 		case Box:
 			shape = new BoxShape(VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalScale()));
@@ -117,7 +118,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	
 	@Override
 	public void onGlfwFrameTick(float tickTime){
-		dynamicsWorld.stepSimulation(tickTime);
+		dynamicsWorld.stepSimulation(tickTime*1000f);
 		for(String id : objects.keySet()){
 			RigidBody body = objects.get(id);
 			manager.getObject(id).getGameModel().setPosition(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
