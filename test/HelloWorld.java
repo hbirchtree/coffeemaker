@@ -17,6 +17,7 @@ public class HelloWorld {
     private GLFWErrorCallback errorCallback;
     private GLFWKeyCallback   keyCallback;
  
+    
     // The window handle
     private long window;
  
