@@ -67,8 +67,7 @@ public class BackgroundWorker implements Runnable,CoffeeRendererListener {
 		if(!loaded||ready)
 			return;
 		
-		for(GameObject object : manager.getObjectList())
-			renderer.addModel(object.getGameModel());
+		
 		
 		for(CoffeeSynchronizerWaiter waiter : waiters)
 			waiter.processFinished();

@@ -2,17 +2,15 @@ package coffeeblocks.opengl;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.foundation.models.ModelContainer;
-import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.CoffeeFramebufferManager;
 import coffeeblocks.opengl.components.LimeLight;
-import coffeeblocks.opengl.components.ShaderBuilder;
 import coffeeblocks.opengl.components.ShaderHelper;
 
 import java.nio.ByteBuffer;
@@ -36,7 +34,7 @@ public class CoffeeRenderer implements Runnable {
 	
 	private Vector4f clearColor = new Vector4f(0.8f,0.8f,1.0f,0f);
 	private CoffeeCamera camera = null;
-	private List<LimeLight> lights = new ArrayList<>();
+	private List<LimeLight> lights = null;
 	public CoffeeCamera getCamera() {
 		return camera;
 	}
@@ -46,11 +44,8 @@ public class CoffeeRenderer implements Runnable {
 	public List<LimeLight> getLights() {
 		return lights;
 	}
-	public void addLight(LimeLight light_sun) {
-		lights.add(light_sun);
-	}
-	public void clearLights(){
-		lights.clear();
+	public void setLights(List<LimeLight> lights) {
+		this.lights = lights;
 	}
 	
 	private int lastOccupiedTextureUnit = -1;
@@ -64,6 +59,21 @@ public class CoffeeRenderer implements Runnable {
 	private int rendering_swaps = 1;
 	public void setSwapping(int swapping){
 		this.rendering_swaps = swapping;
+	}
+	
+	private CoffeeGameObjectManager scene = null;
+	public void setScene(CoffeeGameObjectManager manager){
+		if(manager==null)
+			throw new RuntimeException("You cannot set an empty scene manager!");
+		if(scene!=null)
+			cleanupAll();
+		this.scene = manager;
+		setClearColor(scene.getClearColor());
+		setCamera(scene.getCamera());
+		setLights(scene.getLights());
+	}
+	public void setDrawingEnabled(boolean dodraw){
+		draw = dodraw;
 	}
 	
 	private Vector2d rendering_resolution = new Vector2d(1024,512);
@@ -242,12 +252,13 @@ public class CoffeeRenderer implements Runnable {
 			for(CoffeeRendererListener listener : listeners)
 				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
-			
+
 			loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
 			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
-			
+
 			framebuffer.storeFramebuffer(rendering_resolution);
-			loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
+			if(draw) //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
+				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
 			framebuffer.renderFramebuffer(windowres, lights);
 			
 			glfwSwapBuffers(window); // swap the color buffers
@@ -256,19 +267,25 @@ public class CoffeeRenderer implements Runnable {
 			glfwPollEvents(); //Oppdater handlinger gjort med vinduet osv.
 			tick = glfwGetTime()-tick;
 		}
-		for(ModelContainer object : displayLists){
-			if(object.textureHandle!=0)
-				GL11.glDeleteTextures(object.textureHandle);
-			if(object.vaoHandle!=0)
-				GL30.glDeleteVertexArrays(object.vaoHandle);
-		}
-		tick=glfwGetTime()-tick;
+		cleanupAll();
+	}
+	
+	public void cleanupAll(){
+		for(ModelContainer object : scene.getRenderables())
+			cleanupObject(object);
+	}
+	
+	private void cleanupObject(ModelContainer object){
+		if(object.textureHandle!=0)
+			GL11.glDeleteTextures(object.textureHandle);
+		if(object.vaoHandle!=0)
+			GL30.glDeleteVertexArrays(object.vaoHandle);
+		if(object.getShader().getProgramId()!=0)
+			GL20.glDeleteProgram(object.getShader().getProgramId());
 	}
 	
 	private void loopRenderObjects(){
-		for(ModelContainer object : displayLists){
-			if(!draw)
-				continue;
+		for(ModelContainer object : scene.getRenderables()){
 			if(!object.isObjectBaked()){
 				int textureUnit = lastOccupiedTextureUnit+1+GL13.GL_TEXTURE0;
 				lastOccupiedTextureUnit++;
@@ -308,17 +325,6 @@ public class CoffeeRenderer implements Runnable {
 				glEnable(GL_DEPTH_TEST);
 		}
 	}
-
-	private List<ModelContainer> displayLists = new ArrayList<>();
-	
-	public synchronized void addModel(ModelContainer object){
-		if(displayLists.contains(object))
-			throw new IllegalArgumentException("Object is already in the displaylist!");
-		displayLists.add(object);
-	}
-	public synchronized void removeModel(ModelContainer object){
-		displayLists.remove(object);
-	}
 	private List<CoffeeRendererListener> listeners = new ArrayList<>();
 	private List<CoffeeGlfwInputListener> inputListeners = new ArrayList<>();	
 	public synchronized void addCoffeeListener(CoffeeRendererListener listener){
@@ -326,6 +332,10 @@ public class CoffeeRenderer implements Runnable {
 	}
 	public synchronized void addInputListener(CoffeeGlfwInputListener listener){
 		inputListeners.add(listener);
+	}
+	public void clearListeners(){
+		listeners.clear();
+		inputListeners.clear();
 	}
 	public Vector4f getClearColor() {
 		return clearColor;

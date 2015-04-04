@@ -47,6 +47,6 @@ public class TriangleMeshHelper {
 		indicesB.flip();
 		TriangleIndexVertexArray mesh = new TriangleIndexVertexArray(indices.size(),indicesB,INDEX_STRIDE,vertices.size(),verticesB,VERTEX_STRIDE);
 		
-		return new BvhTriangleMeshShape(mesh,true);
+		return new BvhTriangleMeshShape(mesh,true,true);
 	}
 }

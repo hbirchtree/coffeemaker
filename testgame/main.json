@@ -1,10 +1,68 @@
 {
 	"logic": "scripts/testgame.lua",
-	"scene":{
+	"scene:main":{
+		"key-capture": ["KEY_W","KEY_A","KEY_S","KEY_D"],
 		"clearcolor": [0,0,0,0],
 		"camera": {
-			"position": [3,10,5],
 			"fov": 85
+		},
+		"objects": [
+		{
+			"object-id": "terrain",
+			"model": "models/terrain.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 3,
+			"physics.collision": "models/terrain_collide.obj",
+			"physics.mass": 0,
+			"physics.scale": [1,1,1],
+			"physics.friction": 0.6,
+			"physics.restitution": 0.0,
+			"physics.rotation": [0,1,0]
+		},
+		{
+			"object-id": "player",
+			"model": "models/3dbox.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0,20,0],
+			"rotation": [0.0,0,0],
+			"scale": [1,2,1],
+			"physics.shape": 5,
+			"physics.mass": 1,
+			"physics.scale": [1,2,0],
+			"physics.rotation": [0,0,0],
+			"physics.linearity": [0,1,0],
+			"physics.friction": 0.5,
+			"physics.restitution": 0.1
+		},
+		{
+			"object-id": "skybox",
+			"model": "models/skybox.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0.0,5,5],
+			"rotation": [0.0,0,0],
+			"scale": [2,2,2]
+		}
+		],
+		"lights": [
+		{
+			"object-id": "light.sun",
+			"position": [0,20,0],
+			"color": "#ffccff",
+			"attenuation": 0.005,
+			"ambientcoeff": 0.007
+		}
+		]
+	},
+	"scene:second":{
+		"clearcolor": [1,1,1,0],
+		"camera": {
+			"fov": 60
 		},
 		"objects": [
 		{

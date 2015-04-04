@@ -8,7 +8,6 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.general.VectorTools;
-import coffeeblocks.metaobjects.GameObject;
 
 public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 
@@ -40,15 +39,6 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 	@Override
 	public void coffeeReceiveKeyPress(int key) {
 		// TODO Auto-generated method stub
-		if(key==GLFW_KEY_UP)
-			for(GameObject object : manager.getObjectList())
-				object.getGameModel().rotationalVelocity.y = 0.4f;
-		if(key==GLFW_KEY_KP_0)
-			for(GameObject object : manager.getObjectList())
-				object.getGameModel().rotationalVelocity.y = 0f;
-		if(key==GLFW_KEY_DOWN)
-			for(GameObject object : manager.getObjectList())
-				object.getGameModel().rotationalVelocity.y = -0.4f;
 		if(key==GLFW_KEY_W){
 			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(walkingForce);
 			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;

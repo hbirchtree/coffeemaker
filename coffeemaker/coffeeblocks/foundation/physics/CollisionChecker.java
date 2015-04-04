@@ -32,7 +32,6 @@ import com.bulletphysics.linearmath.Transform;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeGameObjectManagerListener;
 import coffeeblocks.foundation.CoffeeRendererListener;
-import coffeeblocks.general.FileImporter;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 

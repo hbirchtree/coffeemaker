@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
+import coffeeblocks.foundation.CoffeeSceneManager;
+import coffeeblocks.foundation.input.CoffeeInputHandler;
 import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
@@ -14,38 +16,47 @@ import coffeeblocks.opengl.CoffeeRenderer;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 //Veldig stygg kode. Kan sikkert forbedres på noe vis, men akkurat nå behøves det bare noe som fungerer.
 
 public class CoffeeJsonParsing {
-	public static void parseSceneStructure(String filepath,Map<String,Object> source, CoffeeGameObjectManager manager,CoffeeRenderer renderer){
+	public static void parseSceneStructure(String filepath,Map<String,Object> source, CoffeeSceneManager sceneManager){
 		for(String key : source.keySet()){
 			Object item = source.get(key);
-			if(key.equals("scene")&&item instanceof HashMap){
+			if(key.startsWith("scene:")&&item instanceof HashMap){
 				Map<String,Object> map = ((HashMap<String,Object>)item);
-				for(String skey : map.keySet()){
-					Object sitem = map.get(skey);
-					if(skey.equals("camera")){
-						CoffeeCamera cam = parseCameraObject(sitem);
-						manager.addEntity("camera",cam);
-						renderer.setCamera(cam);
-					}else if (skey.equals("clearcolor")&&sitem instanceof ArrayList){
-						List<Object> coloring = ((ArrayList)sitem);
-						renderer.setClearColor(new Vector4f(Float.valueOf(coloring.get(0).toString()),Float.valueOf(coloring.get(1).toString()),Float.valueOf(coloring.get(2).toString()),Float.valueOf(coloring.get(3).toString())));
-					}else if(skey.equals("objects")&&sitem instanceof ArrayList){
-						for(Object model : ((ArrayList)sitem))
-							manager.addObject(parseGameObject(filepath,model));
-					}else if(skey.equals("lights")&&sitem instanceof ArrayList)
-						for(Object lightobj : ((ArrayList)sitem)){
-							LimeLight light = parseLightObject(lightobj);
-							manager.addEntity(light.getLightId(),light);
-							renderer.addLight(light);
-						}
-				}
+				if(key.split(":").length<2)
+					continue;
+				parseSceneObject(key.split(":")[1],map,sceneManager,filepath);
 			}else if(key.equals("logic")&&item instanceof String){
 				System.out.println(((String)item));
+			}
+		}
+	}
+	public static void parseSceneObject(String sceneId, Map<String,Object> scene,CoffeeSceneManager sceneManager,String filepath){
+		sceneManager.createNewScene(sceneId);
+		CoffeeGameObjectManager manager = sceneManager.getScene(sceneId);
+		for(String skey : scene.keySet()){
+			Object sitem = scene.get(skey);
+			if(skey.equals("camera")){
+				CoffeeCamera cam = parseCameraObject(sitem);
+				manager.addEntity("camera",cam);
+			}else if (skey.equals("clearcolor")&&sitem instanceof ArrayList){
+				List<Object> coloring = ((ArrayList)sitem);
+				manager.setClearColor(new Vector4f(Float.valueOf(coloring.get(0).toString()),Float.valueOf(coloring.get(1).toString()),Float.valueOf(coloring.get(2).toString()),Float.valueOf(coloring.get(3).toString())));
+			}else if(skey.equals("objects")&&sitem instanceof ArrayList){
+				for(Object model : ((ArrayList)sitem))
+					manager.addObject(parseGameObject(filepath,model));
+			}else if(skey.equals("lights")&&sitem instanceof ArrayList){
+				List<LimeLight> lights = new ArrayList<>();
+				for(Object lightobj : ((ArrayList)sitem)){
+					LimeLight light = parseLightObject(lightobj);
+					lights.add(light);
+				}
+				manager.addEntity("lights",lights);
 			}
 		}
 	}
