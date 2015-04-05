@@ -1,15 +1,11 @@
 package coffeeblocks;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.CoffeeSceneManager;
-import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.general.JsonParser;
 import coffeeblocks.opengl.CoffeeRenderer;
-import org.lwjgl.glfw.GLFW;
 
 public class CoffeeMaker implements CoffeeRendererListener{
 	

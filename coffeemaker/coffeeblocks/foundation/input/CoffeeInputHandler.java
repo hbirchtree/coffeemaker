@@ -8,6 +8,7 @@ import org.lwjgl.util.vector.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.general.VectorTools;
+import coffeeblocks.metaobjects.GameObject;
 
 public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 
@@ -35,42 +36,38 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 		
 	}
 	
-	private float walkingForce = 5f;
+	private float walkingForce = 3f;
 	@Override
 	public void coffeeReceiveKeyPress(int key) {
 		// TODO Auto-generated method stub
-		if(key==GLFW_KEY_W){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(walkingForce);
-			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
-			manager.requestObjectUpdate("player");
-		}
-		if(key==GLFW_KEY_A){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(-walkingForce);
-			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
-			manager.requestObjectUpdate("player");
-		}
-		if(key==GLFW_KEY_S){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraForwardVec(-walkingForce);
-			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
-			manager.requestObjectUpdate("player");
-		}
-		if(key==GLFW_KEY_D){
-			manager.getObject("player").getGameModel().positionalAcceleration = manager.getCamera().getCameraRightVec(walkingForce);
-			manager.getObject("player").getGameModel().positionalAcceleration.y = 0;
-			manager.requestObjectUpdate("player");
-		}
-		if(key==GLFW_KEY_SPACE){
-			manager.getObject("player").getGameModel().positionalAcceleration = VectorTools.vectorLimit(VectorTools.vectorMul(new Vector3f(0,1,0), 9.81f), 9.8f);
-			manager.requestObjectUpdate("player");
-		}
-		if(key==GLFW_KEY_KP_0){
-			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
-			manager.requestObjectUpdate("player");
-		}
-//		if(glfwGetKey(window,GLFW_KEY_F3)==1&&glfwGetTime()>=controlDelay){
-//			draw=!draw;
-//			controlDelay = glfwGetTime()+0.2;
+//		if(key==GLFW_KEY_W){
+//			positionalAcceleration = manager.getCamera().getCameraForwardVec(walkingForce);
+//			positionalAcceleration.y = 0;
 //		}
+//		if(key==GLFW_KEY_A){
+//			positionalAcceleration = manager.getCamera().getCameraRightVec(-walkingForce);
+//			positionalAcceleration.y = 0;
+//		}
+//		if(key==GLFW_KEY_S){
+//			positionalAcceleration = manager.getCamera().getCameraForwardVec(-walkingForce);
+//			positionalAcceleration.y = 0;
+//		}
+//		if(key==GLFW_KEY_D){
+//			positionalAcceleration = manager.getCamera().getCameraRightVec(walkingForce);
+//			positionalAcceleration.y = 0;
+//		}
+//		if(key==GLFW_KEY_SPACE){
+//			positionalAcceleration = VectorTools.vectorLimit(VectorTools.vectorMul(new Vector3f(0,1,0), 5.0f), 5.0f);
+//			manager.requestObjectUpdate("player");
+//		}
+//		if(key==GLFW_KEY_KP_0){
+//			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
+//			manager.requestObjectUpdate("player");
+//		}
+////		if(glfwGetKey(window,GLFW_KEY_F3)==1&&glfwGetTime()>=controlDelay){
+////			draw=!draw;
+////			controlDelay = glfwGetTime()+0.2;
+////		}
 	}
 	@Override
 	public void coffeeReceiveKeyRelease(int key) {

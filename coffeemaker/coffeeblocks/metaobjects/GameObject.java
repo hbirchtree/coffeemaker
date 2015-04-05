@@ -5,6 +5,17 @@ import coffeeblocks.foundation.models.ModelContainer;
 
 public class GameObject{
 	
+	public enum PropertyEnumeration {
+		NONE,
+		
+		PHYS_ACCEL,PHYS_POS,PHYS_ROT,PHYS_SCALE,
+		PHYS_IMPULSE,
+		
+		MODEL_POS,MODEL_ROT,MODEL_SCALE,
+		
+		RENDER_TEXTURE,RENDER_SHADER
+	}
+	
 	// TODO : legg til spill-relatert metadata
 	
 	public GameObject(){

@@ -12,16 +12,9 @@ public class PhysicsObject {
 		positionalVelocity.y+=positionalAcceleration.y;
 		positionalVelocity.z+=positionalAcceleration.z;
 		
-		rotationalVelocity.x+=rotationalAcceleration.x;
-		rotationalVelocity.y+=rotationalAcceleration.y;
-		rotationalVelocity.z+=rotationalAcceleration.z;
-		
 		position.x+=positionalVelocity.x*physicalMass;
 		position.y+=positionalVelocity.y*physicalMass;
 		position.z+=positionalVelocity.z*physicalMass;
-		rotation.x+=rotationalVelocity.x;
-		rotation.y+=rotationalVelocity.y;
-		rotation.z+=rotationalVelocity.z;
 	}
 	
 	private PhysicsType physicsType = PhysicsType.Undefined;
@@ -51,12 +44,6 @@ public class PhysicsObject {
 	}
 	public void setPosition(Vector3f position) {
 		this.position = position;
-	}
-	public Vector3f getRotation() {
-		return rotation;
-	}
-	public void setRotation(Vector3f rotation) {
-		this.rotation = rotation;
 	}
 	public float getPhysicalMass(){
 		return physicalMass;
@@ -103,10 +90,35 @@ public class PhysicsObject {
 	}
 
 	private Vector3f position = new Vector3f(0,0,0);
-	public Vector3f positionalVelocity = new Vector3f(0,0,0);
-	public Vector3f positionalAcceleration = new Vector3f(0,0,0);
-	public Vector3f scale = new Vector3f(1,1,1);
-	private Vector3f rotation = new Vector3f(0,0,0);
-	public Vector3f rotationalVelocity = new Vector3f(0,0,0);
-	public Vector3f rotationalAcceleration = new Vector3f(0,0,0);
+	private Vector3f positionalVelocity = new Vector3f(0,0,0);
+	private Vector3f positionalAcceleration = new Vector3f(0,0,0);
+	public Vector3f getPositionalVelocity() {
+		return positionalVelocity;
+	}
+	public void setPositionalVelocity(Vector3f positionalVelocity) {
+		this.positionalVelocity = positionalVelocity;
+	}
+	public Vector3f getPositionalAcceleration() {
+		return positionalAcceleration;
+	}
+	public void setPositionalAcceleration(Vector3f positionalAcceleration) {
+		this.positionalAcceleration = positionalAcceleration;
+	}
+	public Vector3f getImpulse() {
+		return impulse;
+	}
+	public void setImpulse(Vector3f impulse) {
+		this.impulse = impulse;
+	}
+
+	private Vector3f impulse = new Vector3f();
+	private Vector3f physicalInertia = new Vector3f();
+	public void setPhysicalInertia(Vector3f inertia) {
+		// TODO Auto-generated method stub
+		if(inertia!=null)
+			this.physicalInertia = inertia;
+	}
+	public Vector3f getPhysicalInertia(){
+		return physicalInertia;
+	}
 }

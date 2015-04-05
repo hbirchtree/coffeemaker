@@ -87,7 +87,7 @@ public class CoffeeJsonParsing {
 				gobj.setObjectId(((String)obj));
 			}else if(key.equals("scale")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().scale = new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString()));
+				gobj.getGameModel().setScale(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("physics.scale")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
 				gobj.getGameModel().setPhysicalScale(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));

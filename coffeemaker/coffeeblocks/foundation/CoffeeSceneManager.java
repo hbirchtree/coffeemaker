@@ -52,9 +52,9 @@ public class CoffeeSceneManager implements CoffeeGlfwInputListener,CoffeeRendere
 		renderer.addInputListener(this);
 		renderer.addCoffeeListener(scene.getPhysicsSystem());
 		renderer.addInputListener(scene.getInputHandler());
-		renderer.setDrawingEnabled(false); //Slår av tegning av objekter
 		renderer.setScene(scene);
-		renderer.setDrawingEnabled(true);
+		sceneToBeApplied = false;
+		sceneApply = "";
 	}
 	
 	public Collection<String> getScenes(){

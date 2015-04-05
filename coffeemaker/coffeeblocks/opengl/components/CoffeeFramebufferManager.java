@@ -56,7 +56,7 @@ public class CoffeeFramebufferManager {
 		ShaderHelper.setupShader(renderMesh);
 		renderMesh.textureHandle = getTexture();
 		renderMesh.setPosition(new Vector3f(0,0,-1.07f));
-		renderMesh.scale = new Vector3f(aspect,1,1);
+		renderMesh.setScale(new Vector3f(aspect,1,1));
 		renderMesh.setRotation(new Vector3f(0,90,0));
 
 		framebuffer = GL30.glGenFramebuffers();

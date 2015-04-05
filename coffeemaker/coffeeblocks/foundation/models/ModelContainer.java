@@ -12,6 +12,18 @@ import coffeeblocks.opengl.components.ShaderBuilder;
 
 public class ModelContainer extends PhysicsObject {
 	private boolean objectBaked = false;
+
+	public synchronized void tick(){
+		super.tick();
+		rotationalVelocity.x+=rotationalAcceleration.x;
+		rotationalVelocity.y+=rotationalAcceleration.y;
+		rotationalVelocity.z+=rotationalAcceleration.z;
+		
+		rotation.x+=rotationalVelocity.x;
+		rotation.y+=rotationalVelocity.y;
+		rotation.z+=rotationalVelocity.z;
+	}
+	
 	public boolean isObjectBaked() {
 		return objectBaked;
 	}
@@ -95,13 +107,32 @@ public class ModelContainer extends PhysicsObject {
 		result.flip();
 		return result;
 	}
-	private Vector3f physicalInertia = new Vector3f();
-	public void setPhysicalInertia(Vector3f inertia) {
-		// TODO Auto-generated method stub
-		if(inertia!=null)
-			this.physicalInertia = inertia;
+	public Vector3f getScale() {
+		return scale;
 	}
-	public Vector3f getPhysicalInertia(){
-		return physicalInertia;
+	private Vector3f scale = new Vector3f(1,1,1);
+	public void setScale(Vector3f scale) {
+		this.scale = scale;
+	}
+	private Vector3f rotation = new Vector3f(0,0,0);
+	public Vector3f getRotation() {
+		return rotation;
+	}
+	public void setRotation(Vector3f rotation) {
+		this.rotation = rotation;
+	}
+	private Vector3f rotationalVelocity = new Vector3f(0,0,0);
+	public Vector3f getRotationalVelocity() {
+		return rotationalVelocity;
+	}
+	public void setRotationalVelocity(Vector3f rotationalVelocity) {
+		this.rotationalVelocity = rotationalVelocity;
+	}
+	private Vector3f rotationalAcceleration = new Vector3f(0,0,0);
+	public Vector3f getRotationalAcceleration() {
+		return rotationalAcceleration;
+	}
+	public void setRotationalAcceleration(Vector3f rotationalAcceleration) {
+		this.rotationalAcceleration = rotationalAcceleration;
 	}
 }

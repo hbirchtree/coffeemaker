@@ -247,9 +247,9 @@ public class CoffeeRenderer implements Runnable {
 		while ( glfwWindowShouldClose(window) == GL_FALSE ){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			fpsCount(); //Skriver ut FPS og tikke-tid
-			for(CoffeeRendererListener listener : listeners)
+			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
 				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
-			for(CoffeeRendererListener listener : listeners)
+			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
 				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 

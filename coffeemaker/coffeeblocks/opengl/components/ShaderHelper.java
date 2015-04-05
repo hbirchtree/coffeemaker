@@ -69,7 +69,7 @@ public class ShaderHelper {
 		
 		Matrix4f modelMatrix = new Matrix4f();
 		Matrix4f.translate(object.getPosition(), modelMatrix, modelMatrix);
-		Matrix4f.scale(object.scale, modelMatrix, modelMatrix);
+		Matrix4f.scale(object.getScale(), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);
@@ -83,7 +83,7 @@ public class ShaderHelper {
 		FloatBuffer result = BufferUtils.createFloatBuffer(16);
 		
 		Matrix4f modelMatrix = new Matrix4f();
-		Matrix4f.scale(object.scale, modelMatrix, modelMatrix);
+		Matrix4f.scale(object.getScale(), modelMatrix, modelMatrix);
 		if(!cylindrical)
 			Matrix4f.rotate((float)Math.toRadians(vertiAngle), new Vector3f(1,0,0), modelMatrix, modelMatrix);
 		Matrix4f.rotate((float)Math.toRadians(horizAngle), new Vector3f(0,1,0), modelMatrix, modelMatrix);

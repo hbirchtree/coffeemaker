@@ -16,6 +16,7 @@ import coffeeblocks.foundation.physics.CollisionListener;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
+
 import org.lwjgl.glfw.GLFW;
 
 public class CoffeeGameObjectManager implements CollisionListener{
@@ -71,12 +72,6 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		for(CoffeeGameObjectManagerListener listener : listeners)
 			listener.newGameObjectAdded(object);
 	}
-	public void requestObjectUpdate(String objectId){
-		if(!objects.containsKey(objectId))
-			throw new IllegalArgumentException("Could not update non-existant object!");
-		for(CoffeeGameObjectManagerListener listener : listeners)
-			listener.existingGameObjectChanged(objectId);
-	}
 	@Override
 	public void updateObject(String objectId){
 		if(!objects.containsKey(objectId))
@@ -113,7 +108,6 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		listeners.add(listener);
 	}
 	
-	
 	public void billboard(String objectId,boolean spherical){
 		if(!objects.containsKey(objectId))
 			throw new IllegalArgumentException("Tried to billboard non-existant object!");
@@ -123,5 +117,10 @@ public class CoffeeGameObjectManager implements CollisionListener{
 			rotation.z = getCamera().getVertiAngle();
 		rotation.y = getCamera().getHorizAngle();
 		getObject(objectId).getGameModel().setRotation(rotation);
+	}
+	
+	@Override
+	public void getCollisionNotification(String body1, String body2){
+		System.out.println("Collision:"+body1+","+body2);
 	}
 }

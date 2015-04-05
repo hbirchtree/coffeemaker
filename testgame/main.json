@@ -19,25 +19,35 @@
 			"physics.collision": "models/terrain_collide.obj",
 			"physics.mass": 0,
 			"physics.scale": [1,1,1],
-			"physics.friction": 0.6,
+			"physics.friction": 0.9,
 			"physics.restitution": 0.0,
 			"physics.rotation": [0,1,0]
 		},
 		{
+			"object-id": "water",
+			"model": "models/water.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 0
+		},
+		{
 			"object-id": "player",
-			"model": "models/3dbox.obj",
+			"model": "models/playermesh.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0,20,0],
 			"rotation": [0.0,0,0],
-			"scale": [1,2,1],
+			"scale": [0.20,0.20,0.20],
 			"physics.shape": 5,
 			"physics.mass": 1,
-			"physics.scale": [1,2,0],
+			"physics.scale": [0.75,1.25,1],
 			"physics.rotation": [0,0,0],
 			"physics.linearity": [0,1,0],
 			"physics.friction": 0.5,
-			"physics.restitution": 0.1
+			"physics.restitution": 0.0
 		},
 		{
 			"object-id": "skybox",
