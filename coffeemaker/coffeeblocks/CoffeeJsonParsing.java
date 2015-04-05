@@ -31,8 +31,6 @@ public class CoffeeJsonParsing {
 				if(key.split(":").length<2)
 					continue;
 				parseSceneObject(key.split(":")[1],map,sceneManager,filepath);
-			}else if(key.equals("logic")&&item instanceof String){
-				System.out.println(((String)item));
 			}
 		}
 	}
