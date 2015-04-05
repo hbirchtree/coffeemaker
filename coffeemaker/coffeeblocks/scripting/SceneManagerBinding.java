@@ -15,7 +15,7 @@ public class SceneManagerBinding extends TwoArgFunction {
 	public LuaValue call(LuaValue modname,LuaValue env){
 		LuaTable lib = new LuaTable();
 		lib.set("clearcolor", new LuaSceneManager(source));
-		env.set("sceneman", lib);
+//		env.set("sceneman", lib);
 		env.get("package").get("loaded").set("sceneman", lib);
 		return lib;
 	}
@@ -29,6 +29,5 @@ public class SceneManagerBinding extends TwoArgFunction {
 			// TODO Auto-generated method stub
 			return LuaValue.valueOf(source.getScene("main").getClearColor().toString());
 		}
-		
 	}
 }

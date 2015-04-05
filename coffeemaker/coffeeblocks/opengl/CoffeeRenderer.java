@@ -64,7 +64,7 @@ public class CoffeeRenderer implements Runnable {
 	private CoffeeGameObjectManager scene = null;
 	public void setScene(CoffeeGameObjectManager manager){
 		if(manager==null)
-			throw new RuntimeException("You cannot set an empty scene manager!");
+			throw new RuntimeException("You cannot set an empty scene!");
 		if(scene!=null)
 			cleanupAll();
 		this.scene = manager;
@@ -249,7 +249,7 @@ public class CoffeeRenderer implements Runnable {
 			fpsCount(); //Skriver ut FPS og tikke-tid
 			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
 				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
-			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
+			for(CoffeeRendererListener listener : listeners)
 				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 
