@@ -21,6 +21,7 @@ end
 --Testing boolean expressions
 
 local booltest = true
+local number = 1.0
 
 if (booltest)
 then
