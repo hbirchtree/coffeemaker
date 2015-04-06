@@ -40,30 +40,29 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 	@Override
 	public void coffeeReceiveKeyPress(int key) {
 		// TODO Auto-generated method stub
-//		if(key==GLFW_KEY_W){
-//			positionalAcceleration = manager.getCamera().getCameraForwardVec(walkingForce);
-//			positionalAcceleration.y = 0;
-//		}
-//		if(key==GLFW_KEY_A){
-//			positionalAcceleration = manager.getCamera().getCameraRightVec(-walkingForce);
-//			positionalAcceleration.y = 0;
-//		}
-//		if(key==GLFW_KEY_S){
-//			positionalAcceleration = manager.getCamera().getCameraForwardVec(-walkingForce);
-//			positionalAcceleration.y = 0;
-//		}
-//		if(key==GLFW_KEY_D){
-//			positionalAcceleration = manager.getCamera().getCameraRightVec(walkingForce);
-//			positionalAcceleration.y = 0;
-//		}
-//		if(key==GLFW_KEY_SPACE){
-//			positionalAcceleration = VectorTools.vectorLimit(VectorTools.vectorMul(new Vector3f(0,1,0), 5.0f), 5.0f);
-//			manager.requestObjectUpdate("player");
-//		}
-//		if(key==GLFW_KEY_KP_0){
-//			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
-//			manager.requestObjectUpdate("player");
-//		}
+		if(key==GLFW_KEY_W){
+			manager.getObject("player").getGameModel().setPositionalAcceleration(manager.getCamera().getCameraForwardVec(walkingForce));
+			manager.requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+		}
+		if(key==GLFW_KEY_A){
+			manager.getObject("player").getGameModel().setPositionalAcceleration(manager.getCamera().getCameraRightVec(-walkingForce));
+			manager.requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+		}
+		if(key==GLFW_KEY_S){
+			manager.getObject("player").getGameModel().setPositionalAcceleration(manager.getCamera().getCameraForwardVec(-walkingForce));
+			manager.requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+		}
+		if(key==GLFW_KEY_D){
+			manager.getObject("player").getGameModel().setPositionalAcceleration(manager.getCamera().getCameraRightVec(walkingForce));
+			manager.requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+		}
+		if(key==GLFW_KEY_SPACE){
+			manager.getObject("player").getGameModel().setPositionalAcceleration(VectorTools.vectorLimit(VectorTools.vectorMul(new Vector3f(0,1,0), 5.0f), 5.0f));
+			manager.requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+		}
+		if(key==GLFW_KEY_KP_0){
+			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
+		}
 ////		if(glfwGetKey(window,GLFW_KEY_F3)==1&&glfwGetTime()>=controlDelay){
 ////			draw=!draw;
 ////			controlDelay = glfwGetTime()+0.2;

@@ -142,7 +142,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	
 	@Override
 	public void onGlfwFrameTick(float tickTime){
-		dynamicsWorld.stepSimulation(tickTime);
+		dynamicsWorld.stepSimulation(tickTime*100f);
 		for(String id : objects.keySet()){
 			RigidBody body = objects.get(id);
 			manager.getObject(id).getGameModel().setPosition(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));

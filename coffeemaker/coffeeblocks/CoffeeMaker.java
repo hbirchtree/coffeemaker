@@ -26,7 +26,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 			return;
 		}
 		main.parseMainFile(args[0]);
-//		main.rendererSpawn();
+		main.rendererSpawn();
 	}
 	public void parseMainFile(String filename){
 		Map<String,Object> properties = JsonParser.parseFile(filename);

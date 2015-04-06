@@ -30,6 +30,7 @@ public class CoffeeCamera {
 	
 	private float horizAngle = 0f;
 	private float vertiAngle = 0f;
+	private float vertiAngleMin = 10f;
 	private float vertiAngleMax = 85f;
 	
 	public float getHorizAngle() {
@@ -159,8 +160,8 @@ public class CoffeeCamera {
 		
 		if(vertiAngle>vertiAngleMax)
 			vertiAngle = vertiAngleMax;
-		else if(vertiAngle<-vertiAngleMax)
-			vertiAngle = -vertiAngleMax;
+		else if(vertiAngle<vertiAngleMin)
+			vertiAngle = vertiAngleMin;
 	}
 	
 	public static FloatBuffer genProjection(float aspect,float fov,float znear,float zfar){

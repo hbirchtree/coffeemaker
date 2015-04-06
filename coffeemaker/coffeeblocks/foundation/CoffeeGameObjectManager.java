@@ -76,10 +76,16 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public void updateObject(String objectId){
 		if(!objects.containsKey(objectId))
 			throw new RuntimeException("Physics reported non-existant object!");
-		if(objectId.equals("player"))
+		if(objectId.equals("player")){
 			getCamera().setCameraPos(Vector3f.add(getObject("player").getGameModel().getPosition(),getCamera().getCameraForwardVec(-5f),null));
+			getLights().get(0).setPosition(getCamera().getCameraPos());
+		}
 	}
 	
+	public void requestObjectUpdate(String objectId, GameObject.PropertyEnumeration prop){
+		for(CoffeeGameObjectManagerListener listener : listeners)
+			listener.existingGameObjectChanged(objectId, prop);
+	}
 	
 	private Map<String,Object> entities = new HashMap<>(); //for å lagre referanser til lys, kamera og andre objekter som skal være tilgjengelige.
 	public synchronized void addEntity(String id,Object object){

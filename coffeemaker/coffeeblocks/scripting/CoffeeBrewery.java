@@ -26,7 +26,7 @@ public class CoffeeBrewery {
 		this.lhc = lhc;
 		
 		LuaValue chunk = globals.loadfile(logicFile);
-		chunk.load(new SceneManagerBinding(manager));
+//		chunk.load(new SceneManagerBinding(manager));
 		chunk.call(LuaValue.valueOf(logicFile));
 	}
 }

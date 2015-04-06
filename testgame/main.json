@@ -50,6 +50,38 @@
 			"physics.restitution": 0.0
 		},
 		{
+			"object-id": "death",
+			"model": "models/nothing.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0,-20,0],
+			"rotation": [0,0,0],
+			"scale": [10,10,10],
+			"physics.shape": 4,
+			"physics.mass": 0,
+			"physics.scale": [0.75,1.25,1],
+			"physics.rotation": [0,1,0],
+			"physics.linearity": [0,1,0],
+			"physics.friction": 0.5,
+			"physics.restitution": 0.0
+		},
+		{
+			"object-id": "death.imwatchingyou",
+			"model": "models/nothing-ness.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [5,-32.15,4.5],
+			"rotation": [0,0,0],
+			"scale": [4,4,4],
+			"physics.shape": 4,
+			"physics.mass": 0,
+			"physics.scale": [0.75,1.25,1],
+			"physics.rotation": [0,1,0],
+			"physics.linearity": [0,1,0],
+			"physics.friction": 0.5,
+			"physics.restitution": 0.0
+		},
+		{
 			"object-id": "skybox",
 			"model": "models/skybox.obj",
 			"vshader": "shaders/vsh.txt",
@@ -135,7 +167,7 @@
 			"object-id": "light.sun",
 			"position": [0,20,0],
 			"color": "#ffccff",
-			"attenuation": 0.005,
+			"attenuation": 0.001,
 			"ambientcoeff": 0.007
 		}
 		]
