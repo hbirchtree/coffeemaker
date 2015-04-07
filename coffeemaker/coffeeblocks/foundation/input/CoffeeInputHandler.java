@@ -63,10 +63,12 @@ public class CoffeeInputHandler implements CoffeeGlfwInputListener{
 		if(key==GLFW_KEY_KP_0){
 			manager.getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
 		}
-////		if(glfwGetKey(window,GLFW_KEY_F3)==1&&glfwGetTime()>=controlDelay){
-////			draw=!draw;
-////			controlDelay = glfwGetTime()+0.2;
-////		}
+		if(key==GLFW_KEY_KP_5){
+			manager.getObject("skybox").getGameModel().selectTexture = 0;
+		}
+		if(key==GLFW_KEY_KP_6){
+			manager.getObject("skybox").getGameModel().selectTexture = 1;
+		}
 	}
 	@Override
 	public void coffeeReceiveKeyRelease(int key) {

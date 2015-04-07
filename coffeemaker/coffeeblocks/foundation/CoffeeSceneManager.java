@@ -11,16 +11,11 @@ import org.lwjgl.glfw.GLFW;
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.opengl.CoffeeRenderer;
 
-public class CoffeeSceneManager implements CoffeeGlfwInputListener,CoffeeRendererListener{
+public class CoffeeSceneManager implements CoffeeRendererListener{
 	//CoffeeGameObjectManager inneholder en scene, fullstendig med objekter, kamera og lys.
 	//Denne klassen laster detaljene inn i CoffeeRenderer for å bytte scene og dermed objekter
 	private boolean sceneToBeApplied = false;
 	private String sceneApply = "";
-	
-	public CoffeeSceneManager(){
-		keys.add(GLFW.GLFW_KEY_KP_9);
-		keys.add(GLFW.GLFW_KEY_KP_8);
-	}
 	
 	private CoffeeRenderer renderer = null;
 	public void setRenderer(CoffeeRenderer renderer){
@@ -49,9 +44,7 @@ public class CoffeeSceneManager implements CoffeeGlfwInputListener,CoffeeRendere
 		CoffeeGameObjectManager scene = scenes.get(name);
 		renderer.clearListeners();
 		renderer.addCoffeeListener(this);
-		renderer.addInputListener(this);
 		renderer.addCoffeeListener(scene.getPhysicsSystem());
-		renderer.addInputListener(scene.getInputHandler());
 		renderer.setScene(scene);
 		sceneToBeApplied = false;
 		sceneApply = "";
@@ -59,24 +52,6 @@ public class CoffeeSceneManager implements CoffeeGlfwInputListener,CoffeeRendere
 	
 	public Collection<String> getScenes(){
 		return scenes.keySet();
-	}
-
-	List<Integer> keys = new ArrayList<>();
-	@Override
-	public List<Integer> getRegisteredKeys() {
-		// TODO Auto-generated method stub
-		return keys;
-	}
-	@Override
-	public void coffeeReceiveKeyPress(int key){
-		if(key==GLFW.GLFW_KEY_KP_9)
-			scheduleSceneApply("main");
-		if(key==GLFW.GLFW_KEY_KP_8)
-			scheduleSceneApply("second");
-	}
-	@Override
-	public boolean getKeyboardEvents(){
-		return true;
 	}
 	@Override
 	public void onGlfwFrameTick(){

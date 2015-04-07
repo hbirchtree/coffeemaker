@@ -1,7 +1,7 @@
 {
 	"logic": "scripts/testgame.lua",
 	"scene:main":{
-		"key-capture": ["KEY_W","KEY_A","KEY_S","KEY_D"],
+		"key-capture": ["KEY_W","KEY_A","KEY_S","KEY_D","KEY_KP_5","KEY_KP_6"],
 		"clearcolor": [0,0,0,0],
 		"camera": {
 			"fov": 85
@@ -26,6 +26,9 @@
 		{
 			"object-id": "water",
 			"model": "models/water.obj",
+			"textures": [
+			"textures/water.png","textures/water_2.png"
+			],
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0.0,0,0.0],
@@ -84,6 +87,9 @@
 		{
 			"object-id": "skybox",
 			"model": "models/skybox.obj",
+			"textures": [
+			"textures/skybox.png","textures/skybox_green.png"
+			],
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0.0,5,5],
@@ -102,7 +108,7 @@
 		]
 	},
 	"scene:second":{
-		"clearcolor": [1,1,1,0],
+		"clearcolor": [1,0,1,0],
 		"camera": {
 			"fov": 120
 		},

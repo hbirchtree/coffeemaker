@@ -24,20 +24,8 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		physicsSystem = new CollisionChecker(this);
 		this.addListener(physicsSystem);
 		physicsSystem.addCollisionListener(this);
-		inputHandler = new CoffeeInputHandler(this);
-		List<Integer> keys = new ArrayList<>();
-		keys.add(GLFW.GLFW_KEY_W);
-		keys.add(GLFW.GLFW_KEY_A);
-		keys.add(GLFW.GLFW_KEY_S);
-		keys.add(GLFW.GLFW_KEY_D);
-		keys.add(GLFW.GLFW_KEY_SPACE);
-		inputHandler.addRegisteredKeys(keys);
 	}
 	
-	private CoffeeInputHandler inputHandler; //Vi holder denne intern, scenen kan ekskludere brukerinteraksjon i visse tilfeller (intro o.l.)
-	public CoffeeInputHandler getInputHandler(){
-		return inputHandler;
-	}
 	private CollisionChecker physicsSystem;
 	public CollisionChecker getPhysicsSystem(){
 		return physicsSystem;
@@ -123,10 +111,5 @@ public class CoffeeGameObjectManager implements CollisionListener{
 			rotation.z = getCamera().getVertiAngle();
 		rotation.y = getCamera().getHorizAngle();
 		getObject(objectId).getGameModel().setRotation(rotation);
-	}
-	
-	@Override
-	public void getCollisionNotification(String body1, String body2){
-//		System.out.println("Collision:"+body1+","+body2);
 	}
 }

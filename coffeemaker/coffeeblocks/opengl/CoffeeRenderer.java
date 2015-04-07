@@ -56,6 +56,7 @@ public class CoffeeRenderer implements Runnable {
 	private boolean fpscounter = true;
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
+	private boolean mouseGrabbed = false;
 	private int rendering_swaps = 1;
 	public void setSwapping(int swapping){
 		this.rendering_swaps = swapping;
@@ -78,6 +79,13 @@ public class CoffeeRenderer implements Runnable {
 	
 	private Vector2d rendering_resolution = new Vector2d(1024,512);
 	private Vector2d windowres = new Vector2d(1280,720);
+	public Vector2d getWindowres() {
+		return windowres;
+	}
+	public void setWindowres(int w,int h) {
+		this.windowres = new Vector2d(w,h);
+	}
+
 	private float aspect = 1f;
 
 	public float getMouseSensitivity() {
@@ -147,9 +155,6 @@ public class CoffeeRenderer implements Runnable {
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Café", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
-		
-		glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
-		glfwSetCursorPos(window,0,0);
 
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
 		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
@@ -159,6 +164,7 @@ public class CoffeeRenderer implements Runnable {
 					glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
 			}
 		});
+		
 
 		// Get the resolution of the primary monitor
 		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -168,11 +174,14 @@ public class CoffeeRenderer implements Runnable {
 				(GLFWvidmode.width(vidmode) - WIDTH) / 2,
 				(GLFWvidmode.height(vidmode) - HEIGHT) / 2
 				);
+		
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
 		// Enable v-sync
 		glfwSwapInterval(this.rendering_swaps);
+		
+		toggleGrabMouse();
 
 		// Make the window visible
 		glfwShowWindow(window);
@@ -189,11 +198,19 @@ public class CoffeeRenderer implements Runnable {
 		glfwSetCursorPos(window,0,0);
 	}
 	
+	private double controlDelay = 0;
+	
 	public void loopHandleKeyboardInput(){
 		for(CoffeeGlfwInputListener listener : inputListeners)
 			for(int key : listener.getRegisteredKeys())
 				if(glfwGetKey(window,key)==1)
 					listener.coffeeReceiveKeyPress(key);
+		if(glfwGetTime()>=controlDelay){
+		if(glfwGetKey(window,GLFW_KEY_F9)==1){
+			toggleGrabMouse();
+		}
+		controlDelay=glfwGetTime()+0.5d;
+		}
 	}
 	
 	private void fpsCount(){
@@ -204,6 +221,17 @@ public class CoffeeRenderer implements Runnable {
 				framecount = 0;
 				fpsTimer = glfwGetTime()+1;
 			}
+		}
+	}
+	
+	private void toggleGrabMouse(){
+		if(!mouseGrabbed){
+			glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
+			glfwSetCursorPos(window,0,0);
+			mouseGrabbed=!mouseGrabbed;
+		}else{
+			glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_NORMAL);
+			mouseGrabbed=!mouseGrabbed;
 		}
 	}
 	
@@ -241,8 +269,8 @@ public class CoffeeRenderer implements Runnable {
 		}
 		framebuffer.setEnabled(false);
 		
-		while ( glfwWindowShouldClose(window) == GL_FALSE ){
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		while (glfwWindowShouldClose(window)==GL_FALSE){
+			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 			fpsCount(); //Skriver ut FPS og tikke-tid
 			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
 				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
@@ -273,8 +301,8 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	private void cleanupObject(ModelContainer object){
-		if(object.textureHandle!=0)
-			GL11.glDeleteTextures(object.textureHandle);
+		if(object.getTextureHandle()!=0)
+			GL11.glDeleteTextures(object.getTextureHandle());
 		if(object.vaoHandle!=0)
 			GL30.glDeleteVertexArrays(object.vaoHandle);
 		if(object.getShader().getProgramId()!=0)
@@ -296,7 +324,7 @@ public class CoffeeRenderer implements Runnable {
 			object.getShader().setUniform("camera", camera.matrix());
 
 			object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
-			for(LimeLight light : lights){
+			for(LimeLight light : lights){ //Selv om vi kun støtter ett lys for øyeblikket skriver vi koden som om vi støttet flere. Vi kan legge til flere lys i fremtiden om nødvendig.
 				object.getShader().setUniform("light.position", light.getPosition());
 				object.getShader().setUniform("light.intensities", light.getIntensities());
 				object.getShader().setUniform("light.attenuation", light.getAttenuation());
@@ -309,7 +337,7 @@ public class CoffeeRenderer implements Runnable {
 			object.getShader().setUniform("materialTransparency", object.getMaterial().getTransparency());
 			
 			GL13.glActiveTexture(object.glTextureUnit);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.textureHandle);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getTextureHandle());
 
 			GL30.glBindVertexArray(object.vaoHandle);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getVertexDataSize());
@@ -332,7 +360,6 @@ public class CoffeeRenderer implements Runnable {
 	}
 	public void clearListeners(){
 		listeners.clear();
-		inputListeners.clear();
 	}
 	public Vector4f getClearColor() {
 		return clearColor;

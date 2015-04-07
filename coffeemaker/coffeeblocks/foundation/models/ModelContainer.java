@@ -1,6 +1,7 @@
 package coffeeblocks.foundation.models;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
@@ -75,7 +76,21 @@ public class ModelContainer extends PhysicsObject {
 
 	public int vaoHandle = 0;
 	
-	public int textureHandle = 0;
+	public int selectTexture = 0;
+	private List<Integer> textureHandles = new ArrayList<>();
+	public int getTextureHandle(){
+		return textureHandles.get(selectTexture);
+	}
+	public void setTextureHandle(int textureHandle) {
+		if(textureHandles.size()>0)
+			textureHandles.clear();
+		textureHandles.add(textureHandle);
+	}
+	public void setTextureHandles(List<Integer> handles){
+		textureHandles.clear();
+		this.textureHandles.addAll(handles);
+	}
+
 	public int glTextureUnit = 0;
 	
 	private List<Float> faces = null;

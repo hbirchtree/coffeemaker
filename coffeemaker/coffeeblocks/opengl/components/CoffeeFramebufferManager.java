@@ -54,7 +54,7 @@ public class CoffeeFramebufferManager {
 		renderMesh.setShader(new ShaderBuilder());
 		renderMesh.setShaderFiles("testgame/shaders/vsh.txt", "testgame/shaders/fsh_nolight.txt");
 		ShaderHelper.setupShader(renderMesh);
-		renderMesh.textureHandle = getTexture();
+		renderMesh.setTextureHandle(getTexture());
 		renderMesh.setPosition(new Vector3f(0,0,-1.07f));
 		renderMesh.setScale(new Vector3f(aspect,1,1));
 		renderMesh.setRotation(new Vector3f(0,90,0));

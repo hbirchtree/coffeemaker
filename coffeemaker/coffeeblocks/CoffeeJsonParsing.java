@@ -112,7 +112,7 @@ public class CoffeeJsonParsing {
 				List<Object> textures = ((ArrayList)obj);
 				for(Object text : textures)
 					if(text instanceof String)
-						gobj.getGameModel().getMaterial().addTexture((String)text);
+						gobj.getGameModel().getMaterial().addTexture(filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)text);
 				gobj.getGameModel().getMaterial().setMultitextured(true);
 			}
 		}

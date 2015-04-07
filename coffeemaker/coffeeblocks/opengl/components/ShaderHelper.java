@@ -1,6 +1,8 @@
 package coffeeblocks.opengl.components;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
@@ -54,8 +56,16 @@ public class ShaderHelper {
 		
 		object.glTextureUnit = textureUnit;
 		
-		int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
-		object.textureHandle = texture;
+		if(object.getMaterial().isMultitextured()){
+			List<Integer> textures = new ArrayList<>();
+			for(String file : object.getMaterial().getMultitexture())
+				textures.add(TextureHelper.genTexture(file, object.glTextureUnit));
+			object.setTextureHandles(textures);
+			System.out.println(textures);
+		}else{
+			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
+			object.setTextureHandle(texture);
+		}
 
 		GL20.glUseProgram(0);
 		
