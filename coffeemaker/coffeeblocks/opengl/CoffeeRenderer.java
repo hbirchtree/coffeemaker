@@ -56,7 +56,7 @@ public class CoffeeRenderer implements Runnable {
 	private boolean fpscounter = true;
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
-	private int rendering_swaps = 0;
+	private int rendering_swaps = 1;
 	public void setSwapping(int swapping){
 		this.rendering_swaps = swapping;
 	}
