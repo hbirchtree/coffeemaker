@@ -2,8 +2,10 @@ package coffeeblocks;
 
 import java.util.Map;
 
+import coffeeblocks.foundation.CoffeeLogicLoop;
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.CoffeeSceneManager;
+import coffeeblocks.foundation.CoffeeShop;
 import coffeeblocks.general.JsonParser;
 import coffeeblocks.opengl.CoffeeRenderer;
 
@@ -41,9 +43,12 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		}
 	}
 	public void rendererSpawn(){
-		sceneManager.applyScene("main");
 		renderingThread = new Thread(renderer);
 		renderingThread.start();
+		
+		CoffeeLogicLoop logic = new CoffeeShop(sceneManager);
+		renderer.addCoffeeListener(logic);
+		logic.eventLoop();
 	}
 	@Override
 	public void onGlfwQuit() {

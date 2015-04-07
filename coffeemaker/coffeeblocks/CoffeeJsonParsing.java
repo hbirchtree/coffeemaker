@@ -7,16 +7,13 @@ import java.util.Map;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeSceneManager;
-import coffeeblocks.foundation.input.CoffeeInputHandler;
 import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
 import coffeeblocks.general.FileImporter;
-import coffeeblocks.opengl.CoffeeRenderer;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 

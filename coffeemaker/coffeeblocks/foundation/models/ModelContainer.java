@@ -90,6 +90,9 @@ public class ModelContainer extends PhysicsObject {
 		textureHandles.clear();
 		this.textureHandles.addAll(handles);
 	}
+	public List<Integer> getTextureHandles(){
+		return textureHandles;
+	}
 
 	public int glTextureUnit = 0;
 	

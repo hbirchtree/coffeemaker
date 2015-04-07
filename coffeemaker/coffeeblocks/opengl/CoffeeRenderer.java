@@ -206,13 +206,13 @@ public class CoffeeRenderer implements Runnable {
 				if(glfwGetKey(window,key)==1)
 					listener.coffeeReceiveKeyPress(key);
 		if(glfwGetTime()>=controlDelay){
-		if(glfwGetKey(window,GLFW_KEY_F9)==1){
-			toggleGrabMouse();
-		}
-		controlDelay=glfwGetTime()+0.5d;
+			if(glfwGetKey(window,GLFW_KEY_F9)==1){
+				toggleGrabMouse();
+				controlDelay=glfwGetTime()+0.5d;
+			}
 		}
 	}
-	
+
 	private void fpsCount(){
 		if(fpscounter){
 			framecount++;
@@ -276,13 +276,17 @@ public class CoffeeRenderer implements Runnable {
 				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
 			for(CoffeeRendererListener listener : listeners)
 				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
+			tick = glfwGetTime(); //Vi bruker den midlertidig
+			for(CoffeeRendererListener listener : listeners)
+				listener.onGlfwFrameTick(glfwGetTime()); //Vi vil ha oversikt over tiden
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 
-			loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
+			if(mouseGrabbed&&scene!=null)
+				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
 			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
 
 			framebuffer.storeFramebuffer(rendering_resolution);
-			if(draw) //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
+			if(draw&&scene!=null) //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
 			framebuffer.renderFramebuffer(windowres, lights);
 			
@@ -352,10 +356,10 @@ public class CoffeeRenderer implements Runnable {
 	}
 	private List<CoffeeRendererListener> listeners = new ArrayList<>();
 	private List<CoffeeGlfwInputListener> inputListeners = new ArrayList<>();	
-	public synchronized void addCoffeeListener(CoffeeRendererListener listener){
+	public void addCoffeeListener(CoffeeRendererListener listener){
 		listeners.add(listener);
 	}
-	public synchronized void addInputListener(CoffeeGlfwInputListener listener){
+	public void addInputListener(CoffeeGlfwInputListener listener){
 		inputListeners.add(listener);
 	}
 	public void clearListeners(){

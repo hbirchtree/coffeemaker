@@ -1,14 +1,8 @@
 package coffeeblocks.foundation;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.lwjgl.glfw.GLFW;
-
-import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.opengl.CoffeeRenderer;
 
 public class CoffeeSceneManager implements CoffeeRendererListener{
@@ -23,9 +17,14 @@ public class CoffeeSceneManager implements CoffeeRendererListener{
 			throw new IllegalArgumentException("Cannot use null renderer!");
 		this.renderer = renderer;
 	}
+	public CoffeeRenderer getRenderer(){
+		//OBS OBS! Ikke misbruk dette, takk
+		return renderer;
+	}
 	
 	private Map<String,CoffeeGameObjectManager> scenes = new HashMap<>();
 	public void createNewScene(String name){
+		//Vi vil holde objektet internt og ikke få det fra hvor som helst.
 		scenes.put(name, new CoffeeGameObjectManager());
 	}
 	public CoffeeGameObjectManager getScene(String name){
@@ -34,6 +33,7 @@ public class CoffeeSceneManager implements CoffeeRendererListener{
 		return scenes.get(name);
 	}
 	public void scheduleSceneApply(String scene){
+		//Disse variablene sier om det er en ny scene, og hvilken scene det er.
 		sceneToBeApplied=true;
 		sceneApply = scene;
 	}
@@ -55,6 +55,7 @@ public class CoffeeSceneManager implements CoffeeRendererListener{
 	}
 	@Override
 	public void onGlfwFrameTick(){
+		//Vi kan ikke bytte scene imens renderer kjører, vi får dermed renderer til å stoppe opp og utføre operasjonen.
 		if(sceneToBeApplied)
 			applyScene(sceneApply);
 	}

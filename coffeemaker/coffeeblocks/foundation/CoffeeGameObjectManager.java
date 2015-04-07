@@ -9,15 +9,12 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import coffeeblocks.foundation.input.CoffeeInputHandler;
 import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.foundation.physics.CollisionChecker;
 import coffeeblocks.foundation.physics.CollisionListener;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
-
-import org.lwjgl.glfw.GLFW;
 
 public class CoffeeGameObjectManager implements CollisionListener{
 	public CoffeeGameObjectManager(){
@@ -64,10 +61,6 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public void updateObject(String objectId){
 		if(!objects.containsKey(objectId))
 			throw new RuntimeException("Physics reported non-existant object!");
-		if(objectId.equals("player")){
-			getCamera().setCameraPos(Vector3f.add(getObject("player").getGameModel().getPosition(),getCamera().getCameraForwardVec(-5f),null));
-			getLights().get(0).setPosition(getCamera().getCameraPos());
-		}
 	}
 	
 	public void requestObjectUpdate(String objectId, GameObject.PropertyEnumeration prop){
