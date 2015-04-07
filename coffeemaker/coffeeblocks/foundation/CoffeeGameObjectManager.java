@@ -127,6 +127,6 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	
 	@Override
 	public void getCollisionNotification(String body1, String body2){
-		System.out.println("Collision:"+body1+","+body2);
+//		System.out.println("Collision:"+body1+","+body2);
 	}
 }

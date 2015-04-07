@@ -56,7 +56,7 @@ public class CoffeeRenderer implements Runnable {
 	private boolean fpscounter = true;
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
-	private int rendering_swaps = 1;
+	private int rendering_swaps = 0;
 	public void setSwapping(int swapping){
 		this.rendering_swaps = swapping;
 	}
@@ -65,8 +65,8 @@ public class CoffeeRenderer implements Runnable {
 	public void setScene(CoffeeGameObjectManager manager){
 		if(manager==null)
 			throw new RuntimeException("You cannot set an empty scene!");
-		if(scene!=null)
-			cleanupAll();
+//		if(scene!=null)
+//			cleanupAll();
 		this.scene = manager;
 		setClearColor(scene.getClearColor());
 		setCamera(scene.getCamera());
@@ -114,9 +114,6 @@ public class CoffeeRenderer implements Runnable {
 			// Terminate GLFW and release the GLFWerrorfun
 			glfwTerminate();
 			errorCallback.release();
-			for(CoffeeRendererListener listener : listeners){
-				listener.onGlfwQuit();
-			}
 		}
 		for(CoffeeRendererListener listener : listeners){
 			listener.onGlfwQuit();

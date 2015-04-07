@@ -1,14 +1,11 @@
 package coffeeblocks;
 
-import java.io.FileNotFoundException;
 import java.util.Map;
 
 import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.CoffeeSceneManager;
-import coffeeblocks.general.FileImporter;
 import coffeeblocks.general.JsonParser;
 import coffeeblocks.opengl.CoffeeRenderer;
-import coffeeblocks.scripting.CoffeeBrewery;
 
 public class CoffeeMaker implements CoffeeRendererListener{
 	
@@ -16,7 +13,6 @@ public class CoffeeMaker implements CoffeeRendererListener{
 	private CoffeeSceneManager sceneManager = new CoffeeSceneManager();
 	private CoffeeRenderer renderer = null;
 	private Thread renderingThread = null;
-//	private Thread backgroundWorkerThread = null;
 	
 	public static void main(String[] args){
 		CoffeeMaker main = new CoffeeMaker();
@@ -37,15 +33,6 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		renderer = new CoffeeRenderer();
 		sceneManager.setRenderer(renderer);
 		renderer.addCoffeeListener(this);
-		
-		if(properties.get("logic")!=null){
-			try {
-				CoffeeBrewery test = new CoffeeBrewery(FileImporter.getBasename(filename)+"/"+(String)properties.get("logic"),null,null, null);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		
 		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.indexOf("/", -1)+1),properties, sceneManager);
 		if(sceneManager.getScenes().size()==0){

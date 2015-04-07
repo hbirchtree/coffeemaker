@@ -70,7 +70,7 @@
 			"model": "models/nothing-ness.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
-			"position": [5,-32.15,4.5],
+			"position": [5,-32.02,4.5],
 			"rotation": [0,0,0],
 			"scale": [4,4,4],
 			"physics.shape": 4,
@@ -104,7 +104,7 @@
 	"scene:second":{
 		"clearcolor": [1,1,1,0],
 		"camera": {
-			"fov": 60
+			"fov": 120
 		},
 		"objects": [
 		{
@@ -160,6 +160,22 @@
 			"position": [0.0,5,5],
 			"rotation": [0.0,0,0],
 			"scale": [2,2,2]
+		},
+		{
+			"object-id": "death",
+			"model": "models/nothing.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0,-20,0],
+			"rotation": [0,0,0],
+			"scale": [10,10,10],
+			"physics.shape": 4,
+			"physics.mass": 0,
+			"physics.scale": [0.75,1.25,1],
+			"physics.rotation": [0,1,0],
+			"physics.linearity": [0,1,0],
+			"physics.friction": 0.5,
+			"physics.restitution": 0.0
 		}
 		],
 		"lights": [
