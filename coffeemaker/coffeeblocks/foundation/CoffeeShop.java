@@ -29,39 +29,41 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		manager.getScene(sceneId).getPhysicsSystem().addCollisionListener(this);
 	}
 
-	Map<String,Double> timers = new HashMap<>();
+	Map<String,Long> timers = new HashMap<>();
+	Map<String,Integer> counters = new HashMap<>();
 	
 	public void eventLoop(){
 		applyScene(startScene);
 		manager.getRenderer().addInputListener(this);
-		timers.put("clock", 0d);
-		int skyboxInt = 0;
+		timers.put("clock", 0l);
+		counters.put("skybox", 0);
+		counters.put("water", 0);
 		while(true){
+			timers.put("clock", System.currentTimeMillis());
 			//Vi stiller opp kameraet og lyset, dette vil skje periodisk. Tidligere skjedde det ved hver oppdatering av fysikken, hvis tidsperiode var altfor variabel.
 			getScene().getCamera().setCameraPos(Vector3f.add(getObject("player").getGameModel().getPosition(),getScene().getCamera().getCameraForwardVec(-5f),null));
 			getScene().getLights().get(0).setPosition(getScene().getCamera().getCameraPos());
 			
-			if(timers.get("water_switch")==null||timers.get("clock")>=timers.get("skybox_switch")){
-				skyboxInt++;
-				if(skyboxInt>=2)
-					skyboxInt = 0;
-				getScene().getObject("water").getGameModel().selectTexture = skyboxInt;
-				timers.put("water_switch",timers.get("clock")+1d);
+			if(timers.get("water_switch")==null||timers.get("clock")>=timers.get("water_switch")){
+				counters.put("water",counters.get("water")+1);
+				if(counters.get("water")>1)
+					counters.put("water",0);
+				getScene().getObject("water").getGameModel().selectTexture = counters.get("water");
+				timers.put("water_switch",timers.get("clock")+200);
 			}
-			if(timers.get("clock")>=timers.get("skybox_switch")){
-				skyboxInt++;
-				if(skyboxInt>=2)
-					skyboxInt = 0;
-				getScene().getObject("skybox").getGameModel().selectTexture = skyboxInt;
-				getScene().getObject("water").getGameModel().selectTexture = skyboxInt;
-				timers.put("skybox_switch",timers.get("clock")+1d);
+			if(timers.get("skybox_switch")==null||timers.get("clock")>=timers.get("skybox_switch")){
+				counters.put("skybox",counters.get("skybox")+1);
+				if(counters.get("skybox")>2)
+					counters.put("skybox",0);
+				getScene().getObject("skybox").getGameModel().selectTexture = counters.get("skybox");
+				timers.put("skybox_switch",timers.get("clock")+1000);
 			}
 		}
 	}
 
 	@Override
 	public void onGlfwFrameTick(double currentTime){
-		timers.put("clock", currentTime); 
+//		timers.put("clock", currentTime); 
 	}
 
 	private List<Integer> mainKeys = new ArrayList<>();
@@ -117,8 +119,8 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	@Override
 	public void getCollisionNotification(String body1, String body2){
 		if(body1.equals("player")&&body2.equals("death")){
-			System.out.println("Collision:"+body1+","+body2);
 			getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
+			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS);
 		}
 	}
 	@Override
