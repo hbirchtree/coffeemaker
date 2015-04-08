@@ -88,7 +88,7 @@
 			"object-id": "skybox",
 			"model": "models/skybox.obj",
 			"textures": [
-			"textures/skybox.png","textures/skybox_green.png"
+			"textures/skybox.png","textures/skybox_green.png","textures/skybox_pink.png"
 			],
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",

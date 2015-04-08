@@ -30,7 +30,7 @@ public class CoffeeRenderer implements Runnable {
 
 	// We need to strongly reference callback instances.
 	private GLFWErrorCallback errorCallback;
-	private GLFWKeyCallback   keyCallback;
+//	private GLFWKeyCallback   keyCallback;
 	
 	private Vector4f clearColor = new Vector4f(0.8f,0.8f,1.0f,0f);
 	private CoffeeCamera camera = null;
@@ -117,7 +117,7 @@ public class CoffeeRenderer implements Runnable {
 
 			// Release window and window callbacks
 			glfwDestroyWindow(window);
-			keyCallback.release();
+//			keyCallback.release();
 		} finally {
 			// Terminate GLFW and release the GLFWerrorfun
 			glfwTerminate();
@@ -157,13 +157,12 @@ public class CoffeeRenderer implements Runnable {
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
-		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
-			@Override
-			public void invoke(long window, int key, int scancode, int action, int mods) {
-				if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-					glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
-			}
-		});
+//		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+//			@Override
+//			public void invoke(long window, int key, int scancode, int action, int mods) {
+//				
+//			}
+//		});
 		
 
 		// Get the resolution of the primary monitor
@@ -185,6 +184,10 @@ public class CoffeeRenderer implements Runnable {
 
 		// Make the window visible
 		glfwShowWindow(window);
+	}
+	
+	public void requestClose(){
+		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
 	public void loopHandleMouseInput(){

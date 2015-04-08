@@ -1,9 +1,10 @@
 package coffeeblocks.foundation;
 
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
+import coffeeblocks.foundation.physics.CollisionListener;
 import coffeeblocks.opengl.CoffeeRenderer;
 
-public abstract class CoffeeLogicLoop implements CoffeeGlfwInputListener,CoffeeRendererListener{
+public abstract class CoffeeLogicLoop implements CoffeeGlfwInputListener,CoffeeRendererListener,CollisionListener{
 	protected CoffeeSceneManager manager = null;
 	public CoffeeLogicLoop(CoffeeSceneManager manager){
 		this.manager = manager;

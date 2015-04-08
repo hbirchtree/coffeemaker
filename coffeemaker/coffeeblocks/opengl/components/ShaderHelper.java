@@ -61,7 +61,6 @@ public class ShaderHelper {
 			for(String file : object.getMaterial().getMultitexture())
 				textures.add(TextureHelper.genTexture(file, object.glTextureUnit));
 			object.setTextureHandles(textures);
-			System.out.println(textures);
 		}else{
 			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
 			object.setTextureHandle(texture);

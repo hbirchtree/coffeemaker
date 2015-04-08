@@ -11,5 +11,5 @@ public interface CoffeeGlfwInputListener{
 	
 	public List<Integer> getRegisteredKeys();
 	default public boolean getMouseEvents(){return false;}
-	default public boolean getKeyboardEvents(){return false;}
+	default public boolean getKeyboardEvents(){return true;}
 }
