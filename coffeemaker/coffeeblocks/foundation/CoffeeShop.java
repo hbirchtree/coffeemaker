@@ -30,7 +30,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		getObject("water").getGameData().setTimerValue("switch",0l);
 		getObject("skybox").getGameData().setTimerValue("switch",0l);
 		getObject("water").getGameData().setIntValue("texture",0);
-		getObject("player").getGameData().setDoubleValue("walk-pace",3d);
+		getObject("player").getGameData().setDoubleValue("walk-pace",4d);
 		getObject("player").getGameModel().setObjectDeactivation(false);
 		getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACTIVATION);
 		getObject("player").getGameData().setBoolValue("can-jump",false);
@@ -38,6 +38,15 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	
 	private long clock = 0l;
+	
+	private void drawHud(){
+		getScene().billboard("sun", true);
+		getObject("sun").getGameModel().setPosition(
+				Vector3f.add(Vector3f.add(
+							getObject("player").getGameModel().getPosition(),
+							getScene().getCamera().getCameraRightVec(-2f),null),
+						getScene().getCamera().getCameraForwardVec(-1.0f*getScene().getCamera().getFieldOfView()/85),null));
+	}
 	
 	public void eventLoop(){
 		applyScene(currentScene);
@@ -51,7 +60,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 							getScene().getCamera().getCameraForwardVec(-5f),null));
 			getScene().getLights().get(0).setPosition(
 					getScene().getCamera().getCameraPos());
-			
+			drawHud();
 			if(getObject("water").getGameData().getTimerValue("switch")==null||
 					clock>=getObject("water").getGameData().getTimerValue("switch")){
 				
@@ -131,7 +140,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_SPACE&&getObject("player").getGameData().getBoolValue("can-jump")){
-				getObject("player").getGameModel().setImpulse(new Vector3f(0,0.3f,0));
+				getObject("player").getGameModel().setImpulse(new Vector3f(0,0.5f,0));
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_IMPULSE);
 			}
 		}else if(currentScene.equals("second")){
@@ -143,6 +152,12 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		}
 		if(key==GLFW.GLFW_KEY_KP_0){
 			getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
+		}
+		if(key==GLFW.GLFW_KEY_KP_9){
+			applyScene("main");
+		}
+		if(key==GLFW.GLFW_KEY_KP_8){
+			applyScene("second");
 		}
 	}
 	@Override

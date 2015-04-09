@@ -52,6 +52,16 @@
 			"physics.restitution": 0.0
 		},
 		{
+			"object-id": "sun",
+			"model": "models/sun.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [25,25,25],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 0
+		},
+		{
 			"object-id": "death",
 			"model": "models/nothing.obj",
 			"vshader": "shaders/vsh.txt",

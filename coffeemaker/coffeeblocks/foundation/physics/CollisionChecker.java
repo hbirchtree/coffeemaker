@@ -147,8 +147,8 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		for(String id : objects.keySet()){
 			RigidBody body = objects.get(id);
 			manager.getObject(id).getGameModel().setPosition(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
-			Quat4f rotation = new Quat4f();
-			body.getWorldTransform(new Transform()).getRotation(rotation);
+//			Quat4f rotation = new Quat4f();
+//			body.getWorldTransform(new Transform()).getRotation(rotation);
 //			Vector3f rot = new Vector3f();
 //			manager.getObject(id).getGameModel().setRotation(VectorTools.vmVec3ftoLwjgl());
 			for(CollisionListener listener : listeners)
