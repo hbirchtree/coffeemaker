@@ -25,6 +25,7 @@ public class ShaderHelper {
 		GL20.glUseProgram(shader.getProgramId());
 
 		try{
+			shader.getUniform("materialBump");
 			shader.getUniform("materialTex");
 			shader.getUniform("camera");
 			shader.getUniform("model");
@@ -48,22 +49,20 @@ public class ShaderHelper {
 		
 		
 		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"));
-		object.vaoHandle = vao;
+		object.getMaterial().setVaoHandle(vao);
 		return shader;
 	}
 	public static ShaderBuilder compileShaders(ModelContainer object,int textureUnit){
 		ShaderBuilder shader = setupShader(object);
 		
-		object.glTextureUnit = textureUnit;
-		
 		if(object.getMaterial().isMultitextured()){
 			List<Integer> textures = new ArrayList<>();
 			for(String file : object.getMaterial().getMultitexture())
-				textures.add(TextureHelper.genTexture(file, object.glTextureUnit));
-			object.setTextureHandles(textures);
+				textures.add(TextureHelper.genTexture(file));
+			object.getMaterial().setTextureHandles(textures);
 		}else{
-			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture(),object.glTextureUnit);
-			object.setTextureHandle(texture);
+			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture());
+			object.getMaterial().setTextureHandle(texture);
 		}
 
 		GL20.glUseProgram(0);
@@ -82,25 +81,6 @@ public class ShaderHelper {
 		Matrix4f.rotate(object.getRotation().y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
 		Matrix4f.rotate(object.getRotation().x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);
-		
-		modelMatrix.store(result);
-		result.flip();
-		
-		return result;
-	}
-	public static FloatBuffer rotateMatriceBillboard(ModelContainer object, float vertiAngle, float horizAngle,boolean cylindrical){
-		FloatBuffer result = BufferUtils.createFloatBuffer(16);
-		
-		Matrix4f modelMatrix = new Matrix4f();
-		Matrix4f.scale(object.getScale(), modelMatrix, modelMatrix);
-		if(!cylindrical)
-			Matrix4f.rotate((float)Math.toRadians(vertiAngle), new Vector3f(1,0,0), modelMatrix, modelMatrix);
-		Matrix4f.rotate((float)Math.toRadians(horizAngle), new Vector3f(0,1,0), modelMatrix, modelMatrix);
-		Matrix4f.transpose(modelMatrix, modelMatrix);
-//		Matrix4f.translate(object.position, modelMatrix, modelMatrix); //Ødelegger aalt
-		Matrix4f.rotate(object.getRotation().y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
-		Matrix4f.rotate(object.getRotation().x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);
-		Matrix4f.rotate(object.getRotation().z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
 		
 		modelMatrix.store(result);
 		result.flip();

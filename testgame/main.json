@@ -23,6 +23,22 @@
 			"physics.rotation": [0,1,0]
 		},
 		{
+			"object-id": "terrain.walls",
+			"model": "models/quad.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 3,
+			"physics.collision": "models/terrain_wall_collide.obj",
+			"physics.mass": 0,
+			"physics.scale": [1,1,1],
+			"physics.friction": 0.9,
+			"physics.restitution": 0.0,
+			"physics.rotation": [0,1,0]
+		},
+		{
 			"object-id": "water",
 			"model": "models/water.obj",
 			"textures": [

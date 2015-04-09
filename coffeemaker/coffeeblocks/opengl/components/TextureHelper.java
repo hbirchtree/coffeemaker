@@ -16,7 +16,7 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
 public class TextureHelper {
-	public static int genTexture(String textureFilename,int textureUnit){
+	public static int genTexture(String textureFilename){
 		ByteBuffer img = null;
 		int tWidth;
 		int tHeight;

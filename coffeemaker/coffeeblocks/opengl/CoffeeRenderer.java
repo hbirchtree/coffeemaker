@@ -47,8 +47,6 @@ public class CoffeeRenderer implements Runnable {
 	public void setLights(List<LimeLight> lights) {
 		this.lights = lights;
 	}
-	
-	private int lastOccupiedTextureUnit = -1;
 
 	private double fpsTimer = 0;
 	private long framecount = 0;
@@ -264,13 +262,13 @@ public class CoffeeRenderer implements Runnable {
 		
 		fpsTimer = glfwGetTime()+1;
 		
-		CoffeeFramebufferManager framebuffer = new CoffeeFramebufferManager(0,GL11.GL_RGBA);
-		try{
-			framebuffer.setRenderBuffer(aspect,(int)rendering_resolution.x, (int)rendering_resolution.y);
-		}catch(IllegalStateException e){
-			System.err.println(e.getMessage());
-		}
-		framebuffer.setEnabled(false);
+//		CoffeeFramebufferManager framebuffer = new CoffeeFramebufferManager(0,GL11.GL_RGBA);
+//		try{
+//			framebuffer.setRenderBuffer(aspect,(int)rendering_resolution.x, (int)rendering_resolution.y);
+//		}catch(IllegalStateException e){
+//			System.err.println(e.getMessage());
+//		}
+//		framebuffer.setEnabled(false);
 		
 		while (glfwWindowShouldClose(window)==GL_FALSE){
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -288,10 +286,10 @@ public class CoffeeRenderer implements Runnable {
 				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
 			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
 
-			framebuffer.storeFramebuffer(rendering_resolution);
+//			framebuffer.storeFramebuffer(rendering_resolution);
 			if(draw&&scene!=null) //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
-			framebuffer.renderFramebuffer(windowres, lights);
+//			framebuffer.renderFramebuffer(windowres, lights);
 			
 			glfwSwapBuffers(window); // swap the color buffers
 			// Poll for window events. The key callback above will only be
@@ -308,10 +306,10 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	private void cleanupObject(ModelContainer object){
-		if(object.getTextureHandle()!=0)
-			GL11.glDeleteTextures(object.getTextureHandle());
-		if(object.vaoHandle!=0)
-			GL30.glDeleteVertexArrays(object.vaoHandle);
+		if(object.getMaterial().getTextureHandle()!=0)
+			GL11.glDeleteTextures(object.getMaterial().getTextureHandle());
+		if(object.getMaterial().getVaoHandle()!=0)
+			GL30.glDeleteVertexArrays(object.getMaterial().getVaoHandle());
 		if(object.getShader().getProgramId()!=0)
 			GL20.glDeleteProgram(object.getShader().getProgramId());
 	}
@@ -319,9 +317,7 @@ public class CoffeeRenderer implements Runnable {
 	private void loopRenderObjects(){
 		for(ModelContainer object : scene.getRenderables()){
 			if(!object.isObjectBaked()){
-				int textureUnit = lastOccupiedTextureUnit+1+GL13.GL_TEXTURE0;
-				lastOccupiedTextureUnit++;
-				ShaderHelper.compileShaders(object,textureUnit);
+				ShaderHelper.compileShaders(object,GL13.GL_TEXTURE0);
 			}
 			if(object.isNoDepthRendering()){
 				glDisable(GL_DEPTH_TEST);
@@ -338,15 +334,15 @@ public class CoffeeRenderer implements Runnable {
 				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
 			}
 
-			object.getShader().setUniform("materialTex", object.glTextureUnit-GL13.GL_TEXTURE0);
+			object.getShader().setUniform("materialTex", 0);
 			object.getShader().setUniform("materialShininess", object.getMaterial().getShininess());
 			object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
 			object.getShader().setUniform("materialTransparency", object.getMaterial().getTransparency());
 			
-			GL13.glActiveTexture(object.glTextureUnit);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getTextureHandle());
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTextureHandle());
 
-			GL30.glBindVertexArray(object.vaoHandle);
+			GL30.glBindVertexArray(object.getMaterial().getVaoHandle());
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getVertexDataSize());
 
 			GL30.glBindVertexArray(0);

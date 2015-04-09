@@ -73,28 +73,6 @@ public class ModelContainer extends PhysicsObject {
 	public void setNoDepthRendering(boolean noDepthRendering) {
 		this.noDepthRendering = noDepthRendering;
 	}
-
-	public int vaoHandle = 0;
-	
-	public int selectTexture = 0;
-	private List<Integer> textureHandles = new ArrayList<>();
-	public int getTextureHandle(){
-		return textureHandles.get(selectTexture);
-	}
-	public void setTextureHandle(int textureHandle) {
-		if(textureHandles.size()>0)
-			textureHandles.clear();
-		textureHandles.add(textureHandle);
-	}
-	public void setTextureHandles(List<Integer> handles){
-		textureHandles.clear();
-		this.textureHandles.addAll(handles);
-	}
-	public List<Integer> getTextureHandles(){
-		return textureHandles;
-	}
-
-	public int glTextureUnit = 0;
 	
 	private List<Float> faces = null;
 	public synchronized void setModelFaces(List<Float> faces){

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
@@ -158,7 +157,8 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	
 	private List<CollisionListener> listeners = new ArrayList<>();
 	public void addCollisionListener(CollisionListener listener){
-		listeners.add(listener);
+		if(!listeners.contains(listener))
+			listeners.add(listener);
 	}
 	
 	@Override
@@ -171,8 +171,8 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			body.activate(true);
 			body.setWorldTransform(createTransform(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getPosition())));
 			break;
-		case PHYS_ROT:
-			
+		case PHYS_CLEARFORCE:
+			body.clearForces();
 			break;
 		case PHYS_ACCEL:
 			body.applyCentralForce(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getPositionalAcceleration()));			

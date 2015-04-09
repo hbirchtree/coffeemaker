@@ -31,7 +31,7 @@ public class CoffeeMaterial {
 	public String specularTexture = ""; //Unimplemented
 	public String highlightTexture = ""; //Unimplemented
 	public String alphaTexture = ""; //Unimplemented
-	public String bumbTexture = ""; //Unimplemented
+	public String bumbTexture = ""; //Planned
 	
 	private Vector3f specularColor = new Vector3f(1,1,1);
 	public Vector3f ambientColor = new Vector3f(1,1,1); //Unimplemented
@@ -64,5 +64,47 @@ public class CoffeeMaterial {
 	}
 	public void setTransparency(float transparency) {
 		this.transparency = transparency;
+	}
+	
+	private int bumpTextureHandle = 0;
+	public int getBumpTextureHandle() {
+		return bumpTextureHandle;
+	}
+	public void setBumpTextureHandle(int bumpTextureHandle) {
+		this.bumpTextureHandle = bumpTextureHandle;
+	}
+
+	private int colorTextureHandle = 0;
+	public int getColorTextureHandle() {
+		return colorTextureHandle;
+	}
+	public void setColorTextureHandle(int colorTextureHandle) {
+		this.colorTextureHandle = colorTextureHandle;
+	}
+	
+	private int vaoHandle = 0;
+	public int getVaoHandle() {
+		return vaoHandle;
+	}
+	public void setVaoHandle(int vaoHandle) {
+		this.vaoHandle = vaoHandle;
+	}
+	
+	public int selectTexture = 0;
+	private List<Integer> textureHandles = new ArrayList<>();
+	public int getTextureHandle(){
+		return textureHandles.get(selectTexture);
+	}
+	public void setTextureHandle(int textureHandle) {
+		if(textureHandles.size()>0)
+			textureHandles.clear();
+		textureHandles.add(textureHandle);
+	}
+	public void setTextureHandles(List<Integer> handles){
+		textureHandles.clear();
+		this.textureHandles.addAll(handles);
+	}
+	public List<Integer> getTextureHandles(){
+		return textureHandles;
 	}
 }

@@ -50,7 +50,7 @@ public class CoffeeFramebufferManager {
 		renderMesh.setShader(new ShaderBuilder());
 		renderMesh.setShaderFiles("testgame/shaders/vsh.txt", "testgame/shaders/fsh_nolight.txt");
 		ShaderHelper.setupShader(renderMesh);
-		renderMesh.setTextureHandle(getTexture());
+		renderMesh.getMaterial().setTextureHandle(getTexture());
 		renderMesh.setPosition(new Vector3f(0,0,-1.07f));
 		renderMesh.setScale(new Vector3f(aspect,1,1));
 		renderMesh.setRotation(new Vector3f(0,90,0));
@@ -117,15 +117,15 @@ public class CoffeeFramebufferManager {
 			renderMesh.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
 		}
 
-		renderMesh.getShader().setUniform("materialTex", renderMesh.glTextureUnit-GL13.GL_TEXTURE0);
+		renderMesh.getShader().setUniform("materialTex", 0);
 		renderMesh.getShader().setUniform("materialShininess", renderMesh.getMaterial().getShininess());
 		renderMesh.getShader().setUniform("materialSpecularColor", renderMesh.getMaterial().getSpecularColor());
 		renderMesh.getShader().setUniform("materialTransparency", renderMesh.getMaterial().getTransparency());
 
-		GL13.glActiveTexture(renderMesh.glTextureUnit);
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
 
-		GL30.glBindVertexArray(renderMesh.vaoHandle);
+		GL30.glBindVertexArray(renderMesh.getMaterial().getVaoHandle());
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, renderMesh.getVertexDataSize());
 
 		GL30.glBindVertexArray(0);

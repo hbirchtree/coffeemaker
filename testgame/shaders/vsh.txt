@@ -2,8 +2,7 @@
 
 //precision highp float;
 
-uniform mat4 camera;
-uniform mat4 model;
+uniform mat4 camera,model;
 
 in vec3 vert;
 in vec2 vertTexCoord;
