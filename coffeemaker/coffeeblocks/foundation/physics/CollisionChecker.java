@@ -18,6 +18,7 @@ import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
 import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.SphereShape;
@@ -120,14 +121,18 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		if(object.getGameModel().getPhysicalMass()!=0f)
 			shape.calculateLocalInertia(object.getGameModel().getPhysicalMass(), inertia);
 		RigidBodyConstructionInfo constInfo = new RigidBodyConstructionInfo(object.getGameModel().getPhysicalMass(),motionState,shape, inertia);
-		constInfo.restitution = object.getGameModel().getRestitution();
-//		constInfo.angularDamping = object.getGameModel().getFriction();
-		constInfo.friction = object.getGameModel().getFriction();
+		if(!(shape instanceof BvhTriangleMeshShape)){
+			constInfo.restitution = object.getGameModel().getRestitution();
+			//		constInfo.angularDamping = object.getGameModel().getFriction();
+			constInfo.friction = object.getGameModel().getFriction();
+		}
 		
 		RigidBody body = new RigidBody(constInfo);
-		body.setInvInertiaDiagLocal(VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalLinearFactor()));
-		body.updateInertiaTensor();
-		body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+		if(!(shape instanceof BvhTriangleMeshShape)){
+			body.setInvInertiaDiagLocal(VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalLinearFactor()));
+			body.updateInertiaTensor();
+		}
+//		body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		body.setUserPointer(object);
 		objects.put(object.getObjectId(), body);
 		dynamicsWorld.addRigidBody(body);
@@ -148,7 +153,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			manager.getObject(id).getGameModel().setPosition(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
 			Quat4f rotation = new Quat4f();
 			body.getWorldTransform(new Transform()).getRotation(rotation);
-			Vector3f rot = new Vector3f();
+//			Vector3f rot = new Vector3f();
 //			manager.getObject(id).getGameModel().setRotation(VectorTools.vmVec3ftoLwjgl());
 			for(CollisionListener listener : listeners)
 				listener.updateObject(id);
@@ -177,7 +182,8 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			body.applyCentralForce(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getPositionalAcceleration()));			
 			break;
 		case PHYS_IMPULSE:
-			body.applyCentralImpulse(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getPositionalAcceleration()));			
+			body.applyCentralImpulse(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getImpulse()));
+			manager.getObject(objectId).getGameModel().setImpulse(new org.lwjgl.util.vector.Vector3f());
 			break;
 		default:
 			break;

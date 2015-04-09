@@ -49,7 +49,7 @@ public class TriangleMeshHelper {
 		indicesB.flip();
 		TriangleIndexVertexArray mesh = new TriangleIndexVertexArray(indices.size(),indicesB,INDEX_STRIDE,vertices.size(),verticesB,VERTEX_STRIDE);
 		
-		return new BvhTriangleMeshShape(mesh,true,true);
+		return new BvhTriangleMeshShape(mesh,true);
 	}
 	public static ConvexHullShape createConvexMesh(String meshFile, Vector3f scale){
 		if(meshFile==null)

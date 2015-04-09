@@ -78,6 +78,7 @@ public class CoffeeGameObjectManager implements CollisionListener{
 				return (CoffeeCamera)entities.get(id);
 		throw new IllegalStateException("Camera is not available in the GameObject manager!");
 	}
+	@SuppressWarnings("unchecked")
 	public List<LimeLight> getLights(){
 		for(String id : entities.keySet())
 			if(id.equals("lights")){

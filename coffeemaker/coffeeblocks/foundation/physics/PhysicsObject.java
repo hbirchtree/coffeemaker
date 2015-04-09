@@ -2,7 +2,7 @@ package coffeeblocks.foundation.physics;
 
 import org.lwjgl.util.vector.Vector3f;
 
-public class PhysicsObject {
+public abstract class PhysicsObject {
 	public enum PhysicsType {
 		Undefined,Box,Sphere,Complex,StaticPlane,Capsule
 	};

@@ -38,7 +38,7 @@ public class GameObject{
 		this.gameModel = gameModel;
 	}
 	
-	private GameMetaData gameData = null;
+	private GameMetaData gameData = new GameMetaData();
 	public synchronized GameMetaData getGameData(){
 		return gameData;
 	}

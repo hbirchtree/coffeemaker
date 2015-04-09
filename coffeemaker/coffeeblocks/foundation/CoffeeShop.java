@@ -20,6 +20,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		mainKeys.add(GLFW.GLFW_KEY_A);
 		mainKeys.add(GLFW.GLFW_KEY_S);
 		mainKeys.add(GLFW.GLFW_KEY_D);
+		mainKeys.add(GLFW.GLFW_KEY_SPACE);
 		mainKeys.add(GLFW.GLFW_KEY_ESCAPE);
 	}
 	
@@ -28,35 +29,54 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		manager.getRenderer().addCoffeeListener(this); //fordi listen av lyttere blir tømt
 		manager.getScene(sceneId).getPhysicsSystem().addCollisionListener(this);
 	}
-
-	Map<String,Long> timers = new HashMap<>();
-	Map<String,Integer> counters = new HashMap<>();
+	
+	private long clock = 0l;
 	
 	public void eventLoop(){
 		applyScene(startScene);
 		manager.getRenderer().addInputListener(this);
-		timers.put("clock", 0l);
-		counters.put("skybox", 0);
-		counters.put("water", 0);
+		
+		getObject("water").getGameData().setTimerValue("switch",0l);
+		getObject("skybox").getGameData().setTimerValue("switch",0l);
+		getObject("water").getGameData().setIntValue("texture",0);
+		getObject("player").getGameData().setDoubleValue("walk-pace",3d);
+		getObject("player").getGameData().setBoolValue("can-jump",false);
+		getObject("skybox").getGameData().setIntValue("texture",0);
+		
 		while(true){
-			timers.put("clock", System.currentTimeMillis());
+			clock = System.currentTimeMillis();
 			//Vi stiller opp kameraet og lyset, dette vil skje periodisk. Tidligere skjedde det ved hver oppdatering av fysikken, hvis tidsperiode var altfor variabel.
-			getScene().getCamera().setCameraPos(Vector3f.add(getObject("player").getGameModel().getPosition(),getScene().getCamera().getCameraForwardVec(-5f),null));
-			getScene().getLights().get(0).setPosition(getScene().getCamera().getCameraPos());
+			getScene().getCamera().setCameraPos(
+					Vector3f.add(getObject("player").getGameModel().getPosition(),
+							getScene().getCamera().getCameraForwardVec(-5f),null));
+			getScene().getLights().get(0).setPosition(
+					getScene().getCamera().getCameraPos());
 			
-			if(timers.get("water_switch")==null||timers.get("clock")>=timers.get("water_switch")){
-				counters.put("water",counters.get("water")+1);
-				if(counters.get("water")>1)
-					counters.put("water",0);
-				getScene().getObject("water").getGameModel().selectTexture = counters.get("water");
-				timers.put("water_switch",timers.get("clock")+200);
+			if(getObject("water").getGameData().getTimerValue("switch")==null||
+					clock>=getObject("water").getGameData().getTimerValue("switch")){
+				
+				getObject("water").getGameData().setIntValue(
+						"texture",
+						getObject("water").getGameData().getIntValue("texture")+1);
+				
+				if(getObject("water").getGameData().getIntValue("texture")>1)
+					getObject("water").getGameData().setIntValue("texture",0);
+				getScene().getObject("water").getGameModel().selectTexture = getObject("water").getGameData().getIntValue("texture");
+				getObject("water").getGameData().setTimerValue("switch",clock+200);
 			}
-			if(timers.get("skybox_switch")==null||timers.get("clock")>=timers.get("skybox_switch")){
-				counters.put("skybox",counters.get("skybox")+1);
-				if(counters.get("skybox")>2)
-					counters.put("skybox",0);
-				getScene().getObject("skybox").getGameModel().selectTexture = counters.get("skybox");
-				timers.put("skybox_switch",timers.get("clock")+1000);
+			if(getObject("skybox").getGameData().getTimerValue("switch")==null||
+					clock>=getObject("skybox").getGameData().getTimerValue("switch")){
+				getObject("skybox").getGameData().setIntValue(
+						"texture",
+						getObject("skybox").getGameData().getIntValue("texture")+1);
+				
+				if(getObject("skybox").getGameData().getIntValue("texture")>1)
+					getObject("skybox").getGameData().setIntValue("texture",0);
+				getScene().getObject("skybox").getGameModel().selectTexture = getObject("skybox").getGameData().getIntValue("texture");
+				getObject("skybox").getGameData().setTimerValue("switch",clock+700);
+			}
+			if(getObject("player").getGameData().getBoolValue("can-jump")&&clock>getObject("player").getGameData().getTimerValue("jump-to")){
+				getObject("player").getGameData().setBoolValue("can-jump",false);
 			}
 		}
 	}
@@ -79,25 +99,40 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		return null;
 	}
 	
-	private float walkingForce = 3f;
 	@Override
 	public void coffeeReceiveKeyPress(int key){
 		if(currentScene.equals("main")){
 			if(key==GLFW.GLFW_KEY_W){
-				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().getCameraForwardVec(walkingForce));
+				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
+						getCameraForwardVec(
+								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+				
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_A){
-				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().getCameraRightVec(-walkingForce));
+				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
+						getCameraRightVec(
+								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+				
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_S){
-				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().getCameraForwardVec(-walkingForce));
+				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
+						getCameraForwardVec(
+								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+				
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_D){
-				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().getCameraRightVec(walkingForce));
+				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
+						getCameraRightVec(
+								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+				
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+			}
+			if(key==GLFW.GLFW_KEY_SPACE&&getObject("player").getGameData().getBoolValue("can-jump")){
+				getObject("player").getGameModel().setImpulse(new Vector3f(0,0.3f,0));
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_IMPULSE);
 			}
 		}else if(currentScene.equals("second")){
 			
@@ -109,19 +144,20 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		if(key==GLFW.GLFW_KEY_KP_0){
 			getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
 		}
-		/*
-		if(key==GLFW_KEY_SPACE){
-			manager.getObject("player").getGameModel().setPositionalAcceleration(VectorTools.vectorLimit(VectorTools.vectorMul(new Vector3f(0,1,0), 5.0f), 5.0f));
-			manager.requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
-		}
-		*/
 	}
 	@Override
 	public void getCollisionNotification(String body1, String body2){
-		if(body1.equals("player")&&body2.equals("death")){
+		if(doBodiesCollide(body1,body2,"player","death")){
 			getObject("player").getGameModel().setPosition(new Vector3f(0,15,0));
 			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS);
+		}else if(doBodiesCollide(body1,body2,"player","terrain")){
+			getObject("player").getGameData().setBoolValue("can-jump", true);
+			getObject("player").getGameData().setTimerValue("jump-to", clock+150);
 		}
+	}
+	private boolean doBodiesCollide(String body1,String body2, String target1,String target2){
+		//Vi vet ikke hvilken rekkefølge objektene blir listet
+		return (body1.equals(target1)&&body2.equals(target2))||(body2.equals(target2)&&body1.equals(target1));
 	}
 	@Override
 	public void onGlfwQuit(){
