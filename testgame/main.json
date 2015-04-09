@@ -1,7 +1,6 @@
 {
 	"logic": "scripts/testgame.lua",
 	"scene:main":{
-		"key-capture": ["KEY_W","KEY_A","KEY_S","KEY_D","KEY_KP_5","KEY_KP_6"],
 		"clearcolor": [0,0,0,0],
 		"camera": {
 			"fov": 85

@@ -97,13 +97,10 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	}
 	
 	public void billboard(String objectId,boolean spherical){
-		if(!objects.containsKey(objectId))
-			throw new IllegalArgumentException("Tried to billboard non-existant object!");
-		Vector3f rotation = getObject(objectId).getGameModel().getRotation();
-		rotation = new Vector3f(0,0,0);
+		CoffeeCamera camera = getCamera();
 		if(spherical)
-			rotation.z = getCamera().getVertiAngle();
-		rotation.y = getCamera().getHorizAngle();
-		getObject(objectId).getGameModel().setRotation(rotation);
+			getObject(objectId).getGameModel().setRotation(new Vector3f(-camera.getVertiAngle(),-camera.getHorizAngle(),0));
+		else
+			getObject(objectId).getGameModel().setRotation(new Vector3f(0,-camera.getHorizAngle(),0));
 	}
 }

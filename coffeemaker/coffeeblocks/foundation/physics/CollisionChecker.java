@@ -121,18 +121,14 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		if(object.getGameModel().getPhysicalMass()!=0f)
 			shape.calculateLocalInertia(object.getGameModel().getPhysicalMass(), inertia);
 		RigidBodyConstructionInfo constInfo = new RigidBodyConstructionInfo(object.getGameModel().getPhysicalMass(),motionState,shape, inertia);
-		if(!(shape instanceof BvhTriangleMeshShape)){
-			constInfo.restitution = object.getGameModel().getRestitution();
-			//		constInfo.angularDamping = object.getGameModel().getFriction();
-			constInfo.friction = object.getGameModel().getFriction();
-		}
-		
+		constInfo.restitution = object.getGameModel().getRestitution();
+		constInfo.friction = object.getGameModel().getFriction();
+
 		RigidBody body = new RigidBody(constInfo);
 		if(!(shape instanceof BvhTriangleMeshShape)){
 			body.setInvInertiaDiagLocal(VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalLinearFactor()));
 			body.updateInertiaTensor();
 		}
-//		body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		body.setUserPointer(object);
 		objects.put(object.getObjectId(), body);
 		dynamicsWorld.addRigidBody(body);
@@ -184,6 +180,10 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		case PHYS_IMPULSE:
 			body.applyCentralImpulse(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getImpulse()));
 			manager.getObject(objectId).getGameModel().setImpulse(new org.lwjgl.util.vector.Vector3f());
+			break;
+		case PHYS_ACTIVATION:
+			if(!manager.getObject(objectId).getGameModel().getObjectDeactivation())
+				body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 			break;
 		default:
 			break;

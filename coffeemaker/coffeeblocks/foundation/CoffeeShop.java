@@ -1,9 +1,7 @@
 package coffeeblocks.foundation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
@@ -11,11 +9,10 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.metaobjects.GameObject;
 
 public class CoffeeShop extends CoffeeLogicLoop{
-	private String startScene = "main";
 	private String currentScene = null;
 	public CoffeeShop(CoffeeSceneManager manager) {
 		super(manager);
-		currentScene = startScene;
+		currentScene = "main";
 		mainKeys.add(GLFW.GLFW_KEY_W);
 		mainKeys.add(GLFW.GLFW_KEY_A);
 		mainKeys.add(GLFW.GLFW_KEY_S);
@@ -28,20 +25,23 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		manager.applyScene(sceneId);
 		manager.getRenderer().addCoffeeListener(this); //fordi listen av lyttere blir tømt
 		manager.getScene(sceneId).getPhysicsSystem().addCollisionListener(this);
-	}
-	
-	private long clock = 0l;
-	
-	public void eventLoop(){
-		applyScene(startScene);
-		manager.getRenderer().addInputListener(this);
+		currentScene = sceneId;
 		
 		getObject("water").getGameData().setTimerValue("switch",0l);
 		getObject("skybox").getGameData().setTimerValue("switch",0l);
 		getObject("water").getGameData().setIntValue("texture",0);
 		getObject("player").getGameData().setDoubleValue("walk-pace",3d);
+		getObject("player").getGameModel().setObjectDeactivation(false);
+		getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACTIVATION);
 		getObject("player").getGameData().setBoolValue("can-jump",false);
 		getObject("skybox").getGameData().setIntValue("texture",0);
+	}
+	
+	private long clock = 0l;
+	
+	public void eventLoop(){
+		applyScene(currentScene);
+		manager.getRenderer().addInputListener(this);
 		
 		while(true){
 			clock = System.currentTimeMillis();
@@ -106,28 +106,28 @@ public class CoffeeShop extends CoffeeLogicLoop{
 				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
 						getCameraForwardVec(
 								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
-				
+				getScene().billboard("player", false);
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_A){
 				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
 						getCameraRightVec(
 								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
-				
+				getScene().billboard("player", false);
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_S){
 				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
 						getCameraForwardVec(
 								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
-				
+				getScene().billboard("player", false);
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_D){
 				getObject("player").getGameModel().setPositionalAcceleration(getScene().getCamera().
 						getCameraRightVec(
 								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
-				
+				getScene().billboard("player", false);
 				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
 			}
 			if(key==GLFW.GLFW_KEY_SPACE&&getObject("player").getGameData().getBoolValue("can-jump")){

@@ -121,4 +121,12 @@ public abstract class PhysicsObject {
 	public Vector3f getPhysicalInertia(){
 		return physicalInertia;
 	}
+	
+	private boolean objectDeactivation = true;
+	public boolean getObjectDeactivation(){
+		return objectDeactivation;
+	}
+	public void setObjectDeactivation(boolean deactivation){
+		this.objectDeactivation = deactivation;
+	}
 }

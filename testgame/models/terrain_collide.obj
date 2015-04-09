@@ -1,6 +1,5 @@
 # Blender v2.69 (sub 0) OBJ File: 'landscape.blend'
 # www.blender.org
-mtllib terrain_collide.mtl
 o Plane_Plane.002
 v 18.257830 4.826694 7.594686
 v -1.554245 4.826694 -5.163449
@@ -171,7 +170,6 @@ v -22.902082 11.208595 -17.780407
 v -3.333042 8.159066 3.090174
 v -2.972083 7.063345 1.719047
 v -7.196531 7.461490 4.425890
-usemtl None
 s off
 f 30 33 31
 f 31 33 32
