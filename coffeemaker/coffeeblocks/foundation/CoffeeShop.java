@@ -71,7 +71,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 							getScene().getCamera().getCameraForwardVec(-5f),null));
 			getScene().getLights().get(0).setPosition(
 					getScene().getCamera().getCameraPos());
-			drawHud();
+//			drawHud();
 			if(getObject("water").getGameData().getTimerValue("switch")==null||
 					clock>=getObject("water").getGameData().getTimerValue("switch")){
 				

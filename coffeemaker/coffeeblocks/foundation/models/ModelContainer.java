@@ -58,14 +58,6 @@ public class ModelContainer extends PhysicsObject {
 		return vertShader;
 	}
 	
-	private boolean billboard = false; //Vil alltid orientere seg mot kamera
-	public boolean isBillboard() {
-		return billboard;
-	}
-	public void setBillboard(boolean billboard) {
-		this.billboard = billboard;
-	}
-	
 	private boolean noDepthRendering = false;
 	public boolean isNoDepthRendering() {
 		return noDepthRendering;

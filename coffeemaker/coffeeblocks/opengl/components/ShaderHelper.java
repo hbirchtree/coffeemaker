@@ -25,30 +25,36 @@ public class ShaderHelper {
 		GL20.glUseProgram(shader.getProgramId());
 
 		try{
-			shader.getUniform("materialBump");
+			if(object.getMaterial().hasBumpMap()/*&&object.getMaterial().hasHighlightMap()&&
+					object.getMaterial().hasSpecularMap()&&object.getMaterial().hasTransparencyMap()*/){
+				shader.getUniform("materialBump");
+				shader.getUniform("materialSpecular");
+				shader.getUniform("materialHighlight");
+				shader.getUniform("materialTransparency");
+				shader.getUniform("cameraRightVec");
+			}
 			shader.getUniform("materialTex");
 			shader.getUniform("camera");
 			shader.getUniform("model");
 
-			if(!object.isBillboard()){
-				shader.getUniform("materialShininess");
-				shader.getUniform("materialTransparency");
-				shader.getUniform("materialSpecularColor");
-				shader.getUniform("light.position");
-				shader.getUniform("light.attenuation");
-				shader.getUniform("light.ambientCoefficient");
-				shader.getUniform("light.intensities");
-			}
+			shader.getUniform("materialShininess");
+			shader.getUniform("materialTransparencyValue");
+			shader.getUniform("materialSpecularColor");
+			shader.getUniform("light.position");
+			shader.getUniform("light.attenuation");
+			shader.getUniform("light.ambientCoefficient");
+			shader.getUniform("light.intensities");
 
 			shader.getAttrib("vert");
 			shader.getAttrib("vertTexCoord");
 			shader.getAttrib("vertNormal");
 		}catch(RuntimeException e){
-//			System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 		}
 		
 		
-		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"));
+		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),
+				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"));
 		object.getMaterial().setVaoHandle(vao);
 		return shader;
 	}
@@ -63,6 +69,11 @@ public class ShaderHelper {
 		}else{
 			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture());
 			object.getMaterial().setTextureHandle(texture);
+		}
+		
+		if(object.getMaterial().hasBumpMap()){
+			int bumpMap = TextureHelper.genTexture(object.getMaterial().getBumpTexture());
+			object.getMaterial().setBumpTextureHandle(bumpMap);
 		}
 
 		GL20.glUseProgram(0);

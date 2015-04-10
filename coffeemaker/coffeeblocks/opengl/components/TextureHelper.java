@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -34,7 +35,7 @@ public class TextureHelper {
 			return 0;
 		}
 		int textureId = GL11.glGenTextures();
-//		GL13.glActiveTexture(textureUnit);
+//		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL_TEXTURE_2D, textureId);
 		
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, tWidth, tHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, img);

@@ -110,6 +110,16 @@ public class WavefrontModelReader implements ModelReader{
 				mtl.setSpecularColor(VectorTools.parseStrVector(line.substring(3,line.length())," "));
 			if(line.startsWith("map_Kd "))
 				mtl.setDiffuseTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(7,line.length()));
+			if(line.startsWith("map_Ks "))
+				mtl.setSpecularTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(7,line.length()));
+			if(line.startsWith("map_Ns "))
+				mtl.setHighlightTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(7,line.length()));
+			if(line.startsWith("map_d "))
+				mtl.setTransparencyTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(6,line.length()));
+			if(line.startsWith("map_Bump "))
+				mtl.setBumpTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(9,line.length()));
+			if(line.startsWith("bump "))
+				mtl.setBumpTexture(filename.substring(0, filename.lastIndexOf('/'))+"/"+line.substring(5,line.length()));
 //			if(line.startsWith("Kd "))
 //				mtl.diffuseColor = parseVector(line.substring(3,line.length()));
 //			if(line.startsWith("d "))

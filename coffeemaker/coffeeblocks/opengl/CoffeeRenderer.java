@@ -2,6 +2,7 @@ package coffeeblocks.opengl;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
@@ -140,7 +141,7 @@ public class CoffeeRenderer implements Runnable {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
@@ -334,18 +335,34 @@ public class CoffeeRenderer implements Runnable {
 				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
 			}
 
-			object.getShader().setUniform("materialTex", 0);
+			object.getShader().setUniform("cameraRightVec", camera.getCameraRightVec(1f));
+			object.getShader().setUniform("materialTex", 0); //Vi leser fargetekstur fra GL_TEXTURE(0)
+			object.getShader().setUniform("materialBump", 1);
+			object.getShader().setUniform("materialSpecular", 2);
+			object.getShader().setUniform("materialHighlight", 3);
+			object.getShader().setUniform("materialTransparency", 4);
 			object.getShader().setUniform("materialShininess", object.getMaterial().getShininess());
 			object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
-			object.getShader().setUniform("materialTransparency", object.getMaterial().getTransparency());
+			object.getShader().setUniform("materialTransparencyValue", object.getMaterial().getTransparency());
 			
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTextureHandle());
+			GL13.glActiveTexture(GL13.GL_TEXTURE1);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getBumpTextureHandle());
+			GL13.glActiveTexture(GL13.GL_TEXTURE2);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getSpecularTextureHandle());
+			GL13.glActiveTexture(GL13.GL_TEXTURE3);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getHighlightTextureHandle());
+			GL13.glActiveTexture(GL13.GL_TEXTURE4);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTransparencyTextureHandle());
 
 			GL30.glBindVertexArray(object.getMaterial().getVaoHandle());
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getVertexDataSize());
 
 			GL30.glBindVertexArray(0);
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+			GL13.glActiveTexture(GL13.GL_TEXTURE1);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 			GL20.glUseProgram(0);
 			

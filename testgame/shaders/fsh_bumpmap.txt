@@ -5,9 +5,14 @@ uniform vec3 cameraPosition;
 
 // material settings
 uniform sampler2D materialTex;
+uniform sampler2D materialBump;
+uniform sampler2D materialSpecular;
+uniform sampler2D materialTransparency;
+uniform sampler2D materialHighlight;
 uniform float materialShininess;
 uniform float materialTransparencyValue;
 uniform vec3 materialSpecularColor;
+uniform vec3 cameraRightVec;
 
 uniform struct Light {
    vec3 position;
@@ -23,7 +28,12 @@ in vec3 fragVert;
 out vec4 finalColor;
 
 void main() {
-    vec3 normal = normalize(transpose(inverse(mat3(model))) * fragNormal);
+	//normal
+    vec4 normalColor = texture(materialBump,fragTexCoord);
+    vec3 normalStatic = normalize(transpose(inverse(mat3(model))) * fragNormal);
+    vec3 normal = normalize(normalColor.rgb*2.0-1.0);
+
+	//Stuff
     vec3 surfacePos = vec3(model * vec4(fragVert, 1));
     vec4 surfaceColor = texture(materialTex, fragTexCoord);
     vec3 surfaceToLight = normalize(light.position - surfacePos);
@@ -33,13 +43,14 @@ void main() {
     vec3 ambient = light.ambientCoefficient * surfaceColor.rgb * light.intensities;
 
     //diffuse
-    float diffuseCoefficient = max(0.0, dot(normal, surfaceToLight));
+    vec3 lightVec = -surfaceToLight * dot(-surfaceToLight,-surfaceToLight);
+    float diffuseCoefficient = max(0.0, dot(normal, -lightVec));
     vec3 diffuse = diffuseCoefficient * surfaceColor.rgb * light.intensities;
     
     //specular
     float specularCoefficient = 0.0;
     if(diffuseCoefficient > 0.0)
-        specularCoefficient = pow(max(0.0, dot(surfaceToCamera, reflect(-surfaceToLight, normal))), materialShininess);
+        specularCoefficient = pow(max(0.0, dot(surfaceToCamera, reflect(-surfaceToLight, normalStatic))), materialShininess);
     vec3 specular = specularCoefficient * materialSpecularColor * light.intensities;
     
     //attenuation
@@ -52,4 +63,6 @@ void main() {
     //final color (after gamma correction)
     vec3 gamma = vec3(1.0/2.2);
     finalColor = vec4(pow(linearColor, gamma), materialTransparencyValue);
+    
+    
 }

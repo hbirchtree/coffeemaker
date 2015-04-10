@@ -68,11 +68,11 @@
 			"physics.restitution": 0.0
 		},
 		{
-			"object-id": "sun",
-			"model": "models/sun.obj",
+			"object-id": "testbox",
+			"model": "models/3dbox_bumped.obj",
 			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_nolight.txt",
-			"position": [25,25,25],
+			"fshader": "shaders/fsh_bumpmap.txt",
+			"position": [0,7,0],
 			"rotation": [0,0,0],
 			"scale": [1,1,1],
 			"physics.shape": 0
