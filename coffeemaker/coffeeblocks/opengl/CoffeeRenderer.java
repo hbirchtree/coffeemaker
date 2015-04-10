@@ -335,7 +335,6 @@ public class CoffeeRenderer implements Runnable {
 				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
 			}
 
-			object.getShader().setUniform("cameraRightVec", camera.getCameraRightVec(1f));
 			object.getShader().setUniform("materialTex", 0); //Vi leser fargetekstur fra GL_TEXTURE(0)
 			object.getShader().setUniform("materialBump", 1);
 			object.getShader().setUniform("materialSpecular", 2);

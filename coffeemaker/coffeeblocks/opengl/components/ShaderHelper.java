@@ -22,6 +22,8 @@ public class ShaderHelper {
 		}
 		object.setShader(shader);
 		
+		System.out.println(object.getVertices().size());
+		
 		GL20.glUseProgram(shader.getProgramId());
 
 		try{
@@ -31,7 +33,6 @@ public class ShaderHelper {
 				shader.getUniform("materialSpecular");
 				shader.getUniform("materialHighlight");
 				shader.getUniform("materialTransparency");
-				shader.getUniform("cameraRightVec");
 			}
 			shader.getUniform("materialTex");
 			shader.getUniform("camera");
@@ -48,13 +49,14 @@ public class ShaderHelper {
 			shader.getAttrib("vert");
 			shader.getAttrib("vertTexCoord");
 			shader.getAttrib("vertNormal");
+			shader.getAttrib("vertTangent");
 		}catch(RuntimeException e){
 			System.err.println(e.getMessage());
 		}
 		
 		
 		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),
-				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"));
+				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"),shader.getAttrib("vertTangent"));
 		object.getMaterial().setVaoHandle(vao);
 		return shader;
 	}
