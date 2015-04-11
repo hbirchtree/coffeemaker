@@ -19,7 +19,7 @@ void main() {
     fragTexCoord = vertTexCoord;
     fragNormal = vertNormal;
     fragVert = vert;
-    fragTangent = vertTangent;
+    fragTangent = (camera * model * vec4(vertTangent,0.0)).xyz;
     
     // Apply all matrix transformations to vert
     gl_Position = camera * model * vec4(vert, 1);

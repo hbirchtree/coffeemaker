@@ -18,10 +18,5 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/PNGDecoder.jar"/>
 	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/vecmath.jar"/>
-	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/luaj-jse-3.0.jar" sourcepath="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/luaj/luaj-sources-3.0.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/luaj/javadoc/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -54,9 +54,17 @@
 		{
 			"object-id": "player",
 			"model": "models/playermesh.obj",
+			"poses": {
+				"run.1": "playermesh_run1.obj",
+				"run.2": "playermesh_run2.obj",
+				"walk.1": "playermesh_walk1.obj",
+				"walk.2": "playermesh_walk2.obj",
+				"jump": "playermesh_jump.obj"
+			},
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0,20,0],
+			"stream-draw": true,
 			"rotation": [0.0,0,0],
 			"scale": [0.20,0.20,0.20],
 			"physics.shape": 5,

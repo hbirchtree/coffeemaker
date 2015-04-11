@@ -2,7 +2,6 @@ package coffeeblocks.opengl;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
@@ -10,9 +9,10 @@ import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.opengl.components.CoffeeCamera;
-import coffeeblocks.opengl.components.CoffeeFramebufferManager;
+import coffeeblocks.opengl.components.CoffeeVertex;
 import coffeeblocks.opengl.components.LimeLight;
 import coffeeblocks.opengl.components.ShaderHelper;
+import coffeeblocks.opengl.components.VAOHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -51,8 +51,10 @@ public class CoffeeRenderer implements Runnable {
 
 	private double fpsTimer = 0;
 	private long framecount = 0;
+	private long triCount = 0;
 	private double tick = 0;
 	private boolean fpscounter = true;
+	
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
 	private boolean mouseGrabbed = false;
@@ -84,8 +86,6 @@ public class CoffeeRenderer implements Runnable {
 	public void setWindowres(int w,int h) {
 		this.windowres = new Vector2d(w,h);
 	}
-
-	private float aspect = 1f;
 
 	public float getMouseSensitivity() {
 		return mouseSensitivity;
@@ -121,10 +121,11 @@ public class CoffeeRenderer implements Runnable {
 			// Terminate GLFW and release the GLFWerrorfun
 			glfwTerminate();
 			errorCallback.release();
+			for(CoffeeRendererListener listener : listeners)
+				listener.onGlfwQuit();
 		}
-		for(CoffeeRendererListener listener : listeners){
+		for(CoffeeRendererListener listener : listeners)
 			listener.onGlfwQuit();
-		}
 	}
 
 	private void init() {
@@ -148,7 +149,7 @@ public class CoffeeRenderer implements Runnable {
 		int WIDTH = (int)windowres.x;
 		int HEIGHT = (int)windowres.y;
 		
-		aspect = (float)(rendering_resolution.x/rendering_resolution.y);
+//		aspect = (float)(rendering_resolution.x/rendering_resolution.y);
 
 		// Create the window
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Café", NULL, NULL);
@@ -219,8 +220,9 @@ public class CoffeeRenderer implements Runnable {
 		if(fpscounter){
 			framecount++;
 			if(glfwGetTime()>=fpsTimer){
-				System.out.println("FPS: "+framecount+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
+				System.out.println("FPS: "+framecount+"\nTriangles: "+triCount+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
 				framecount = 0;
+				triCount = 0;
 				fpsTimer = glfwGetTime()+1;
 			}
 		}
@@ -315,16 +317,29 @@ public class CoffeeRenderer implements Runnable {
 			GL20.glDeleteProgram(object.getShader().getProgramId());
 	}
 	
+	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(VAOHelper.VERT_STRIDE);
+	
 	private void loopRenderObjects(){
 		for(ModelContainer object : scene.getRenderables()){
 			if(!object.isObjectBaked()){
-				ShaderHelper.compileShaders(object,GL13.GL_TEXTURE0);
+				ShaderHelper.compileShaders(object);
 			}
 			if(object.isNoDepthRendering()){
 				glDisable(GL_DEPTH_TEST);
 			}
 			GL20.glUseProgram(object.getShader().getProgramId());
 
+			//Animasjon ved å endre modellen fra en annen tråd
+			if(!object.getAnimationContainer().isStaticallyDrawn()){
+				//Vi bruker en enkel ByteBuffer for alle for å unngå tonnevis med allokasjoner per sekund. Vi tilbakestiller denne hver gang vi skal rendre på nytt.
+				//Dersom vi ikke gjør dette synker ytelsen *dramatisk*
+				if(glfwGetTime()%1>0.5)
+					object.getAnimationContainer().morphToState("run.1", 0.4f);
+				else
+					object.getAnimationContainer().morphToState("run.2", 0.4f);
+				VAOHelper.modifyVbo(object.getAnimationContainer().getVboHandle(), object.getAnimationContainer().getCurrentMesh(),vertBuffer);
+			}
+			
 			object.getShader().setUniform("camera", camera.matrix());
 
 			object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
@@ -335,7 +350,7 @@ public class CoffeeRenderer implements Runnable {
 				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
 			}
 
-			object.getShader().setUniform("materialTex", 0); //Vi leser fargetekstur fra GL_TEXTURE(0)
+			object.getShader().setUniform("materialTex", 0); //Vi leser fargetekstur fra GL_TEXTURE(0), samme med de under
 			object.getShader().setUniform("materialBump", 1);
 			object.getShader().setUniform("materialSpecular", 2);
 			object.getShader().setUniform("materialHighlight", 3);
@@ -344,6 +359,7 @@ public class CoffeeRenderer implements Runnable {
 			object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
 			object.getShader().setUniform("materialTransparencyValue", object.getMaterial().getTransparency());
 			
+			//Vi legger inn teksturene i minne for å kunne bruke de
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTextureHandle());
 			GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -355,13 +371,22 @@ public class CoffeeRenderer implements Runnable {
 			GL13.glActiveTexture(GL13.GL_TEXTURE4);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTransparencyTextureHandle());
 
+			//Vi bind'er lokasjonen i minne hvor punktene befinner seg og tegner det på skjermen
 			GL30.glBindVertexArray(object.getMaterial().getVaoHandle());
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getVertexDataSize());
+			triCount+=object.getVertexDataSize()/(CoffeeVertex.VERTEX_DATA_SIZE)/3; //Vi vil vite hvor mange polygoner vi har på skjermen
 
+			//Vi ber tilstandsmaskinen om å tilbakestilles for å unngå mulige feil
 			GL30.glBindVertexArray(0);
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 			GL13.glActiveTexture(GL13.GL_TEXTURE1);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+			GL13.glActiveTexture(GL13.GL_TEXTURE2);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+			GL13.glActiveTexture(GL13.GL_TEXTURE3);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+			GL13.glActiveTexture(GL13.GL_TEXTURE4);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 			GL20.glUseProgram(0);
 			

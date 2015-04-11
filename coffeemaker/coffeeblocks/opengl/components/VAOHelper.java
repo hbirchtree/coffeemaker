@@ -1,5 +1,6 @@
 package coffeeblocks.opengl.components;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.List;
 
@@ -9,12 +10,12 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.general.VectorTools;
+import coffeeblocks.foundation.models.ModelContainer;
 
 public class VAOHelper {
-	private static int VERT_STRIDE = 4*(3+2+3+3);
+	public static int VERT_STRIDE = 4*(3+2+3+3);
 	
-	public static int genVAO(FloatBuffer vertices, int vertLocation, int vertTexCoordLocation, int vertNormalLocation, int vertTangentLocation){
+	public static void genVAO(ModelContainer object,FloatBuffer vertices, int vertLocation, int vertTexCoordLocation, int vertNormalLocation, int vertTangentLocation){
 		int vbo = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STREAM_DRAW);
@@ -40,7 +41,9 @@ public class VAOHelper {
 		
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		GL30.glBindVertexArray(0);
-		return vao;
+		
+		object.getMaterial().setVaoHandle(vao);
+		object.getAnimationContainer().setVboHandle(vbo);
 	}
 	
 	public static List<CoffeeVertex> genTangents(List<CoffeeVertex> inputFace){
@@ -68,17 +71,33 @@ public class VAOHelper {
 	    bt.x = f * (-deltaU2 * edge1.x - deltaU1 * edge2.x);
 	    bt.y = f * (-deltaU2 * edge1.y - deltaU1 * edge2.y);
 	    bt.z = f * (-deltaU2 * edge1.z - deltaU1 * edge2.z);
-		
-	    t.normalise();
-	    bt.normalise();
 	    
-	    v0.tangent = t;
-	    v0.bitangent = bt;
-	    v1.tangent = t;
-	    v1.bitangent = bt;
-	    v2.tangent = t;
-	    v2.bitangent = bt;
+	    v0.tangent = Vector3f.add(t, v0.tangent, null);
+	    v1.tangent = Vector3f.add(t, v1.tangent, null);
+	    v2.tangent = Vector3f.add(t, v2.tangent, null);
+	    
+	    inputFace.set(0, v0);
+	    inputFace.set(1, v1);
+	    inputFace.set(2, v2);
 	    
 		return inputFace;
+	}
+	
+	public static void modifyVbo(int vboId, List<CoffeeVertex> mesh,ByteBuffer scratchBuf){
+		if(mesh.size()==0)
+			return;
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
+		
+		for(int i=0;i<mesh.size();i++){
+			float[] data = mesh.get(i).getElements();
+			
+			FloatBuffer buffer = scratchBuf.asFloatBuffer();
+			buffer.rewind();
+			buffer.put(data);
+			buffer.flip();
+			GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, i*VERT_STRIDE, scratchBuf);
+		}
+		
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
 }

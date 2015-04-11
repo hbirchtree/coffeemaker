@@ -80,6 +80,8 @@ public class CoffeeJsonParsing {
 				gobj.getGameModel().setRotation(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("object-id")&&obj instanceof String){
 				gobj.setObjectId(((String)obj));
+			}else if(key.equals("stream-draw")&&obj instanceof Boolean){
+				gobj.getGameModel().getAnimationContainer().setStaticDraw(!(Boolean)obj);
 			}else if(key.equals("scale")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
 				gobj.getGameModel().setScale(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
@@ -111,6 +113,12 @@ public class CoffeeJsonParsing {
 					if(text instanceof String)
 						gobj.getGameModel().getMaterial().addTexture(filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)text);
 				gobj.getGameModel().getMaterial().setMultitextured(true);
+			}else if(key.equals("poses")&&obj instanceof HashMap){
+				Map<String,Object> poses = ((HashMap)obj);
+				for(String pose : poses.keySet()){
+					String modelfile = filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)poses.get(pose);
+					gobj.getGameModel().getAnimationContainer().addState(pose,ModelLoader.loadModel(modelfile).getVertices());
+				}
 			}
 		}
 		return gobj;

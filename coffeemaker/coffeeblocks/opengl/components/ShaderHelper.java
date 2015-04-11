@@ -22,13 +22,11 @@ public class ShaderHelper {
 		}
 		object.setShader(shader);
 		
-		System.out.println(object.getVertices().size());
-		
 		GL20.glUseProgram(shader.getProgramId());
 
 		try{
-			if(object.getMaterial().hasBumpMap()/*&&object.getMaterial().hasHighlightMap()&&
-					object.getMaterial().hasSpecularMap()&&object.getMaterial().hasTransparencyMap()*/){
+			if(object.getMaterial().hasBumpMap()&&object.getMaterial().hasHighlightMap()&&
+					object.getMaterial().hasSpecularMap()&&object.getMaterial().hasTransparencyMap()){
 				shader.getUniform("materialBump");
 				shader.getUniform("materialSpecular");
 				shader.getUniform("materialHighlight");
@@ -55,12 +53,11 @@ public class ShaderHelper {
 		}
 		
 		
-		int vao = VAOHelper.genVAO(object.getVertexData(),shader.getAttrib("vert"),
+		VAOHelper.genVAO(object,object.getVertexData(),shader.getAttrib("vert"),
 				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"),shader.getAttrib("vertTangent"));
-		object.getMaterial().setVaoHandle(vao);
 		return shader;
 	}
-	public static ShaderBuilder compileShaders(ModelContainer object,int textureUnit){
+	public static ShaderBuilder compileShaders(ModelContainer object){
 		ShaderBuilder shader = setupShader(object);
 		
 		if(object.getMaterial().isMultitextured()){
@@ -76,6 +73,18 @@ public class ShaderHelper {
 		if(object.getMaterial().hasBumpMap()){
 			int bumpMap = TextureHelper.genTexture(object.getMaterial().getBumpTexture());
 			object.getMaterial().setBumpTextureHandle(bumpMap);
+		}
+		if(object.getMaterial().hasTransparencyMap()){
+			int alphaMap = TextureHelper.genTexture(object.getMaterial().getTransparencyTexture());
+			object.getMaterial().setTransparencyTextureHandle(alphaMap);
+		}
+		if(object.getMaterial().hasHighlightMap()){
+			int highMap = TextureHelper.genTexture(object.getMaterial().getHighlightTexture());
+			object.getMaterial().setHighlightTextureHandle(highMap);
+		}
+		if(object.getMaterial().hasSpecularMap()){
+			int specMap = TextureHelper.genTexture(object.getMaterial().getSpecularTexture());
+			object.getMaterial().setSpecularTextureHandle(specMap);
 		}
 
 		GL20.glUseProgram(0);

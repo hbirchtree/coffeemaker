@@ -13,6 +13,7 @@ import com.bulletphysics.collision.broadphase.Dispatcher;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
@@ -161,6 +162,26 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			listeners.add(listener);
 	}
 	
+	public boolean performRaytest(org.lwjgl.util.vector.Vector3f start,String targetObject){
+		RigidBody target = objects.get(targetObject);
+		Vector3f end = target.getWorldTransform(new Transform()).origin;
+		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(VectorTools.lwjglToVMVec3f(start), end);
+		dynamicsWorld.rayTest(VectorTools.lwjglToVMVec3f(start), end, ray);
+		if(ray.hasHit()&&target==(RigidBody)ray.collisionObject){ //Vi vil vite at det er det absolutt samme objektet vi spør etter. Strålen kan treffe mye annet.
+			return true;
+		}
+		return false;
+	}
+	
+	public String performRaytestId(org.lwjgl.util.vector.Vector3f start,org.lwjgl.util.vector.Vector3f end){
+		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(VectorTools.lwjglToVMVec3f(start), VectorTools.lwjglToVMVec3f(end));
+		dynamicsWorld.rayTest(VectorTools.lwjglToVMVec3f(start), VectorTools.lwjglToVMVec3f(end), ray);
+		if(ray.hasHit()){ //Vi vil vite at det er det absolutt samme objektet vi spør etter. Strålen kan treffe mye annet.
+			return ((GameObject)((RigidBody)ray.collisionObject).getUserPointer()).getObjectId();
+		}
+		return null;
+	}
+	
 	@Override
 	public void existingGameObjectChanged(String objectId,GameObject.PropertyEnumeration property){
 		if(!objects.containsKey(objectId))
@@ -172,6 +193,8 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			body.setWorldTransform(createTransform(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getPosition())));
 			break;
 		case PHYS_CLEARFORCE:
+			body.setLinearVelocity(new Vector3f());
+			body.setAngularVelocity(new Vector3f());
 			body.clearForces();
 			break;
 		case PHYS_ACCEL:

@@ -55,6 +55,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	
 	public void eventLoop(){
+		long raytest = clock+100;
 		applyScene(currentScene);
 		manager.getRenderer().addInputListener(this);
 		
@@ -72,6 +73,11 @@ public class CoffeeShop extends CoffeeLogicLoop{
 			getScene().getLights().get(0).setPosition(
 					getScene().getCamera().getCameraPos());
 //			drawHud();
+//			if(clock>=raytest){
+//				if(performRaytest("player",new Vector3f(0,15,0)))
+//						System.out.println("It's a hit!");
+//				raytest = clock+100;
+//			}
 			if(getObject("water").getGameData().getTimerValue("switch")==null||
 					clock>=getObject("water").getGameData().getTimerValue("switch")){
 				
@@ -84,17 +90,17 @@ public class CoffeeShop extends CoffeeLogicLoop{
 				getScene().getObject("water").getGameModel().getMaterial().selectTexture = getObject("water").getGameData().getIntValue("texture");
 				getObject("water").getGameData().setTimerValue("switch",clock+200);
 			}
-			if(getObject("skybox").getGameData().getTimerValue("switch")==null||
-					clock>=getObject("skybox").getGameData().getTimerValue("switch")){
-				getObject("skybox").getGameData().setIntValue(
-						"texture",
-						getObject("skybox").getGameData().getIntValue("texture")+1);
-				
-				if(getObject("skybox").getGameData().getIntValue("texture")>1)
-					getObject("skybox").getGameData().setIntValue("texture",0);
-				getScene().getObject("skybox").getGameModel().getMaterial().selectTexture = getObject("skybox").getGameData().getIntValue("texture");
-				getObject("skybox").getGameData().setTimerValue("switch",clock+700);
-			}
+//			if(getObject("skybox").getGameData().getTimerValue("switch")==null||
+//					clock>=getObject("skybox").getGameData().getTimerValue("switch")){
+//				getObject("skybox").getGameData().setIntValue(
+//						"texture",
+//						getObject("skybox").getGameData().getIntValue("texture")+1);
+//				
+//				if(getObject("skybox").getGameData().getIntValue("texture")>1)
+//					getObject("skybox").getGameData().setIntValue("texture",0);
+//				getScene().getObject("skybox").getGameModel().getMaterial().selectTexture = getObject("skybox").getGameData().getIntValue("texture");
+//				getObject("skybox").getGameData().setTimerValue("switch",clock+700);
+//			}
 			if(getObject("player").getGameData().getBoolValue("can-jump")&&clock>getObject("player").getGameData().getTimerValue("jump-to")){
 				getObject("player").getGameData().setBoolValue("can-jump",false);
 			}
@@ -217,5 +223,8 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	private GameObject getObject(String object){
 		return getScene().getObject(object);
+	}
+	private boolean performRaytest(String object,Vector3f startPoint){
+		return getScene().getPhysicsSystem().performRaytest(startPoint,object);
 	}
 }
