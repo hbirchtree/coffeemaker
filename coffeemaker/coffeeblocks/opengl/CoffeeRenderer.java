@@ -57,6 +57,7 @@ public class CoffeeRenderer implements Runnable {
 	
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
+	private boolean doMouseGrab = true;
 	private boolean mouseGrabbed = false;
 	private int rendering_swaps = 1;
 	public void setSwapping(int swapping){
@@ -180,7 +181,8 @@ public class CoffeeRenderer implements Runnable {
 		// Enable v-sync
 		glfwSwapInterval(this.rendering_swaps);
 		
-		toggleGrabMouse();
+		if(doMouseGrab)
+			toggleGrabMouse();
 
 		// Make the window visible
 		glfwShowWindow(window);
@@ -265,27 +267,22 @@ public class CoffeeRenderer implements Runnable {
 		
 		fpsTimer = glfwGetTime()+1;
 		
-//		CoffeeFramebufferManager framebuffer = new CoffeeFramebufferManager(0,GL11.GL_RGBA);
-//		try{
-//			framebuffer.setRenderBuffer(aspect,(int)rendering_resolution.x, (int)rendering_resolution.y);
-//		}catch(IllegalStateException e){
-//			System.err.println(e.getMessage());
-//		}
-//		framebuffer.setEnabled(false);
+		float lastTick = 0f;
 		
 		while (glfwWindowShouldClose(window)==GL_FALSE){
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 			fpsCount(); //Skriver ut FPS og tikke-tid
+			lastTick = (float)tick;
+			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
 				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
 			for(CoffeeRendererListener listener : listeners)
-				listener.onGlfwFrameTick((float)tick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
+				listener.onGlfwFrameTick(lastTick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
 			tick = glfwGetTime(); //Vi bruker den midlertidig
 			for(CoffeeRendererListener listener : listeners)
-				listener.onGlfwFrameTick(glfwGetTime()); //Vi vil ha oversikt over tiden
-			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
+				listener.onGlfwFrameTick(glfwGetTime()); //Vi vil ha oversikt over spilltiden i de andre trådene
 
-			if(mouseGrabbed&&scene!=null)
+			if(mouseGrabbed&&scene!=null&&doMouseGrab)
 				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
 			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
 
@@ -317,7 +314,7 @@ public class CoffeeRenderer implements Runnable {
 			GL20.glDeleteProgram(object.getShader().getProgramId());
 	}
 	
-	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(VAOHelper.VERT_STRIDE);
+	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(4*3);
 	
 	private void loopRenderObjects(){
 		for(ModelContainer object : scene.getRenderables()){
@@ -333,10 +330,10 @@ public class CoffeeRenderer implements Runnable {
 			if(!object.getAnimationContainer().isStaticallyDrawn()){
 				//Vi bruker en enkel ByteBuffer for alle for å unngå tonnevis med allokasjoner per sekund. Vi tilbakestiller denne hver gang vi skal rendre på nytt.
 				//Dersom vi ikke gjør dette synker ytelsen *dramatisk*
-				if(glfwGetTime()%1>0.5)
-					object.getAnimationContainer().morphToState("run.1", 0.4f);
-				else
-					object.getAnimationContainer().morphToState("run.2", 0.4f);
+//				if(glfwGetTime()%1>0.5)
+//					object.getAnimationContainer().morphToState("run.1", 0.4f);
+//				else
+//					object.getAnimationContainer().morphToState("run.2", 0.4f);
 				VAOHelper.modifyVbo(object.getAnimationContainer().getVboHandle(), object.getAnimationContainer().getCurrentMesh(),vertBuffer);
 			}
 			

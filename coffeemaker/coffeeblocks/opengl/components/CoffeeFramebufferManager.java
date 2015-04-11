@@ -51,9 +51,9 @@ public class CoffeeFramebufferManager {
 		renderMesh.setShaderFiles("testgame/shaders/vsh.txt", "testgame/shaders/fsh_nolight.txt");
 		ShaderHelper.setupShader(renderMesh);
 		renderMesh.getMaterial().setTextureHandle(getTexture());
-		renderMesh.setPosition(new Vector3f(0,0,-1.07f));
-		renderMesh.setScale(new Vector3f(aspect,1,1));
-		renderMesh.setRotation(new Vector3f(0,90,0));
+		renderMesh.getPosition().setValue(new Vector3f(0,0,-1.07f));
+		renderMesh.getScale().setValue(new Vector3f(aspect,1,1));
+		renderMesh.getRotation().setValue(new Vector3f(0,90,0));
 
 		framebuffer = GL30.glGenFramebuffers();
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebuffer);

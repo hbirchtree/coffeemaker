@@ -3,10 +3,11 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class VectorTools {
 	public static Vector3f vectorMul(Vector3f vec, float scalar){
-		vec.x *= scalar;
-		vec.y *= scalar;
-		vec.z *= scalar;
-		return vec;
+		Vector3f ovec = new Vector3f(vec);
+		ovec.x *= scalar;
+		ovec.y *= scalar;
+		ovec.z *= scalar;
+		return ovec;
 	}
 	public static Vector3f vectorLimit(Vector3f src, float max){
 		if(src.x>0&&src.x>max)

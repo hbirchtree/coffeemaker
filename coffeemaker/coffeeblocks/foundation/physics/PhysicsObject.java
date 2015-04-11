@@ -2,19 +2,16 @@ package coffeeblocks.foundation.physics;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import coffeeblocks.foundation.Vector3Container;
+
 public abstract class PhysicsObject {
 	public enum PhysicsType {
 		Undefined,Box,Sphere,Complex,StaticPlane,Capsule
 	};
 	
 	public synchronized void tick(){
-		positionalVelocity.x+=positionalAcceleration.x;
-		positionalVelocity.y+=positionalAcceleration.y;
-		positionalVelocity.z+=positionalAcceleration.z;
-		
-		position.x+=positionalVelocity.x*physicalMass;
-		position.y+=positionalVelocity.y*physicalMass;
-		position.z+=positionalVelocity.z*physicalMass;
+		position.increaseVelocity(position.getAcceleration());
+		position.increaseValue(position.getVelocity());
 	}
 	
 	private PhysicsType physicsType = PhysicsType.Undefined;
@@ -39,17 +36,11 @@ public abstract class PhysicsObject {
 			return;
 		this.physicalMass = physicalMass;
 	}
-	public Vector3f getPosition() {
-		return position;
-	}
-	public void setPosition(Vector3f position) {
-		this.position = position;
-	}
 	public float getPhysicalMass(){
 		return physicalMass;
 	}
 	
-	private Vector3f physicalScale = new Vector3f(1.0f,1.0f,1.0f);
+	private Vector3f physicalScale = new Vector3f(1.0f,1.0f,1.0f); //Skala for det fysiske objektet
 	public synchronized void setPhysicalScale(Vector3f physicalScale){
 		this.physicalScale = physicalScale;
 	}
@@ -57,8 +48,8 @@ public abstract class PhysicsObject {
 		return physicalScale;
 	}
 	
-	private float restitution = 0f;
-	private float friction = 0.5f;
+	private float restitution = 0f; //Hvor mye objektet gir etter ved støt
+	private float friction = 0.5f; //Friksjon.
 	public float getRestitution() {
 		return restitution;
 	}
@@ -89,21 +80,28 @@ public abstract class PhysicsObject {
 		this.physicalLinearFactor = physicalLinearFactor;
 	}
 
-	private Vector3f position = new Vector3f(0,0,0);
-	private Vector3f positionalVelocity = new Vector3f(0,0,0);
-	private Vector3f positionalAcceleration = new Vector3f(0,0,0);
-	public Vector3f getPositionalVelocity() {
-		return positionalVelocity;
+//	private Vector3f position = new Vector3f(0,0,0); //Posisjon i 3D-rommet og fysikk-rommet
+	private Vector3Container position = new Vector3Container();
+	public Vector3Container getPosition() {
+		return position;
 	}
-	public void setPositionalVelocity(Vector3f positionalVelocity) {
-		this.positionalVelocity = positionalVelocity;
-	}
-	public Vector3f getPositionalAcceleration() {
-		return positionalAcceleration;
-	}
-	public void setPositionalAcceleration(Vector3f positionalAcceleration) {
-		this.positionalAcceleration = positionalAcceleration;
-	}
+//	public void setPosition(Vector3f position) {
+//		this.position = position;
+//	}
+//	private Vector3f positionalVelocity = new Vector3f(0,0,0); //Statisk fart i 3D-rommet, ikke fysikk-rommet
+//	private Vector3f positionalAcceleration = new Vector3f(0,0,0); //Statisk akselerasjon i 3D-rommet, ikke fysikk-rommet
+//	public Vector3f getPositionalVelocity() {
+//		return positionalVelocity;
+//	}
+//	public void setPositionalVelocity(Vector3f positionalVelocity) {
+//		this.positionalVelocity = positionalVelocity;
+//	}
+//	public Vector3f getPositionalAcceleration() {
+//		return positionalAcceleration;
+//	}
+//	public void setPositionalAcceleration(Vector3f positionalAcceleration) {
+//		this.positionalAcceleration = positionalAcceleration;
+//	}
 	public Vector3f getImpulse() {
 		return impulse;
 	}
@@ -128,5 +126,13 @@ public abstract class PhysicsObject {
 	}
 	public void setObjectDeactivation(boolean deactivation){
 		this.objectDeactivation = deactivation;
+	}
+	
+	private boolean notifiesForce = false;
+	public boolean isNotifyForce(){
+		return notifiesForce;
+	}
+	public void setNotifyForce(boolean notify){
+		this.notifiesForce = notify;
 	}
 }

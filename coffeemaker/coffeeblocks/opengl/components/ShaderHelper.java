@@ -98,11 +98,12 @@ public class ShaderHelper {
 		FloatBuffer result = BufferUtils.createFloatBuffer(16);
 		
 		Matrix4f modelMatrix = new Matrix4f();
-		Matrix4f.translate(object.getPosition(), modelMatrix, modelMatrix);
-		Matrix4f.scale(object.getScale(), modelMatrix, modelMatrix);
-		Matrix4f.rotate(object.getRotation().y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
-		Matrix4f.rotate(object.getRotation().z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
-		Matrix4f.rotate(object.getRotation().x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);
+		Matrix4f.translate(object.getPosition().getValue(), modelMatrix, modelMatrix);
+		Matrix4f.scale(object.getScale().getValue(), modelMatrix, modelMatrix);
+		Vector3f rotation = object.getRotation().getValue();
+		Matrix4f.rotate(rotation.y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
+		Matrix4f.rotate(rotation.z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
+		Matrix4f.rotate(rotation.x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);
 		
 		modelMatrix.store(result);
 		result.flip();

@@ -89,11 +89,15 @@ public class VAOHelper {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
 		
 		for(int i=0;i<mesh.size();i++){
-			float[] data = mesh.get(i).getElements();
+//			float[] data = mesh.get(i).getElements();
+			float[] vpos = new float[3];
+			vpos[0] = mesh.get(i).position.x;
+			vpos[1] = mesh.get(i).position.y;
+			vpos[2] = mesh.get(i).position.z;
 			
 			FloatBuffer buffer = scratchBuf.asFloatBuffer();
 			buffer.rewind();
-			buffer.put(data);
+			buffer.put(vpos);
 			buffer.flip();
 			GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, i*VERT_STRIDE, scratchBuf);
 		}

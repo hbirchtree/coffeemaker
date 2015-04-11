@@ -73,18 +73,20 @@ public class CoffeeJsonParsing {
 			if(key.equals("position")){
 				if(obj instanceof ArrayList){
 					List<Object> pos = ((ArrayList)obj);
-					gobj.getGameModel().setPosition(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+					gobj.getGameModel().getPosition().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 				}
 			}else if(key.equals("rotation")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().setRotation(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().getRotation().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("object-id")&&obj instanceof String){
 				gobj.setObjectId(((String)obj));
 			}else if(key.equals("stream-draw")&&obj instanceof Boolean){
 				gobj.getGameModel().getAnimationContainer().setStaticDraw(!(Boolean)obj);
+			}else if(key.equals("notify-force")&&obj instanceof Boolean){
+				gobj.getGameModel().setNotifyForce((Boolean)obj);
 			}else if(key.equals("scale")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().setScale(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().getScale().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("physics.scale")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
 				gobj.getGameModel().setPhysicalScale(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));

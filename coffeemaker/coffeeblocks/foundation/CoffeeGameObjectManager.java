@@ -99,8 +99,8 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public void billboard(String objectId,boolean spherical){
 		CoffeeCamera camera = getCamera();
 		if(spherical)
-			getObject(objectId).getGameModel().setRotation(new Vector3f(-camera.getVertiAngle(),-camera.getHorizAngle(),0));
+			getObject(objectId).getGameModel().getRotation().setValue(new Vector3f(-camera.getVertiAngle(),-camera.getHorizAngle(),0));
 		else
-			getObject(objectId).getGameModel().setRotation(new Vector3f(0,-camera.getHorizAngle(),0));
+			getObject(objectId).getGameModel().getRotation().setValue(new Vector3f(0,-camera.getHorizAngle(),0));
 	}
 }

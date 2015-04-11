@@ -7,16 +7,32 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import coffeeblocks.foundation.Vector3Container;
+
 public class CoffeeCamera {
 	
-	private Vector3f cameraPos = new Vector3f(3,10,5);
+	private Vector3Container cameraPosition = new Vector3Container();
+	private Vector3f cameraOffset = null;
 	public Vector3f getCameraPos() {
-		return cameraPos;
+		if(cameraOffset!=null)
+			return Vector3f.add(cameraPosition.getValue(),cameraOffset,null);
+		return cameraPosition.getValue();
+	}
+	public void bindCameraPos(Vector3Container target){
+		cameraPosition = target;
+	}
+	public void bindCameraPos(Vector3Container target,Vector3f offset){
+		cameraOffset = offset;
+		cameraPosition = target;
+	}
+	public void unbindCameraPos(){
+		cameraPosition = new Vector3Container();
 	}
 	public void setCameraPos(Vector3f cameraPos) {
-		this.cameraPos = cameraPos;
+		unbindCameraPos();
+		cameraPosition.setValue(cameraPos);
 	}
-	public float getFieldOfView() {
+	public float getFieldOfView(){
 		return fieldOfView;
 	}
 	public void setFieldOfView(float fieldOfView) {
@@ -41,7 +57,7 @@ public class CoffeeCamera {
 	}
 	
 	public void lookAt(Vector3f targetPos){
-		Vector3f direction = Vector3f.sub(targetPos, cameraPos, null);
+		Vector3f direction = Vector3f.sub(targetPos, getCameraPos(), null);
 		direction.normalise();
 		vertiAngle = -(float)Math.toRadians(Math.asin(-direction.y));
 		horizAngle = -(float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
@@ -90,7 +106,9 @@ public class CoffeeCamera {
 	}
 	
 	public void offsetPosition(Vector3f offset){
-		setCameraPos(Vector3f.add(getCameraPos(), offset, null));
+		if(this.cameraOffset==null)
+			cameraOffset = new Vector3f();
+		Vector3f.add(this.cameraOffset,offset,this.cameraOffset);
 	}
 	
 	public Matrix4f getOrientation(){
@@ -142,7 +160,7 @@ public class CoffeeCamera {
 	public Matrix4f getView(){
 		Matrix4f view = new Matrix4f();
 		Matrix4f pos = new Matrix4f();
-		Vector3f cameraPosNeg = new Vector3f(cameraPos);
+		Vector3f cameraPosNeg = new Vector3f(getCameraPos());
 		cameraPosNeg.negate();
 		Matrix4f.translate(cameraPosNeg, pos, pos);
 		Matrix4f.mul(getOrientation(), pos, view);
