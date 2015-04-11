@@ -205,7 +205,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			body.clearForces();
 			break;
 		case PHYS_ACCEL:
-			body.applyCentralForce(manager.getObject(objectId).getGameModel().getPosition().getAccelerationVM());			
+			body.applyCentralForce(manager.getObject(objectId).getGameModel().getPosition().getAccelerationVM());
 			break;
 		case PHYS_IMPULSE:
 			body.applyCentralImpulse(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getImpulse()));

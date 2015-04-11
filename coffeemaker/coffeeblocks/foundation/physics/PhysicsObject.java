@@ -80,28 +80,11 @@ public abstract class PhysicsObject {
 		this.physicalLinearFactor = physicalLinearFactor;
 	}
 
-//	private Vector3f position = new Vector3f(0,0,0); //Posisjon i 3D-rommet og fysikk-rommet
 	private Vector3Container position = new Vector3Container();
-	public Vector3Container getPosition() {
+	public Vector3Container getPosition(){
 		return position;
 	}
-//	public void setPosition(Vector3f position) {
-//		this.position = position;
-//	}
-//	private Vector3f positionalVelocity = new Vector3f(0,0,0); //Statisk fart i 3D-rommet, ikke fysikk-rommet
-//	private Vector3f positionalAcceleration = new Vector3f(0,0,0); //Statisk akselerasjon i 3D-rommet, ikke fysikk-rommet
-//	public Vector3f getPositionalVelocity() {
-//		return positionalVelocity;
-//	}
-//	public void setPositionalVelocity(Vector3f positionalVelocity) {
-//		this.positionalVelocity = positionalVelocity;
-//	}
-//	public Vector3f getPositionalAcceleration() {
-//		return positionalAcceleration;
-//	}
-//	public void setPositionalAcceleration(Vector3f positionalAcceleration) {
-//		this.positionalAcceleration = positionalAcceleration;
-//	}
+	
 	public Vector3f getImpulse() {
 		return impulse;
 	}

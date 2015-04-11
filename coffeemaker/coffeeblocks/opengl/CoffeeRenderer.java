@@ -330,10 +330,6 @@ public class CoffeeRenderer implements Runnable {
 			if(!object.getAnimationContainer().isStaticallyDrawn()){
 				//Vi bruker en enkel ByteBuffer for alle for å unngå tonnevis med allokasjoner per sekund. Vi tilbakestiller denne hver gang vi skal rendre på nytt.
 				//Dersom vi ikke gjør dette synker ytelsen *dramatisk*
-//				if(glfwGetTime()%1>0.5)
-//					object.getAnimationContainer().morphToState("run.1", 0.4f);
-//				else
-//					object.getAnimationContainer().morphToState("run.2", 0.4f);
 				VAOHelper.modifyVbo(object.getAnimationContainer().getVboHandle(), object.getAnimationContainer().getCurrentMesh(),vertBuffer);
 			}
 			

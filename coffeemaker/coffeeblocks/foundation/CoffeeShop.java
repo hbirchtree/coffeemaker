@@ -50,7 +50,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		getScene().billboard("sun", true);
 		getObject("sun").getGameModel().getPosition().setValue(
 				Vector3f.add(Vector3f.add(
-							getScene().getCamera().getCameraPos(),
+							getScene().getCamera().getCameraPos().getValue(),
 							getScene().getCamera().getCameraRightVec(-2f),null),
 						getScene().getCamera().getCameraForwardVec(1.0f*getScene().getCamera().getFieldOfView()/85),null));
 	}
@@ -60,35 +60,23 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		long raytest = clock+100;
 		applyScene(currentScene);
 		manager.getRenderer().addInputListener(this);
-		getScene().getCamera().bindCameraPos(getObject("player").getGameModel().getPosition(),
-						Vector3f.add(VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(0.2f),null));
+		getScene().getCamera().getCameraPos().bindValue(getObject("player").getGameModel().getPosition());
+		getScene().getLights().get(0).bindPosition(getScene().getCamera().getCameraPos());
 		
 		while(true){
 			clock = System.currentTimeMillis();
-			//Vi stiller opp kameraet og lyset, dette vil skje periodisk. Tidligere skjedde det ved hver oppdatering av fysikken, hvis tidsperiode var altfor variabel.
-//			if(fpsMode)
-//				getScene().getCamera().setCameraPos(
-//						Vector3f.add(getObject("player").getGameModel().getPosition().getValue(),
-//								getScene().getCamera().getUp(),null));
-//			else
-//			getScene().getCamera().lookAt(getObject("player").getGameModel().getPosition().getValue());
-//			getScene().getCamera().setCameraPos(
-//					Vector3f.add(getObject("player").getGameModel().getPosition().getValue(),
-//							getScene().getCamera().getCameraForwardVec(-5f),null));
-			getScene().getLights().get(0).setPosition(
-					getScene().getCamera().getCameraPos());
+			//Kameraets posisjon relativt til spilleren endrer seg, derfor må vi endre offset for kameraets posisjon for å holde det i bane rundt spilleren.
+			getScene().getCamera().getCameraPos().setValueOffset(Vector3f.add(VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(-5f),null));
 //			drawHud();
 //			if(clock>=raytest){
 //				if(performRaytest("player",new Vector3f(0,15,0)))
 //						System.out.println("It's a hit!");
 //				raytest = clock+100;
 //			}
-//			if(clock%1000%10==0)
-//				getObject("testbox").getGameModel().getRotation().increaseValue(new Vector3f(0,0.003f,0));
 			if(getObject("water").getGameData().getTimerValue("switch")==null||
 					clock>=getObject("water").getGameData().getTimerValue("switch")){
 				getObject("testbox").getGameModel().getRotation().setValue(new Vector3f());
-				anim.addTransition(getObject("testbox").getGameModel().getRotation(), new Vector3f(0,180f,0), CoffeeAnimator.TransitionType.ValueExpo, 300f);
+				anim.addTransition(getObject("testbox").getGameModel().getRotation(), new Vector3f(0,360f,0), CoffeeAnimator.TransitionType.ValueExpo, 1000f);
 				
 				getObject("water").getGameData().setIntValue(
 						"texture",

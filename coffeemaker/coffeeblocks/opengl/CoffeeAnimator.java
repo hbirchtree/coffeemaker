@@ -55,7 +55,6 @@ public class CoffeeAnimator {
 			switch(transitional.animationType){
 			case ValueExpo:
 				transitional.transitionRestTime -= tickTime*1000f;
-//				System.out.println("Resttime:"+transitional.transitionRestTime);
 				if(transitional.transitionRestTime<=0){
 					transitions.remove(transitional);
 					break;
@@ -64,17 +63,16 @@ public class CoffeeAnimator {
 //				transitional.animationIncrement = Vector3f.add(transitional.animationIncrementIncrement, transitional.animationIncrement, null);
 //				System.out.println(VectorTools.vectorMul(transitional.animationIncrement,(transitional.transitionTime-transitional.transitionRestTime)).toString());
 				transitional.setValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
-				System.out.println(transitional.getValue());
 				break;
 			case ValueIExpo:
 				break;
 			case ValueLinear:
-				transitional.transitionRestTime -= tickTime;
+				transitional.transitionRestTime -= tickTime*1000f;
 				if(transitional.transitionRestTime<=0){
 					transitions.remove(transitional);
 					break;
 				}
-				transitional.increaseValue(transitional.animationIncrement);
+				transitional.setValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
 				break;
 			default:
 				break;

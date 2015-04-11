@@ -12,26 +12,26 @@ import coffeeblocks.foundation.Vector3Container;
 public class CoffeeCamera {
 	
 	private Vector3Container cameraPosition = new Vector3Container();
-	private Vector3f cameraOffset = null;
-	public Vector3f getCameraPos() {
-		if(cameraOffset!=null)
-			return Vector3f.add(cameraPosition.getValue(),cameraOffset,null);
-		return cameraPosition.getValue();
+//	private Vector3f cameraOffset = null;
+//	public void setCameraOffset(Vector3f offset){
+//		cameraOffset = offset;
+//	}
+//	public Vector3f getCameraOffset(){
+//		return cameraOffset;
+//	}
+	public Vector3Container getCameraPos(){
+		return cameraPosition;
 	}
-	public void bindCameraPos(Vector3Container target){
-		cameraPosition = target;
-	}
-	public void bindCameraPos(Vector3Container target,Vector3f offset){
-		cameraOffset = offset;
-		cameraPosition = target;
-	}
-	public void unbindCameraPos(){
-		cameraPosition = new Vector3Container();
-	}
-	public void setCameraPos(Vector3f cameraPos) {
-		unbindCameraPos();
-		cameraPosition.setValue(cameraPos);
-	}
+//	public void bindCameraPos(Vector3Container target){
+//		cameraPosPointer = target;
+//	}
+//	public void unbindCameraPos(){
+//		cameraPosPointer = cameraPosition;
+//	}
+//	public void setCameraPos(Vector3f cameraPos) {
+//		unbindCameraPos();
+//		cameraPosPointer.setValue(cameraPos);
+//	}
 	public float getFieldOfView(){
 		return fieldOfView;
 	}
@@ -57,7 +57,7 @@ public class CoffeeCamera {
 	}
 	
 	public void lookAt(Vector3f targetPos){
-		Vector3f direction = Vector3f.sub(targetPos, getCameraPos(), null);
+		Vector3f direction = Vector3f.sub(targetPos, getCameraPos().getValue(), null);
 		direction.normalise();
 		vertiAngle = -(float)Math.toRadians(Math.asin(-direction.y));
 		horizAngle = -(float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
@@ -70,15 +70,15 @@ public class CoffeeCamera {
 		normalizeAngles();
 	}
 	
-	public void moveCameraForward(float scalar){
-		Vector3f direction = getForward();
-		Vector3f displace = new Vector3f();
-		displace.x = direction.x*scalar;
-		displace.y = direction.y*scalar;
-		displace.z = direction.z*scalar;
-		Vector3f.add(getCameraPos(), displace, displace);
-		setCameraPos(displace);
-	}
+//	public void moveCameraForward(float scalar){
+//		Vector3f direction = getForward();
+//		Vector3f displace = new Vector3f();
+//		displace.x = direction.x*scalar;
+//		displace.y = direction.y*scalar;
+//		displace.z = direction.z*scalar;
+//		Vector3f.add(getCameraPos().getValue(), displace, displace);
+//		setCameraPos(displace);
+//	}
 	public Vector3f getCameraForwardVec(float scalar){
 		Vector3f direction = getForward();
 		Vector3f displace = new Vector3f();
@@ -87,15 +87,15 @@ public class CoffeeCamera {
 		displace.z = direction.z*scalar;
 		return displace;
 	}
-	public void moveCameraRight(float scalar){
-		Vector3f direction = getRight();
-		Vector3f displace = new Vector3f();
-		displace.x = direction.x*scalar;
-		displace.y = direction.y*scalar;
-		displace.z = direction.z*scalar;
-		Vector3f.add(getCameraPos(), displace, displace);
-		setCameraPos(displace);
-	}
+//	public void moveCameraRight(float scalar){
+//		Vector3f direction = getRight();
+//		Vector3f displace = new Vector3f();
+//		displace.x = direction.x*scalar;
+//		displace.y = direction.y*scalar;
+//		displace.z = direction.z*scalar;
+//		Vector3f.add(getCameraPos().getValue(), displace, displace);
+//		setCameraPos(displace);
+//	}
 	public Vector3f getCameraRightVec(float scalar){
 		Vector3f direction = getRight();
 		Vector3f displace = new Vector3f();
@@ -106,9 +106,7 @@ public class CoffeeCamera {
 	}
 	
 	public void offsetPosition(Vector3f offset){
-		if(this.cameraOffset==null)
-			cameraOffset = new Vector3f();
-		Vector3f.add(this.cameraOffset,offset,this.cameraOffset);
+		cameraPosition.setValueOffset(offset);
 	}
 	
 	public Matrix4f getOrientation(){
@@ -160,7 +158,7 @@ public class CoffeeCamera {
 	public Matrix4f getView(){
 		Matrix4f view = new Matrix4f();
 		Matrix4f pos = new Matrix4f();
-		Vector3f cameraPosNeg = new Vector3f(getCameraPos());
+		Vector3f cameraPosNeg = new Vector3f(getCameraPos().getValue());
 		cameraPosNeg.negate();
 		Matrix4f.translate(cameraPosNeg, pos, pos);
 		Matrix4f.mul(getOrientation(), pos, view);

@@ -134,7 +134,7 @@ public class CoffeeJsonParsing {
 			Object obj = map.get(key);
 			if(key.equals("position")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				cam.setCameraPos(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				cam.getCameraPos().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("look-at")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
 //				cam.lookAt(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
