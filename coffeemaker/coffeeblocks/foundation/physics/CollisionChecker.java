@@ -248,6 +248,14 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			if(!manager.getObject(objectId).getGameModel().getObjectDeactivation())
 				body.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 			break;
+		case PHYS_GRAVITY:
+			if(!(value instanceof Boolean))
+				return;
+			if(!(Boolean)value){
+				body.setGravity(new Vector3f());
+			}else
+				body.setGravity(gravity);
+			break;
 		default:
 			break;
 		}

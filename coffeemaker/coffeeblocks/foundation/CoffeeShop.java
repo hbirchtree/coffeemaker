@@ -31,6 +31,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	private void applyScene(String sceneId){
 		manager.applyScene(sceneId);
 		manager.getRenderer().addSounds(getScene()); //Yes, sound in the renderer.
+		manager.getRenderer().setRendering_swaps(1);
 		manager.getRenderer().addCoffeeListener(this); //fordi listen av lyttere blir tømt
 //		manager.getRenderer().addCoffeeListener(poser);
 		manager.getScene(sceneId).getPhysicsSystem().addCollisionListener(this);
@@ -53,7 +54,6 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	
 	private long clock = 0l;
-	private boolean fpsMode = false;
 	
 	private void drawHud(){
 		getScene().billboard("sun", true);
@@ -69,7 +69,9 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		applyScene(currentScene);
 		manager.getRenderer().addInputListener(this);
 		getScene().getCamera().getCameraPos().bindValue(getObject("player").getGameModel().getPosition());
-		getScene().getLights().get(0).getPosition().bindValue(getScene().getCamera().getCameraPos());
+//		getScene().getLights().get(0).getPosition().bindValue(getScene().getCamera().getCameraPos());
+		manager.getRenderer().getAlListenPosition().bindValue(getObject("player").getGameModel().getPosition());
+		getObject("player").getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 		
 		while(true){
 			clock = System.currentTimeMillis();
@@ -108,7 +110,10 @@ public class CoffeeShop extends CoffeeLogicLoop{
 					getObject("player").getGameModel().getAnimationContainer().setAnimationState("run.1", 0.01f);
 				else
 					getObject("player").getGameModel().getAnimationContainer().setAnimationState("run.2", 0.01f);
-			}
+			}else if(!getObject("player").getGameData().getBoolValue("ani.jumping"))
+				//Uten dette vil spilleren gli overalt, hvilket er ekstremt plagsomt.
+				//Bi-effekten er at spilleren har en stor massetreghet som om den var uendelig tung, og kan derfor ikke dyttes av andre objekter.
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null); 
 			if(getObject("player").getGameData().getBoolValue("ani.jumping")) //Hopping prioriteres over gå-animasjonen
 				getObject("player").getGameModel().getAnimationContainer().setAnimationState("jump", 0.01f);
 //			poser.updateObject("player");
@@ -124,8 +129,9 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		//Denne løsningen er mest elegant, ettersom synkronisering av trådene ville være en altfor dyr og unødvendig operasjon.
 		if(getScene().getPhysicsSystem().performRaytestHeight("player")<=0.1f){
 			getObject("player").getGameData().setBoolValue("ani.jumping",false);
-		}else
+		}else{
 			getObject("player").getGameData().setBoolValue("ani.jumping",true);
+		}
 	}
 	@Override
 	public void onGlfwFrameTick(float tickTime){
@@ -242,21 +248,21 @@ public class CoffeeShop extends CoffeeLogicLoop{
 			return;
 		}
 		case GLFW.GLFW_KEY_KP_9:{
-			applyScene("main");
+			manager.getRenderer().al_playSound("test2");
 			return;
 		}
-		case GLFW.GLFW_KEY_KP_8:{
-			applyScene("second");
-			return;
-		}
+//		case GLFW.GLFW_KEY_KP_8:{
+//			applyScene("second");
+//			return;
+//		}
 		}
 		
 	}
 	@Override
 	public void getCollisionNotification(String body1, String body2){
 		if(doBodiesCollide(body1,body2,"player","death")){
-			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS,new Vector3f(0,15,0));
-		}else if(doBodiesCollide(body1,body2,"player","terrain")){
+			getObject("player").getGameData().setTimerValue("time-to-die", clock+6000);
+		}else if(doBodiesCollide(body1,body2,"player","terrain")||doBodiesCollide(body1,body2,"player","terrain.walkway")){
 			getObject("player").getGameData().setBoolValue("can-jump", true);
 			getObject("player").getGameData().setTimerValue("jump-to", clock+150);
 		}

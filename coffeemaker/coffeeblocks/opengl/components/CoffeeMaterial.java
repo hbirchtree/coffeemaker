@@ -140,7 +140,9 @@ public class CoffeeMaterial {
 	public int selectTexture = 0;
 	private List<Integer> textureHandles = new ArrayList<>();
 	public int getTextureHandle(){
-		return textureHandles.get(selectTexture);
+		if(isMultitextured())
+			return textureHandles.get(selectTexture);
+		else return textureHandles.get(selectTexture);
 	}
 	public void setTextureHandle(int textureHandle) {
 		if(textureHandles.size()>0)

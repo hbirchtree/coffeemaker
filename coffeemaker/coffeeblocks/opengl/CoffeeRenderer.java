@@ -431,6 +431,9 @@ public class CoffeeRenderer implements Runnable {
 	}
 
 	private Vector3Container al_listen_position = new Vector3Container();
+	public Vector3Container getAlListenPosition(){
+		return al_listen_position;
+	}
 	
 	private Map<String,SoundObject> soundObjects = new HashMap<>();
 	public void addSoundObject(SoundObject obj){
@@ -440,11 +443,12 @@ public class CoffeeRenderer implements Runnable {
 	}
 	public void addSounds(CoffeeGameObjectManager manager){
 		for(GameObject object : manager.getObjectList()){
-			try{
-				addSoundObject(object.getSoundBox());
-			}catch(IllegalArgumentException e){
-				System.err.println(e.getMessage());
-			}
+				for(SoundObject obj : object.getSoundBox())
+					try{
+						addSoundObject(obj);
+					}catch(IllegalArgumentException e){
+						System.err.println(e.getMessage());
+					}
 		}
 	}
 

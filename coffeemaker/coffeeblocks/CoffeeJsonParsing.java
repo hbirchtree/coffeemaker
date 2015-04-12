@@ -126,7 +126,7 @@ public class CoffeeJsonParsing {
 				Map<String,Object> sounds = ((HashMap)obj);
 				for(String sound : sounds.keySet()){
 					String soundfile = filepath+"/"+(String)sounds.get(sound);
-					gobj.setSoundBox(new SoundObject(sound,soundfile));
+					gobj.addSoundBox(new SoundObject(sound,soundfile));
 				}
 			}
 		}

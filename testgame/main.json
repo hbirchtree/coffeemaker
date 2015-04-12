@@ -8,17 +8,33 @@
 		"objects": [
 		{
 			"object-id": "terrain",
-			"model": "models/terrain.obj",
+			"model": "models/canyon2.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0.0,0,0.0],
 			"rotation": [0,0,0],
 			"scale": [1,1,1],
 			"physics.shape": 3,
-			"physics.collision": "models/terrain_collide.obj",
+			"physics.collision": "models/canyon_floor.obj",
 			"physics.mass": 0,
 			"physics.scale": [1,1,1],
-			"physics.friction": 0.9,
+			"physics.friction": 1,
+			"physics.restitution": 0.0,
+			"physics.rotation": [0,1,0]
+		},
+		{
+			"object-id": "terrain.walkway",
+			"model": "models/canyon_walkway.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 3,
+			"physics.collision": "models/canyon_walkway.obj",
+			"physics.mass": 0,
+			"physics.scale": [1,1,1],
+			"physics.friction": 1,
 			"physics.restitution": 0.0,
 			"physics.rotation": [0,1,0]
 		},
@@ -31,7 +47,7 @@
 			"rotation": [0,0,0],
 			"scale": [1,1,1],
 			"physics.shape": 3,
-			"physics.collision": "models/terrain_wall_collide.obj",
+			"physics.collision": "models/canyon_walls.obj",
 			"physics.mass": 0,
 			"physics.scale": [1,1,1],
 			"physics.friction": 1,
@@ -40,13 +56,10 @@
 		},
 		{
 			"object-id": "water",
-			"model": "models/water.obj",
+			"model": "models/canyon_water.obj",
 			"textures": [
 			"textures/water.png","textures/water_2.png"
 			],
-			"sounds": {
-			"test": "sounds/test.wav"
-			},
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0.0,0,0.0],
@@ -64,9 +77,13 @@
 				"walk.2": "playermesh_walk2.obj",
 				"jump": "playermesh_jump.obj"
 			},
+			"sounds": {
+			"test": "sounds/test.wav",
+			"test2": "sounds/test.wav"
+			},
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
-			"position": [0,20,0],
+			"position": [93.575,84.232,-138.666],
 			"stream-draw": true,
 			"notify-force": true,
 			"rotation": [0.0,0,0],
@@ -77,16 +94,26 @@
 			"physics.rotation": [0,0,0],
 			"physics.linearity": [0,1,0],
 			"physics.friction": 1,
-			"physics.restitution": 0.0
+			"physics.restitution": 0.1
 		},
 		{
 			"object-id": "testbox",
 			"model": "models/3dbox_bumped.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_bumpmap.txt",
-			"position": [0,7,0],
+			"position": [0,15,0],
 			"rotation": [0,0,0],
 			"scale": [1,1,1],
+			"physics.shape": 0
+		},
+		{
+			"object-id": "10.tree1",
+			"model": "models/tree_1.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [55.351,11.5,13.1511],
+			"rotation": [0,0,0],
+			"scale": [0.5,0.5,0.5],
 			"physics.shape": 0
 		},
 		{
@@ -131,15 +158,15 @@
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0.0,5,5],
 			"rotation": [0.0,0,0],
-			"scale": [2,2,2]
+			"scale": [10,10,10]
 		}
 		],
 		"lights": [
 		{
 			"object-id": "light.sun",
-			"position": [0,20,0],
-			"color": "#ffccff",
-			"attenuation": 0.005,
+			"position": [0,250,0],
+			"color": "#ffffff",
+			"attenuation": 0.00005,
 			"ambientcoeff": 0.007
 		}
 		]

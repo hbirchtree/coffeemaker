@@ -1,5 +1,8 @@
 package coffeeblocks.metaobjects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import coffeeblocks.foundation.GameMetaData;
 import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.openal.SoundObject;
@@ -11,6 +14,7 @@ public class GameObject{
 		
 		PHYS_ACCEL,PHYS_POS,PHYS_ROT,PHYS_SCALE,
 		PHYS_IMPULSE,PHYS_ACTIVATION,PHYS_CLEARFORCE,
+		PHYS_GRAVITY,
 		
 		MODEL_POS,MODEL_ROT,MODEL_SCALE,
 		
@@ -47,12 +51,12 @@ public class GameObject{
 		this.gameData = gameData;
 	}
 	
-	private SoundObject soundBox = null;
-	public SoundObject getSoundBox() {
+	private List<SoundObject> soundBox = new ArrayList<>();
+	public List<SoundObject> getSoundBox() {
 		return soundBox;
 	}
-	public void setSoundBox(SoundObject soundBox) {
-		this.soundBox = soundBox;
+	public void addSoundBox(SoundObject soundBox) {
+		this.soundBox.add(soundBox);
 	}
 
 }

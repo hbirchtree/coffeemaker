@@ -42,7 +42,7 @@ public class CoffeeCamera {
 	private float aspect = 16/9f;
 	private float fieldOfView = 90f;
 	private float zNear = 0.1f;
-	private float zFar = 200f;
+	private float zFar = 300f;
 	
 	private float horizAngle = 0f;
 	private float vertiAngle = 0f;

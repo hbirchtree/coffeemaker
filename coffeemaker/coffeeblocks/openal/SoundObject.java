@@ -49,9 +49,6 @@ public class SoundObject {
 		this.soundId = soundId;
 	}
 	
-	public void destructor(){
-	}
-	
 	public boolean initSound(){
 		WaveData data;
 		try {
