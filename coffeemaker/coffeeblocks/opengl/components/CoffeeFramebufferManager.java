@@ -111,7 +111,7 @@ public class CoffeeFramebufferManager {
 
 		renderMesh.getShader().setUniform("model", ShaderHelper.rotateMatrice(renderMesh));
 		for(LimeLight light : lights){
-			renderMesh.getShader().setUniform("light.position", light.getPosition());
+			renderMesh.getShader().setUniform("light.position", light.getPosition().getValue());
 			renderMesh.getShader().setUniform("light.intensities", light.getIntensities());
 			renderMesh.getShader().setUniform("light.attenuation", light.getAttenuation());
 			renderMesh.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());

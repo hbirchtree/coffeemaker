@@ -1,4 +1,8 @@
 package coffeeblocks.general;
+import java.nio.FloatBuffer;
+import java.util.List;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 
 public class VectorTools {
@@ -29,5 +33,20 @@ public class VectorTools {
 	}
 	public static Vector3f vmVec3ftoLwjgl(javax.vecmath.Vector3f vec){
 		return new Vector3f(vec.x,vec.y,vec.z);
+	}
+	public static FloatBuffer vecToFloatBuffer(Vector3f vec){
+		FloatBuffer buf = BufferUtils.createFloatBuffer(3).put(new float[]{vec.x,vec.y,vec.z});
+		buf.flip();
+		return buf;
+	}
+	public static FloatBuffer listFloatsToBuffer(List<Float> floats){
+		FloatBuffer buf = BufferUtils.createFloatBuffer(floats.size());
+		float[] statfloats = new float[floats.size()];
+		for(int i=0;i<floats.size();i++){
+			statfloats[i] = floats.get(i);
+		}
+		buf.put(statfloats);
+		buf.flip();
+		return buf;
 	}
 }

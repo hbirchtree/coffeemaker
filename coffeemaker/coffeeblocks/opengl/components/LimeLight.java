@@ -14,7 +14,6 @@ public class LimeLight {
 	}
 	
 	private Vector3Container position = new Vector3Container();
-	private Vector3Container positionPointer = position; //Ved å bruke en "peker" kan vi beholde den originale posisjonen til lyset
 	private Vector3f intensities = new Vector3f();
 	private float attenuation = 0.1f;
 	private float ambientCoefficient = 0.005f;
@@ -30,21 +29,8 @@ public class LimeLight {
 	public synchronized void setAmbientCoefficient(float ambientCoefficient) {
 		this.ambientCoefficient = ambientCoefficient;
 	}
-	public Vector3Container getPositionObj(){
+	public Vector3Container getPosition() {
 		return position;
-	}
-	public void bindPosition(Vector3Container position){
-		positionPointer = position;
-	}
-	public void unbindPosition(){
-		this.positionPointer = this.position;
-	}
-	public Vector3f getPosition() {
-		return positionPointer.getValue();
-	}
-	public synchronized void setPosition(Vector3f position) {
-		unbindPosition();
-		this.positionPointer.setValue(position);
 	}
 	public Vector3f getIntensities() {
 		return intensities;

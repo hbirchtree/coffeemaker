@@ -11,6 +11,7 @@ import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.opengl.CoffeeAnimator;
 
 public class CoffeeShop extends CoffeeLogicLoop{
+	
 	private String currentScene = null;
 	public CoffeeShop(CoffeeSceneManager manager) {
 		super(manager);
@@ -29,18 +30,26 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	
 	private void applyScene(String sceneId){
 		manager.applyScene(sceneId);
+		manager.getRenderer().addSounds(getScene()); //Yes, sound in the renderer.
 		manager.getRenderer().addCoffeeListener(this); //fordi listen av lyttere blir tømt
+//		manager.getRenderer().addCoffeeListener(poser);
 		manager.getScene(sceneId).getPhysicsSystem().addCollisionListener(this);
 		currentScene = sceneId;
 		
 		getObject("water").getGameData().setTimerValue("switch",0l);
 		getObject("skybox").getGameData().setTimerValue("switch",0l);
 		getObject("water").getGameData().setIntValue("texture",0);
-		getObject("player").getGameData().setDoubleValue("walk-pace",4d);
+		getObject("player").getGameData().setDoubleValue("walk-pace",12d);
 		getObject("player").getGameModel().setObjectDeactivation(false);
-		getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACTIVATION);
+		getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACTIVATION,null);
 		getObject("player").getGameData().setBoolValue("can-jump",false);
 		getObject("skybox").getGameData().setIntValue("texture",0);
+		getObject("player").getGameData().setBoolValue("ani.running.w",false);
+		getObject("player").getGameData().setBoolValue("ani.running.a",false);
+		getObject("player").getGameData().setBoolValue("ani.running.s",false);
+		getObject("player").getGameData().setBoolValue("ani.running.d",false);
+		getObject("player").getGameData().setBoolValue("ani.jumping",false);
+		getObject("player").getGameData().setTimerValue("ani.runcycle", 0l);
 	}
 	
 	private long clock = 0l;
@@ -57,26 +66,23 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	CoffeeAnimator anim = new CoffeeAnimator();
 	
 	public void eventLoop(){
-		long raytest = clock+100;
 		applyScene(currentScene);
 		manager.getRenderer().addInputListener(this);
 		getScene().getCamera().getCameraPos().bindValue(getObject("player").getGameModel().getPosition());
-		getScene().getLights().get(0).bindPosition(getScene().getCamera().getCameraPos());
+		getScene().getLights().get(0).getPosition().bindValue(getScene().getCamera().getCameraPos());
 		
 		while(true){
 			clock = System.currentTimeMillis();
 			//Kameraets posisjon relativt til spilleren endrer seg, derfor må vi endre offset for kameraets posisjon for å holde det i bane rundt spilleren.
-			getScene().getCamera().getCameraPos().setValueOffset(Vector3f.add(VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(-5f),null));
+			getScene().getCamera().getCameraPos().setValueOffset(Vector3f.add(
+					VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(-5f),null));
 //			drawHud();
-//			if(clock>=raytest){
-//				if(performRaytest("player",new Vector3f(0,15,0)))
-//						System.out.println("It's a hit!");
-//				raytest = clock+100;
-//			}
+			//Miljø
 			if(getObject("water").getGameData().getTimerValue("switch")==null||
 					clock>=getObject("water").getGameData().getTimerValue("switch")){
 				getObject("testbox").getGameModel().getRotation().setValue(new Vector3f());
-				anim.addTransition(getObject("testbox").getGameModel().getRotation(), new Vector3f(0,360f,0), CoffeeAnimator.TransitionType.ValueExpo, 1000f);
+				anim.addTransition(getObject("testbox").getGameModel().getRotation(),
+						new Vector3f(0,360f,0), CoffeeAnimator.TransitionType.ValueExpo, 1000f);
 				
 				getObject("water").getGameData().setIntValue(
 						"texture",
@@ -87,15 +93,39 @@ public class CoffeeShop extends CoffeeLogicLoop{
 				getScene().getObject("water").getGameModel().getMaterial().selectTexture = getObject("water").getGameData().getIntValue("texture");
 				getObject("water").getGameData().setTimerValue("switch",clock+400);
 			}
+			
+			//Spillervariabler
 			if(getObject("player").getGameData().getBoolValue("can-jump")&&clock>getObject("player").getGameData().getTimerValue("jump-to")){
 				getObject("player").getGameData().setBoolValue("can-jump",false);
 			}
+			
+			//Animasjon
+			if(getObject("player").getGameData().getBoolValue("ani.running.w")||
+					getObject("player").getGameData().getBoolValue("ani.running.a")||
+					getObject("player").getGameData().getBoolValue("ani.running.s")||
+					getObject("player").getGameData().getBoolValue("ani.running.d")){
+				if(clock%800<400)
+					getObject("player").getGameModel().getAnimationContainer().setAnimationState("run.1", 0.01f);
+				else
+					getObject("player").getGameModel().getAnimationContainer().setAnimationState("run.2", 0.01f);
+			}
+			if(getObject("player").getGameData().getBoolValue("ani.jumping")) //Hopping prioriteres over gå-animasjonen
+				getObject("player").getGameModel().getAnimationContainer().setAnimationState("jump", 0.01f);
+//			poser.updateObject("player");
+			getObject("player").getGameModel().getAnimationContainer().morphToState();
+			getObject("player").getGameModel().getAnimationContainer().setAnimationState(null);;
 		}
 	}
 
 	@Override
 	public void onGlfwFrameTick(double currentTime){
-//		timers.put("clock", currentTime);
+		//Denne operasjonen er lagt i render-loopen for å kjøre på et tidspunkt hvor fysikk-systemet ikke har tick.
+		//Dersom fysikk-tick skjer ved samme tidspunkt som denne operasjonen vil det føre til en rekke ulike feil avhengig av hvor den er i tick'et og forårsake en krasj.
+		//Denne løsningen er mest elegant, ettersom synkronisering av trådene ville være en altfor dyr og unødvendig operasjon.
+		if(getScene().getPhysicsSystem().performRaytestHeight("player")<=0.1f){
+			getObject("player").getGameData().setBoolValue("ani.jumping",false);
+		}else
+			getObject("player").getGameData().setBoolValue("ani.jumping",true);
 	}
 	@Override
 	public void onGlfwFrameTick(float tickTime){
@@ -116,46 +146,78 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	
 	@Override
+	public void coffeeReceiveKeyRelease(int key){
+		if(currentScene.equals("main")){
+			switch(key){
+			case GLFW.GLFW_KEY_W:{
+				getObject("player").getGameData().setBoolValue("ani.running.w", false);
+				return;
+			}
+			case GLFW.GLFW_KEY_A:{
+				getObject("player").getGameData().setBoolValue("ani.running.a", false);
+				return;
+			}
+			case GLFW.GLFW_KEY_S:{
+				getObject("player").getGameData().setBoolValue("ani.running.s", false);
+				return;
+			}
+			case GLFW.GLFW_KEY_D:{
+				getObject("player").getGameData().setBoolValue("ani.running.d", false);
+				return;
+			}
+			}
+			
+		}
+	}
+	
+	@Override
 	public void coffeeReceiveKeyPress(int key){
 		if(currentScene.equals("main")){
 			switch(key){
 			case GLFW.GLFW_KEY_W:{
-				getObject("player").getGameModel().getPosition().setAcceleration(getScene().getCamera().
+				Vector3f accel = getScene().getCamera().
 						getCameraForwardVec(
-								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue());
+				accel.y = 0;
 				getScene().billboard("player", false);
-				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
+				getObject("player").getGameData().setBoolValue("ani.running.w", true);
 				return;
 			}
 			case GLFW.GLFW_KEY_A:{
-				getObject("player").getGameModel().getPosition().setAcceleration(getScene().getCamera().
+				Vector3f accel = getScene().getCamera().
 						getCameraRightVec(
-								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue());
+				accel.y = 0;
 				getScene().billboard("player", false);
-				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
+				getObject("player").getGameData().setBoolValue("ani.running.a", true);
 				return;
 			}
 			case GLFW.GLFW_KEY_S:{
-				getObject("player").getGameModel().getPosition().setAcceleration(getScene().getCamera().
+				Vector3f accel = getScene().getCamera().
 						getCameraForwardVec(
-								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+								-getObject("player").getGameData().getDoubleValue("walk-pace").floatValue());
+				accel.y = 0;
 				getScene().billboard("player", false);
-				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
+				getObject("player").getGameData().setBoolValue("ani.running.s", true);
 				return;
 			}
 			case GLFW.GLFW_KEY_D:{
-				getObject("player").getGameModel().getPosition().setAcceleration(getScene().getCamera().
+				Vector3f accel = getScene().getCamera().
 						getCameraRightVec(
-								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue()));
+								getObject("player").getGameData().getDoubleValue("walk-pace").floatValue());
+				accel.y = 0;
 				getScene().billboard("player", false);
-				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL);
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
+				getObject("player").getGameData().setBoolValue("ani.running.d", true);
 				return;
 			}
 			case GLFW.GLFW_KEY_SPACE:{
 				if(!getObject("player").getGameData().getBoolValue("can-jump"))
 					return;
-				getObject("player").getGameModel().setImpulse(new Vector3f(0,0.5f,0));
-				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_IMPULSE);
+				getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_IMPULSE,new Vector3f(0,0.5f,0));
 				return;
 			}
 			}
@@ -170,13 +232,13 @@ public class CoffeeShop extends CoffeeLogicLoop{
 			return;
 		}
 		case GLFW.GLFW_KEY_KP_0:{
-			getObject("player").getGameModel().getPosition().setValue(new Vector3f(0,15,0));
-			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS);
-			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_CLEARFORCE);
+			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS,new Vector3f(0,15,0));
+			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
 			return;
 		}
 		case GLFW.GLFW_KEY_KP_1:{
-			getScene().getPhysicsSystem().setGravity(VectorTools.lwjglToVMVec3f(new Vector3f(0,0,0)));
+//			getScene().getPhysicsSystem().setGravity(VectorTools.lwjglToVMVec3f(new Vector3f(0,0,0)));
+			manager.getRenderer().al_playSound("test");
 			return;
 		}
 		case GLFW.GLFW_KEY_KP_9:{
@@ -193,8 +255,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	@Override
 	public void getCollisionNotification(String body1, String body2){
 		if(doBodiesCollide(body1,body2,"player","death")){
-			getObject("player").getGameModel().getPosition().setValue(new Vector3f(0,15,0));
-			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS);
+			getScene().requestObjectUpdate("player", GameObject.PropertyEnumeration.PHYS_POS,new Vector3f(0,15,0));
 		}else if(doBodiesCollide(body1,body2,"player","terrain")){
 			getObject("player").getGameData().setBoolValue("can-jump", true);
 			getObject("player").getGameData().setTimerValue("jump-to", clock+150);

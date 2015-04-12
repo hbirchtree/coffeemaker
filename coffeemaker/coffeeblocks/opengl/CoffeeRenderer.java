@@ -1,13 +1,19 @@
 package coffeeblocks.opengl;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALContext;
 import org.lwjgl.opengl.*;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeRendererListener;
+import coffeeblocks.foundation.Vector3Container;
 import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.foundation.models.ModelContainer;
+import coffeeblocks.general.VectorTools;
+import coffeeblocks.metaobjects.GameObject;
+import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.CoffeeVertex;
 import coffeeblocks.opengl.components.LimeLight;
@@ -23,7 +29,9 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.vecmath.Vector2d;
 
@@ -59,7 +67,7 @@ public class CoffeeRenderer implements Runnable {
 	private boolean draw = true;
 	private boolean doMouseGrab = true;
 	private boolean mouseGrabbed = false;
-	private int rendering_swaps = 1;
+	private int rendering_swaps = 0;
 	public void setSwapping(int swapping){
 		this.rendering_swaps = swapping;
 	}
@@ -109,6 +117,7 @@ public class CoffeeRenderer implements Runnable {
 
 	// The window handle
 	private long window;
+	private ALContext alContext;
 
 	public synchronized void run() {
 		try {
@@ -117,6 +126,7 @@ public class CoffeeRenderer implements Runnable {
 
 			// Release window and window callbacks
 			glfwDestroyWindow(window);
+			alContext.destroy();
 //			keyCallback.release();
 		} finally {
 			// Terminate GLFW and release the GLFWerrorfun
@@ -178,6 +188,8 @@ public class CoffeeRenderer implements Runnable {
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		alContext = ALContext.create();
+		alContext.makeCurrent();
 		// Enable v-sync
 		glfwSwapInterval(this.rendering_swaps);
 		
@@ -207,15 +219,27 @@ public class CoffeeRenderer implements Runnable {
 	
 	public void loopHandleKeyboardInput(){
 		for(CoffeeGlfwInputListener listener : inputListeners)
-			for(int key : listener.getRegisteredKeys())
+			for(int key : listener.getRegisteredKeys()){
 				if(glfwGetKey(window,key)==1)
 					listener.coffeeReceiveKeyPress(key);
+				else
+					listener.coffeeReceiveKeyRelease(key);
+			}
 		if(glfwGetTime()>=controlDelay){
 			if(glfwGetKey(window,GLFW_KEY_F9)==1){
 				toggleGrabMouse();
 				controlDelay=glfwGetTime()+0.5d;
 			}
 		}
+	}
+	
+	public void loopHandleAudio(){
+		for(SoundObject obj : new ArrayList<>(soundObjects.values()))
+			if(!obj.isBaked()&&!obj.initSound())
+				soundObjects.remove(obj);
+		
+		AL10.alListener(AL10.AL_POSITION, VectorTools.vecToFloatBuffer(al_listen_position.getValue()));
+		AL10.alListener(AL10.AL_VELOCITY, VectorTools.vecToFloatBuffer(al_listen_position.getVelocity()));
 	}
 
 	private void fpsCount(){
@@ -285,6 +309,7 @@ public class CoffeeRenderer implements Runnable {
 			if(mouseGrabbed&&scene!=null&&doMouseGrab)
 				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
 			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
+			loopHandleAudio();
 
 //			framebuffer.storeFramebuffer(rendering_resolution);
 			if(draw&&scene!=null) //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
@@ -337,7 +362,7 @@ public class CoffeeRenderer implements Runnable {
 
 			object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
 			for(LimeLight light : lights){ //Selv om vi kun støtter ett lys for øyeblikket skriver vi koden som om vi støttet flere. Vi kan legge til flere lys i fremtiden om nødvendig.
-				object.getShader().setUniform("light.position", light.getPosition());
+				object.getShader().setUniform("light.position", light.getPosition().getValue());
 				object.getShader().setUniform("light.intensities", light.getIntensities());
 				object.getShader().setUniform("light.attenuation", light.getAttenuation());
 				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
@@ -405,5 +430,37 @@ public class CoffeeRenderer implements Runnable {
 		this.clearColor = clearColor;
 	}
 
+	private Vector3Container al_listen_position = new Vector3Container();
+	
+	private Map<String,SoundObject> soundObjects = new HashMap<>();
+	public void addSoundObject(SoundObject obj){
+		if(obj==null)
+			throw new IllegalArgumentException("Invalid sound object!");
+		soundObjects.put(obj.getSoundId(), obj);
+	}
+	public void addSounds(CoffeeGameObjectManager manager){
+		for(GameObject object : manager.getObjectList()){
+			try{
+				addSoundObject(object.getSoundBox());
+			}catch(IllegalArgumentException e){
+				System.err.println(e.getMessage());
+			}
+		}
+	}
+
+	public void al_playSound(String id){
+		if(soundObjects.containsKey(id))
+			AL10.alSourcePlay(soundObjects.get(id).getSource());
+		else
+			System.out.println("Could not find sound: "+id);
+	}
+	public void al_pauseSound(String id){
+		if(soundObjects.containsKey(id))
+			AL10.alSourcePause(soundObjects.get(id).getSource());
+	}
+	public void al_stopSound(String id){
+		if(soundObjects.containsKey(id))
+			AL10.alSourceStop(soundObjects.get(id).getSource());
+	}
 }
 

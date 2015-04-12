@@ -61,7 +61,6 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		if(manager==null)
 			throw new RuntimeException("Failed to initialize physics: No object manager");
 		this.manager = manager;
-		this.manager.addListener(this);
 		BroadphaseInterface broadphase = new DbvtBroadphase();
 		CollisionConfiguration collideConfig = new DefaultCollisionConfiguration();
 		CollisionDispatcher dispatch = new CollisionDispatcher(collideConfig);
@@ -150,10 +149,21 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	
 	@Override
 	public void onGlfwFrameTick(float tickTime){
+		try{
 		dynamicsWorld.stepSimulation(tickTime*100f);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		for(String id : objects.keySet()){
 			RigidBody body = objects.get(id);
 			manager.getObject(id).getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
+			Vector3f out = new Vector3f();
+			body.getLinearVelocity(out);
+			manager.getObject(id).getGameModel().getPosition().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+			body.getAngularVelocity(out);
+			manager.getObject(id).getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+			body.getGravity(out);
+			manager.getObject(id).getGameModel().getPosition().setAcceleration(VectorTools.vmVec3ftoLwjgl(out));
 //			Quat4f rotation = new Quat4f();
 //			body.getWorldTransform(new Transform()).getRotation(rotation);
 //			Vector3f rot = new Vector3f();
@@ -180,6 +190,23 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		return false;
 	}
 	
+	public Float performRaytestHeight(String targetObject){
+		RigidBody target = objects.get(targetObject);
+		Vector3f start = target.getWorldTransform(new Transform()).origin;
+		Vector3f end = new Vector3f(start);
+		end.y -= 100f;
+		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(start, end);
+		dynamicsWorld.rayTest(start, end, ray);
+		if(ray.hasHit()){ //Vi vil vite at det er det absolutt samme objektet vi spør etter. Strålen kan treffe mye annet.
+			Vector3f distance = ray.hitPointWorld;
+			Vector3f botPoint = target.getWorldTransform(new Transform()).origin;
+			botPoint.y -= manager.getObject(targetObject).getGameModel().getPhysicalScale().y;
+			distance.sub(botPoint);
+			return distance.length();
+		}
+		return Float.NaN;
+	}
+	
 	public String performRaytestId(org.lwjgl.util.vector.Vector3f start,org.lwjgl.util.vector.Vector3f end){
 		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(VectorTools.lwjglToVMVec3f(start), VectorTools.lwjglToVMVec3f(end));
 		dynamicsWorld.rayTest(VectorTools.lwjglToVMVec3f(start), VectorTools.lwjglToVMVec3f(end), ray);
@@ -190,14 +217,16 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	}
 	
 	@Override
-	public void existingGameObjectChanged(String objectId,GameObject.PropertyEnumeration property){
+	public void existingGameObjectChanged(String objectId,GameObject.PropertyEnumeration property, Object value){
 		if(!objects.containsKey(objectId))
 			return;
 		RigidBody body = objects.get(objectId);
 		switch(property){
 		case PHYS_POS:
+			if(!(value instanceof org.lwjgl.util.vector.Vector3f))
+				return;
 			body.activate(true);
-			body.setWorldTransform(createTransform(manager.getObject(objectId).getGameModel().getPosition().getValueVM()));
+			body.setWorldTransform(createTransform(VectorTools.lwjglToVMVec3f((org.lwjgl.util.vector.Vector3f)value)));
 			break;
 		case PHYS_CLEARFORCE:
 			body.setLinearVelocity(new Vector3f());
@@ -205,10 +234,14 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			body.clearForces();
 			break;
 		case PHYS_ACCEL:
-			body.applyCentralForce(manager.getObject(objectId).getGameModel().getPosition().getAccelerationVM());
+			if(!(value instanceof org.lwjgl.util.vector.Vector3f))
+				return;
+			body.applyCentralForce(VectorTools.lwjglToVMVec3f((org.lwjgl.util.vector.Vector3f)value));
 			break;
 		case PHYS_IMPULSE:
-			body.applyCentralImpulse(VectorTools.lwjglToVMVec3f(manager.getObject(objectId).getGameModel().getImpulse()));
+			if(!(value instanceof org.lwjgl.util.vector.Vector3f))
+				return;
+			body.applyCentralImpulse(VectorTools.lwjglToVMVec3f((org.lwjgl.util.vector.Vector3f)value));
 			manager.getObject(objectId).getGameModel().setImpulse(new org.lwjgl.util.vector.Vector3f());
 			break;
 		case PHYS_ACTIVATION:

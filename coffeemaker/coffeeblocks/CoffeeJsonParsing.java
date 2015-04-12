@@ -11,6 +11,7 @@ import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
 import coffeeblocks.general.FileImporter;
+import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
 
@@ -121,6 +122,12 @@ public class CoffeeJsonParsing {
 					String modelfile = filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)poses.get(pose);
 					gobj.getGameModel().getAnimationContainer().addState(pose,ModelLoader.loadModel(modelfile).getVertices());
 				}
+			}else if(key.equals("sounds")&&obj instanceof HashMap){
+				Map<String,Object> sounds = ((HashMap)obj);
+				for(String sound : sounds.keySet()){
+					String soundfile = filepath+"/"+(String)sounds.get(sound);
+					gobj.setSoundBox(new SoundObject(sound,soundfile));
+				}
 			}
 		}
 		return gobj;
@@ -153,7 +160,7 @@ public class CoffeeJsonParsing {
 			Object obj = map.get(key);
 			if(key.equals("position")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				light.setPosition(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				light.getPosition().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 			}else if(key.equals("color")&&obj instanceof String){
 				light.setIntensities(hexToVec(((String)obj)));
 			}else if(key.equals("attenuation")&&(obj instanceof Integer||obj instanceof Double)){

@@ -20,7 +20,6 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public CoffeeGameObjectManager(){
 		physicsSystem = new CollisionChecker(this);
 		this.addListener(physicsSystem);
-		physicsSystem.addCollisionListener(this);
 	}
 	
 	private CollisionChecker physicsSystem;
@@ -57,15 +56,10 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		for(CoffeeGameObjectManagerListener listener : listeners)
 			listener.newGameObjectAdded(object);
 	}
-	@Override
-	public void updateObject(String objectId){
-		if(!objects.containsKey(objectId))
-			throw new RuntimeException("Physics reported non-existant object!");
-	}
 	
-	public void requestObjectUpdate(String objectId, GameObject.PropertyEnumeration prop){
+	public void requestObjectUpdate(String objectId, GameObject.PropertyEnumeration prop,Object value){
 		for(CoffeeGameObjectManagerListener listener : listeners)
-			listener.existingGameObjectChanged(objectId, prop);
+			listener.existingGameObjectChanged(objectId, prop, value);
 	}
 	
 	private Map<String,Object> entities = new HashMap<>(); //for å lagre referanser til lys, kamera og andre objekter som skal være tilgjengelige.

@@ -2,6 +2,7 @@ package coffeeblocks.metaobjects;
 
 import coffeeblocks.foundation.GameMetaData;
 import coffeeblocks.foundation.models.ModelContainer;
+import coffeeblocks.openal.SoundObject;
 
 public class GameObject{
 	
@@ -31,7 +32,7 @@ public class GameObject{
 	}
 	
 	private ModelContainer gameModel = null;
-	public synchronized ModelContainer getGameModel(){
+	public ModelContainer getGameModel(){
 		return gameModel;
 	}
 	public synchronized void setGameModel(ModelContainer gameModel){
@@ -39,11 +40,19 @@ public class GameObject{
 	}
 	
 	private GameMetaData gameData = new GameMetaData();
-	public synchronized GameMetaData getGameData(){
+	public GameMetaData getGameData(){
 		return gameData;
 	}
 	public synchronized void setGameData(GameMetaData gameData){
 		this.gameData = gameData;
 	}
 	
+	private SoundObject soundBox = null;
+	public SoundObject getSoundBox() {
+		return soundBox;
+	}
+	public void setSoundBox(SoundObject soundBox) {
+		this.soundBox = soundBox;
+	}
+
 }

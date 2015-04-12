@@ -18,5 +18,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/PNGDecoder.jar"/>
 	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/vecmath.jar"/>
+	<classpathentry kind="lib" path="/home/havard/Dokumenter/Eclipse/Spillprosjekt/lwjgl/slick-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -107,15 +107,39 @@ public class CoffeeAnimationContainer {
 	public List<CoffeeVertex> getState(String name){
 		return states.get(name);
 	}
-	public void morphToState(String stateName,float percentage){
-		if(!states.containsKey(stateName))
+	public void morphToState(){
+		if(getAnimationState()!=null&&!states.containsKey(getAnimationState()))
 			throw new IllegalArgumentException("Non-existant animation state was requested for model!");
+		List<CoffeeVertex> targetMesh;
+		if(getAnimationState()!=null)
+			targetMesh = states.get(getAnimationState());
+		else
+			targetMesh = base;
 		List<CoffeeVertex> workMesh = new ArrayList<>(getCurrentMesh());
-		List<CoffeeVertex> targetMesh = states.get(stateName);
 		for(int i=0;i<targetMesh.size();i++){
-			workMesh.set(i, CoffeeAnimator.morphVertToTarget(workMesh.get(i), targetMesh.get(i), percentage));
+			workMesh.set(i, CoffeeAnimator.morphVertToTarget(workMesh.get(i), targetMesh.get(i), getAnimationSpeed()));
 		}
 		setCurrentMesh(workMesh);
+	}
+	
+	private float animationSpeed = 0f;
+	public float getAnimationSpeed(){
+		return animationSpeed;
+	}
+	public void setAnimationSpeed(float animationSpeed){
+		this.animationSpeed = animationSpeed;
+	}
+	
+	private String animationState = null;
+	public String getAnimationState(){
+		return animationState;
+	}
+	public void setAnimationState(String animationState){
+		this.animationState = animationState;
+	}
+	public void setAnimationState(String animationState, float animationSpeed){
+		this.animationState = animationState;
+		setAnimationSpeed(animationSpeed);
 	}
 	
 	private int vboHandle = 0;
