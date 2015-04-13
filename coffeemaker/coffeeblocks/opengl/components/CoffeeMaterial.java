@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import coffeeblocks.foundation.FloatContainer;
+
 public class CoffeeMaterial {
 	private boolean multitextured = false;
 	private List<String> multitexture = new ArrayList<>();
@@ -21,18 +23,18 @@ public class CoffeeMaterial {
 		this.multitexture.add(textureFile);
 	}
 	
-	private float shininess = 100f;
-	private float transparency = 1f;
+	private FloatContainer shininess = new FloatContainer(500f);
+	private FloatContainer transparency = new FloatContainer(1f);
 	public float dissolution = 0f; //Unimplemented
 	public int illum = 0; //Unimplemented
 	
 	private String diffuseTexture = "/home/havard/texture.png"; //Texture
 	public String ambientTexture = ""; //Unimplemented
 
-	private String specularTexture = ""; //Planned
-	private String highlightTexture = ""; //Unimplemented
-	private String alphaTexture = ""; //Unimplemented
-	private String bumpTexture = ""; //Planned
+	private String specularTexture = "";
+	private String highlightTexture = "";
+	private String alphaTexture = "";
+	private String bumpTexture = "";
 	
 	public boolean hasBumpMap(){
 		return !bumpTexture.isEmpty();
@@ -74,11 +76,14 @@ public class CoffeeMaterial {
 	public void setDiffuseTexture(String diffuseTexture) {
 		this.diffuseTexture = diffuseTexture;
 	}
-	public float getShininess() {
+	public FloatContainer getShininessObject(){
 		return shininess;
 	}
+	public float getShininess() {
+		return shininess.getValue();
+	}
 	public void setShininess(float shininess) {
-		this.shininess = shininess;
+		this.shininess.setValue(shininess);
 	}
 	public Vector3f getSpecularColor() {
 		return specularColor;
@@ -91,11 +96,14 @@ public class CoffeeMaterial {
 		specularColor.x = g;
 		specularColor.x = b;
 	}
-	public float getTransparency() {
+	public FloatContainer getTransparencyObject(){
 		return transparency;
 	}
+	public float getTransparency() {
+		return transparency.getValue();
+	}
 	public void setTransparency(float transparency) {
-		this.transparency = transparency;
+		this.transparency.setValue(transparency);
 	}
 	
 	private int specularTextureHandle = 0;

@@ -1,7 +1,7 @@
 {
 	"logic": "scripts/testgame.lua",
 	"scene:main":{
-		"clearcolor": [0,0,0,0],
+		"clearcolor": [0,1,1,0],
 		"camera": {
 			"fov": 85
 		},
@@ -55,19 +55,6 @@
 			"physics.rotation": [0,1,0]
 		},
 		{
-			"object-id": "water",
-			"model": "models/canyon_water.obj",
-			"textures": [
-			"textures/water.png","textures/water_2.png"
-			],
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_nolight.txt",
-			"position": [0.0,0,0.0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 0
-		},
-		{
 			"object-id": "player",
 			"model": "models/playermesh.obj",
 			"poses": {
@@ -97,18 +84,40 @@
 			"physics.restitution": 0.1
 		},
 		{
-			"object-id": "testbox",
+			"object-id": "1.testbox",
 			"model": "models/3dbox_bumped.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_bumpmap.txt",
-			"position": [0,15,0],
+			"position": [0,17,5],
 			"rotation": [0,0,0],
 			"scale": [1,1,1],
 			"physics.shape": 0
 		},
 		{
-			"object-id": "10.tree1",
-			"model": "models/tree_1.obj",
+			"object-id": "0.overlay",
+			"model": "models/overlay.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0,0,0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1]
+		},
+		{
+			"object-id": "2.water",
+			"model": "models/canyon_water.obj",
+			"textures": [
+			"textures/water.png","textures/water_2.png"
+			],
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 0
+		},
+		{
+			"object-id": "tree1",
+			"model": "models/test.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [55.351,11.5,13.1511],

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import coffeeblocks.foundation.FloatContainer;
 import coffeeblocks.foundation.Vector3Container;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.opengl.components.CoffeeVertex;
@@ -28,6 +29,7 @@ public class CoffeeAnimator {
 	}
 	
 	private List<Vector3Container> transitions = new ArrayList<>();
+	private List<FloatContainer> floatTransitions = new ArrayList<>();
 	public void addTransition(Vector3Container value , Vector3f target, TransitionType transition, float time){
 		//time skal være i ms
 		if(transitions.contains(value))
@@ -38,7 +40,7 @@ public class CoffeeAnimator {
 		value.animationType = transition;
 		switch(transition){
 		case ValueExpo:
-			value.animationIncrement = VectorTools.vectorMul(Vector3f.sub(target, value.getValue(), null),1/time);
+			value.animationIncrementIncrement = VectorTools.vectorMul(Vector3f.sub(target, value.getValue(), null),1/time);
 			break;
 		case ValueIExpo:
 			break;
@@ -50,32 +52,71 @@ public class CoffeeAnimator {
 		}
 		transitions.add(value);
 	}
+	public void addTransition(FloatContainer value, float target, TransitionType transition, float time){
+		if(floatTransitions.contains(value))
+			return;
+		value.transitionTime = time;
+		value.transitionRestTime = time;
+		value.animationType = transition;
+		
+		System.out.println("Original value: "+value.getValue());
+		System.out.println("Transition: "+transition);
+		System.out.println("Time: "+time);
+		System.out.println("Target: "+target);
+		
+		switch(transition){
+		case ValueExpo:
+			break;
+		case ValueIExpo:
+			break;
+		case ValueLinear:
+			value.animationIncrement = (target-value.getValue())/time;
+			break;
+		default:
+			break;
+		
+		}
+		
+		floatTransitions.add(value);
+	}
 	public void tickTransitions(float tickTime){
 		for(Vector3Container transitional : new ArrayList<>(transitions)){
+			transitional.transitionRestTime -= tickTime*1000f;
+			if(transitional.transitionRestTime<=0){
+				transitions.remove(transitional);
+				break;
+			}
 			switch(transitional.animationType){
 			case ValueExpo:
-				transitional.transitionRestTime -= tickTime*1000f;
-				if(transitional.transitionRestTime<=0){
-					transitions.remove(transitional);
-					break;
-				}
-//				System.out.println(transitional.animationIncrement.toString());
-//				transitional.animationIncrement = Vector3f.add(transitional.animationIncrementIncrement, transitional.animationIncrement, null);
-//				System.out.println(VectorTools.vectorMul(transitional.animationIncrement,(transitional.transitionTime-transitional.transitionRestTime)).toString());
-				transitional.setValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
+				transitional.animationIncrement = Vector3f.add(transitional.animationIncrementIncrement, transitional.animationIncrement, null);
+				transitional.increaseValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
 				break;
 			case ValueIExpo:
 				break;
 			case ValueLinear:
-				transitional.transitionRestTime -= tickTime*1000f;
-				if(transitional.transitionRestTime<=0){
-					transitions.remove(transitional);
-					break;
-				}
-				transitional.setValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
+				transitional.increaseValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
 				break;
 			default:
 				break;
+			}
+		}
+		for(FloatContainer transitional : new ArrayList<>(floatTransitions)){
+			transitional.transitionRestTime -= tickTime*1000f;
+			if(transitional.transitionRestTime<=0){
+				floatTransitions.remove(transitional);
+				break;
+			}
+			switch(transitional.animationType){
+			case ValueExpo:
+				break;
+			case ValueIExpo:
+				break;
+			case ValueLinear:
+				transitional.increaseValue(transitional.animationIncrement*(transitional.transitionTime-transitional.transitionRestTime));
+				break;
+			default:
+				break;
+			
 			}
 		}
 	}

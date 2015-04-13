@@ -12,5 +12,5 @@ illum 1
 map_Kd textures/texture_uvtest.png
 map_Bump textures/3dbox_bump.png
 map_Ks textures/3dbox_spec.png
-map_Ns textures/3dbox_spechigh.png
+map_Ns textures/couple_eyes.png
 map_d textures/3dbox_alpha.png

@@ -81,6 +81,7 @@ public class CoffeeRenderer implements Runnable {
 		this.scene = manager;
 		setClearColor(scene.getClearColor());
 		setCamera(scene.getCamera());
+		getCamera().setAspect((float)windowres.x/(float)windowres.y);
 		setLights(scene.getLights());
 	}
 	public void setDrawingEnabled(boolean dodraw){
@@ -265,6 +266,13 @@ public class CoffeeRenderer implements Runnable {
 		}
 	}
 	
+	public void grabMouse(boolean todoOrNotToDo){ //Denne vil kunne brukes fra utsiden for å påtvinge en spesiell tilstand.
+		if(mouseGrabbed&&todoOrNotToDo)
+			toggleGrabMouse();
+		else if(!mouseGrabbed&&!todoOrNotToDo)
+			toggleGrabMouse();
+	}
+	
 	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
@@ -307,7 +315,7 @@ public class CoffeeRenderer implements Runnable {
 				listener.onGlfwFrameTick(glfwGetTime()); //Vi vil ha oversikt over spilltiden i de andre trådene
 
 			if(mouseGrabbed&&scene!=null&&doMouseGrab)
-				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende (burde bli konfigurerbart gjennom Lua)
+				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende
 			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
 			loopHandleAudio();
 
@@ -342,7 +350,8 @@ public class CoffeeRenderer implements Runnable {
 	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(4*3);
 	
 	private void loopRenderObjects(){
-		for(ModelContainer object : scene.getRenderables()){
+		for(ModelContainer object : scene.getRenderablesOrdered()){
+			
 			if(!object.isObjectBaked()){
 				ShaderHelper.compileShaders(object);
 			}

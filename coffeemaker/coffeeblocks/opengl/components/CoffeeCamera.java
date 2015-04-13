@@ -12,26 +12,13 @@ import coffeeblocks.foundation.Vector3Container;
 public class CoffeeCamera {
 	
 	private Vector3Container cameraPosition = new Vector3Container();
-//	private Vector3f cameraOffset = null;
-//	public void setCameraOffset(Vector3f offset){
-//		cameraOffset = offset;
-//	}
-//	public Vector3f getCameraOffset(){
-//		return cameraOffset;
-//	}
+	private Vector3Container cameraRotation = new Vector3Container();
 	public Vector3Container getCameraPos(){
 		return cameraPosition;
 	}
-//	public void bindCameraPos(Vector3Container target){
-//		cameraPosPointer = target;
-//	}
-//	public void unbindCameraPos(){
-//		cameraPosPointer = cameraPosition;
-//	}
-//	public void setCameraPos(Vector3f cameraPos) {
-//		unbindCameraPos();
-//		cameraPosPointer.setValue(cameraPos);
-//	}
+	public Vector3Container getCameraRotation(){
+		return cameraRotation;
+	}
 	public float getFieldOfView(){
 		return fieldOfView;
 	}
@@ -39,34 +26,45 @@ public class CoffeeCamera {
 		this.fieldOfView = fieldOfView;
 	}
 	
+	public CoffeeCamera(){
+		cameraRotation.setValueMax(new Vector3f(85f,Float.POSITIVE_INFINITY,0));
+		cameraRotation.setValueMin(new Vector3f(10f,Float.NEGATIVE_INFINITY,0));
+	}
+	
+	public void setAspect(float aspect){
+		if(aspect<=0)
+			throw new IllegalArgumentException("Invalid aspect ratio given, please correct this issue.");
+		this.aspect = aspect;
+	}
+	
 	private float aspect = 16/9f;
 	private float fieldOfView = 90f;
 	private float zNear = 0.1f;
 	private float zFar = 300f;
 	
-	private float horizAngle = 0f;
-	private float vertiAngle = 0f;
-	private float vertiAngleMin = 10f;
-	private float vertiAngleMax = 85f;
+//	private float horizAngle = 0f;
+//	private float vertiAngle = 0f;
+//	private float vertiAngleMin = 10f;
+//	private float vertiAngleMax = 85f;
 	
 	public float getHorizAngle() {
-		return horizAngle;
+		return cameraRotation.getValue().y;
 	}
 	public float getVertiAngle() {
-		return vertiAngle;
+		return cameraRotation.getValue().x;
 	}
 	
 	public void lookAt(Vector3f targetPos){
 		Vector3f direction = Vector3f.sub(targetPos, getCameraPos().getValue(), null);
 		direction.normalise();
-		vertiAngle = -(float)Math.toRadians(Math.asin(-direction.y));
-		horizAngle = -(float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
+		cameraRotation.getValue().x = -(float)Math.toRadians(Math.asin(-direction.y));
+		cameraRotation.getValue().y = -(float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
 		normalizeAngles();
 	}
 	
 	public void offsetOrientation(float rightAngle,float upAngle){
-		horizAngle += rightAngle;
-		vertiAngle += upAngle;
+		cameraRotation.getValue().y += rightAngle;
+		cameraRotation.getValue().x += upAngle;
 		normalizeAngles();
 	}
 	
@@ -111,8 +109,8 @@ public class CoffeeCamera {
 	
 	public Matrix4f getOrientation(){
 		Matrix4f result = new Matrix4f();
-		Matrix4f.rotate((float)Math.toRadians(vertiAngle), new Vector3f(1,0,0), result, result);
-		Matrix4f.rotate((float)Math.toRadians(horizAngle), new Vector3f(0,1,0), result, result);
+		Matrix4f.rotate((float)Math.toRadians(cameraRotation.getValue().x), new Vector3f(1,0,0), result, result);
+		Matrix4f.rotate((float)Math.toRadians(cameraRotation.getValue().y), new Vector3f(0,1,0), result, result);
 		return result;
 	}
 	
@@ -170,14 +168,14 @@ public class CoffeeCamera {
 	}
 	
 	public void normalizeAngles(){
-		horizAngle = horizAngle%360f;
-		if(horizAngle<0f)
-			horizAngle += 360f;
+		cameraRotation.getValue().y = cameraRotation.getValue().y%360f;
+		if(cameraRotation.getValue().y<0f)
+			cameraRotation.getValue().y += 360f;
 		
-		if(vertiAngle>vertiAngleMax)
-			vertiAngle = vertiAngleMax;
-		else if(vertiAngle<vertiAngleMin)
-			vertiAngle = vertiAngleMin;
+		if(cameraRotation.getValue().x>cameraRotation.getValueMax().x)
+			cameraRotation.getValue().x = cameraRotation.getValueMax().x;
+		else if(cameraRotation.getValue().x<cameraRotation.getValueMin().x)
+			cameraRotation.getValue().x = cameraRotation.getValueMin().x;
 	}
 	
 	public static FloatBuffer genProjection(float aspect,float fov,float znear,float zfar){

@@ -2,9 +2,11 @@ package coffeeblocks.foundation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -42,9 +44,17 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	}
 	public Collection<ModelContainer> getRenderables(){
 		Collection<ModelContainer> result = new ArrayList<>();
-		for(GameObject object : objects.values())
-			result.add(object.getGameModel());
+		getObjectList().stream().forEach(o -> result.add(o.getGameModel()));
 		return result;
+	}
+	public Collection<ModelContainer> getRenderablesOrdered(){
+		Comparator<GameObject> byId = (o1,o2) -> o2.getObjectId().compareTo(o1.getObjectId());
+		Collection<ModelContainer> result = new ArrayList<>();
+		getObjectList().stream().sorted(byId).forEach(o -> result.add(o.getGameModel()));
+		return result;
+	}
+	public Set<String> getRenderableIds(){
+		return objects.keySet();
 	}
 	public GameObject getObject(String objectId){
 		return objects.get(objectId);
@@ -88,13 +98,5 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	private List<CoffeeGameObjectManagerListener> listeners = new ArrayList<>();
 	public void addListener(CoffeeGameObjectManagerListener listener){
 		listeners.add(listener);
-	}
-	
-	public void billboard(String objectId,boolean spherical){
-		CoffeeCamera camera = getCamera();
-		if(spherical)
-			getObject(objectId).getGameModel().getRotation().setValue(new Vector3f(-camera.getVertiAngle(),-camera.getHorizAngle(),0));
-		else
-			getObject(objectId).getGameModel().getRotation().setValue(new Vector3f(0,-camera.getHorizAngle(),0));
 	}
 }

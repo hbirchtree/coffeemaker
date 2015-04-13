@@ -13,14 +13,32 @@ public class VectorTools {
 		ovec.z *= scalar;
 		return ovec;
 	}
-	public static Vector3f vectorLimit(Vector3f src, float max){
-		if(src.x>0&&src.x>max)
-			src.x *= max/src.x;
-		if(src.y>0&&src.y>max)
-			src.y *= max/src.y;
-		if(src.z>0&&src.z>max)
-			src.z *= max/src.z;
-		return src;
+	public static Vector3f vectorMul(Vector3f vec, Vector3f scalar){
+		Vector3f ovec = new Vector3f(vec);
+		ovec.x *= scalar.x;
+		ovec.y *= scalar.y;
+		ovec.z *= scalar.z;
+		return ovec;
+	}
+	public static Vector3f vectorLimitMin(Vector3f src, Vector3f valueMin){
+		Vector3f value = new Vector3f(src);
+		if(value.x<valueMin.x)
+			value.x = valueMin.x;
+		if(value.y<valueMin.y)
+			value.y = valueMin.y;
+		if(value.z<valueMin.z)
+			value.z = valueMin.z;
+		return value;
+	}
+	public static Vector3f vectorLimitMax(Vector3f src,Vector3f valueMax){
+		Vector3f value = new Vector3f(src);
+		if(value.x>valueMax.x)
+			value.x = valueMax.x;
+		if(value.y>valueMax.y)
+			value.y = valueMax.y;
+		if(value.z>valueMax.z)
+			value.z = valueMax.z;
+		return value;
 	}
 	public static Vector3f parseStrVector(String source,String separator){
 		String[] splits = source.split(separator);

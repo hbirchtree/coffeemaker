@@ -5,6 +5,7 @@ uniform mat4 model;
 
 // material settings
 uniform sampler2D materialTex;
+uniform float materialTransparencyValue;
 
 in vec2 fragTexCoord;
 in vec3 fragNormal;
@@ -23,5 +24,5 @@ void main() {
     
     //final color (after gamma correction)
     vec3 gamma = vec3(1.0/2.2);
-    finalColor = vec4(pow(linearColor, gamma), surfaceColor.a);
+    finalColor = vec4(pow(linearColor, gamma), surfaceColor.a*materialTransparencyValue);
 }

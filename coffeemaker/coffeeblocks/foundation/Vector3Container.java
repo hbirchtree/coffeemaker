@@ -23,6 +23,17 @@ public class Vector3Container {
 	
 	private Vector3f value = new Vector3f();
 	private Vector3f valueOffset = null;
+	private Vector3f valueMultiplier = null;
+	private Vector3f valueMin = null;
+	private Vector3f valueMax = null;
+
+	public Vector3f getValueMax() {
+		return valueMax;
+	}
+
+	public void setValueMax(Vector3f valueMax) {
+		this.valueMax = valueMax;
+	}
 
 	private Vector3f velocity = new Vector3f(); //For å øke verdien ved tick
 	private Vector3f acceleration = new Vector3f(); //For å øke farten ved tick
@@ -33,11 +44,17 @@ public class Vector3Container {
 		else
 			result = value;
 		if(valueOffset!=null)
-			return Vector3f.add(result, valueOffset,null);
+			result = Vector3f.add(result, valueOffset,null);
+		if(valueMultiplier!=null)
+			result = VectorTools.vectorMul(result, valueMultiplier);
 		return result;
 	}
 	public void setValue(Vector3f value) {
 		unbindValue();
+		if(valueMax!=null)
+			value = VectorTools.vectorLimitMax(value, valueMax);
+		if(valueMin!=null)
+			value = VectorTools.vectorLimitMax(value, valueMin);
 		this.value = value;
 	}
 	public void increaseValue(Vector3f value){
@@ -109,6 +126,22 @@ public class Vector3Container {
 		bound = false;
 	}
 	
+	public Vector3f getValueMin() {
+		return valueMin;
+	}
+
+	public void setValueMin(Vector3f valueMin) {
+		this.valueMin = valueMin;
+	}
+
+	public Vector3f getValueMultiplier() {
+		return valueMultiplier;
+	}
+
+	public void setValueMultiplier(Vector3f valueMultiplier) {
+		this.valueMultiplier = valueMultiplier;
+	}
+
 	public CoffeeAnimator.TransitionType animationType;
 	public float transitionTime = 0f;
 	public float transitionRestTime = 0f;
