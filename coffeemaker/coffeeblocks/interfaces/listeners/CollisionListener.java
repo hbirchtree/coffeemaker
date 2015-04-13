@@ -1,4 +1,4 @@
-package coffeeblocks.foundation.physics;
+package coffeeblocks.interfaces.listeners;
 
 import org.lwjgl.util.vector.Vector3f;
 

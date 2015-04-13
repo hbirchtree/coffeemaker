@@ -2,11 +2,11 @@ package coffeeblocks;
 
 import java.util.Map;
 
-import coffeeblocks.foundation.CoffeeLogicLoop;
-import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.foundation.CoffeeSceneManager;
-import coffeeblocks.foundation.CoffeeShop;
+import coffeeblocks.foundation.logic.CoffeeLogicLoop;
+import coffeeblocks.foundation.logic.CoffeeShop;
 import coffeeblocks.general.JsonParser;
+import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
 import coffeeblocks.opengl.CoffeeRenderer;
 
 public class CoffeeMaker implements CoffeeRendererListener{

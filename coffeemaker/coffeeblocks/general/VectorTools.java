@@ -2,6 +2,8 @@ package coffeeblocks.general;
 import java.nio.FloatBuffer;
 import java.util.List;
 
+import javax.vecmath.Quat4f;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -66,5 +68,34 @@ public class VectorTools {
 		buf.put(statfloats);
 		buf.flip();
 		return buf;
+	}
+	public static javax.vecmath.Vector3f quaternionToEulerVM(Quat4f quat){
+		return lwjglToVMVec3f(quaternionToEuler(quat));
+	}
+	public static Vector3f quaternionToEuler(Quat4f quat){
+		float sqw = quat.w*quat.w;
+		float sqx = quat.x*quat.x;
+		float sqy = quat.y*quat.y;
+		float sqz = quat.z*quat.z;
+		
+		float unit = sqx + sqy + sqz + sqw;
+		float test = quat.x*quat.y + quat.z*quat.w;
+		if(!(test<=0.5*unit)){
+			return new Vector3f(
+					(float)Math.atan2(quat.x, quat.w)*2f,
+					(float)Math.PI/2f,
+					0f);
+		}
+		if(!(test>=-0.5*unit)){
+			return new Vector3f(
+					-(float)Math.atan2(quat.x, quat.w)*2f,
+					-(float)Math.PI/2f,
+					0f);
+		}
+		
+		return new Vector3f(
+				(float)Math.atan2(2*quat.y*quat.w-2*quat.x*quat.z, sqx-sqy-sqz+sqw),
+				(float)Math.asin(2*test/unit),
+				(float)Math.atan2(2*quat.x*quat.w-2*quat.y*quat.z, -sqx+sqy-sqz+sqw));
 	}
 }

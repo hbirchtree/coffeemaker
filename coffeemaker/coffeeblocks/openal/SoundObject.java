@@ -12,8 +12,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.openal.WaveData;
 
-import coffeeblocks.foundation.Vector3Container;
 import coffeeblocks.general.VectorTools;
+import coffeeblocks.metaobjects.Vector3Container;
 
 public class SoundObject {
 	private boolean baked = false;

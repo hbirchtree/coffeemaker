@@ -3,8 +3,8 @@ package coffeeblocks.foundation.models;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import coffeeblocks.foundation.Vector3Container;
 import coffeeblocks.foundation.physics.PhysicsObject;
+import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.components.CoffeeMaterial;
 import coffeeblocks.opengl.components.CoffeeVertex;
 import coffeeblocks.opengl.components.ShaderBuilder;

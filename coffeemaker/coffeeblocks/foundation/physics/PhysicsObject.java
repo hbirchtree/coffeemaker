@@ -2,7 +2,7 @@ package coffeeblocks.foundation.physics;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.foundation.Vector3Container;
+import coffeeblocks.metaobjects.Vector3Container;
 
 public abstract class PhysicsObject {
 	public enum PhysicsType {
@@ -117,5 +117,13 @@ public abstract class PhysicsObject {
 	}
 	public void setNotifyForce(boolean notify){
 		this.notifiesForce = notify;
+	}
+	
+	private boolean updateRotation = true;
+	public boolean isUpdateRotation(){
+		return updateRotation;
+	}
+	public void setUpdateRotation(boolean updateRotation){
+		this.updateRotation = updateRotation;
 	}
 }

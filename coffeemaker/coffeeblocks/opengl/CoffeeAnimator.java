@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.foundation.FloatContainer;
-import coffeeblocks.foundation.Vector3Container;
 import coffeeblocks.general.VectorTools;
+import coffeeblocks.metaobjects.FloatContainer;
+import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.components.CoffeeVertex;
 
 public class CoffeeAnimator {
@@ -58,11 +58,6 @@ public class CoffeeAnimator {
 		value.transitionTime = time;
 		value.transitionRestTime = time;
 		value.animationType = transition;
-		
-		System.out.println("Original value: "+value.getValue());
-		System.out.println("Transition: "+transition);
-		System.out.println("Time: "+time);
-		System.out.println("Target: "+target);
 		
 		switch(transition){
 		case ValueExpo:

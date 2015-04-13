@@ -7,7 +7,8 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import coffeeblocks.foundation.Vector3Container;
+import coffeeblocks.metaobjects.FloatContainer;
+import coffeeblocks.metaobjects.Vector3Container;
 
 public class CoffeeCamera {
 	
@@ -20,10 +21,10 @@ public class CoffeeCamera {
 		return cameraRotation;
 	}
 	public float getFieldOfView(){
-		return fieldOfView;
+		return fieldOfView.getValue();
 	}
 	public void setFieldOfView(float fieldOfView) {
-		this.fieldOfView = fieldOfView;
+		this.fieldOfView.setValue(fieldOfView);
 	}
 	
 	public CoffeeCamera(){
@@ -38,14 +39,9 @@ public class CoffeeCamera {
 	}
 	
 	private float aspect = 16/9f;
-	private float fieldOfView = 90f;
+	private FloatContainer fieldOfView = new FloatContainer(90f);
 	private float zNear = 0.1f;
 	private float zFar = 300f;
-	
-//	private float horizAngle = 0f;
-//	private float vertiAngle = 0f;
-//	private float vertiAngleMin = 10f;
-//	private float vertiAngleMax = 85f;
 	
 	public float getHorizAngle() {
 		return cameraRotation.getValue().y;
@@ -61,22 +57,11 @@ public class CoffeeCamera {
 		cameraRotation.getValue().y = -(float)Math.toRadians(Math.atan2(-direction.x,-direction.z));
 		normalizeAngles();
 	}
-	
 	public void offsetOrientation(float rightAngle,float upAngle){
 		cameraRotation.getValue().y += rightAngle;
 		cameraRotation.getValue().x += upAngle;
 		normalizeAngles();
 	}
-	
-//	public void moveCameraForward(float scalar){
-//		Vector3f direction = getForward();
-//		Vector3f displace = new Vector3f();
-//		displace.x = direction.x*scalar;
-//		displace.y = direction.y*scalar;
-//		displace.z = direction.z*scalar;
-//		Vector3f.add(getCameraPos().getValue(), displace, displace);
-//		setCameraPos(displace);
-//	}
 	public Vector3f getCameraForwardVec(float scalar){
 		Vector3f direction = getForward();
 		Vector3f displace = new Vector3f();
@@ -85,15 +70,6 @@ public class CoffeeCamera {
 		displace.z = direction.z*scalar;
 		return displace;
 	}
-//	public void moveCameraRight(float scalar){
-//		Vector3f direction = getRight();
-//		Vector3f displace = new Vector3f();
-//		displace.x = direction.x*scalar;
-//		displace.y = direction.y*scalar;
-//		displace.z = direction.z*scalar;
-//		Vector3f.add(getCameraPos().getValue(), displace, displace);
-//		setCameraPos(displace);
-//	}
 	public Vector3f getCameraRightVec(float scalar){
 		Vector3f direction = getRight();
 		Vector3f displace = new Vector3f();
@@ -164,7 +140,7 @@ public class CoffeeCamera {
 	}
 	
 	public Matrix4f getProjection(){
-		return CoffeeCamera.gluPerspective(aspect,fieldOfView,zNear,zFar);
+		return CoffeeCamera.gluPerspective(aspect,fieldOfView.getValue(),zNear,zFar);
 	}
 	
 	public void normalizeAngles(){

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
@@ -35,9 +36,10 @@ import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
-import coffeeblocks.foundation.CoffeeGameObjectManagerListener;
-import coffeeblocks.foundation.CoffeeRendererListener;
 import coffeeblocks.general.VectorTools;
+import coffeeblocks.interfaces.listeners.CoffeeGameObjectManagerListener;
+import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
+import coffeeblocks.interfaces.listeners.CollisionListener;
 import coffeeblocks.metaobjects.GameObject;
 
 public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeRendererListener{
@@ -149,23 +151,20 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 	
 	@Override
 	public void onGlfwFrameTick(float tickTime){
-		try{
 		dynamicsWorld.stepSimulation(tickTime*100f);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 		for(String id : objects.keySet()){
 			RigidBody body = objects.get(id);
 			manager.getObject(id).getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
 			Vector3f out = new Vector3f();
 			body.getLinearVelocity(out);
 			manager.getObject(id).getGameModel().getPosition().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
-			body.getAngularVelocity(out);
-			manager.getObject(id).getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
 			body.getGravity(out);
 			manager.getObject(id).getGameModel().getPosition().setAcceleration(VectorTools.vmVec3ftoLwjgl(out));
-//			Quat4f rotation = new Quat4f();
-//			body.getWorldTransform(new Transform()).getRotation(rotation);
+			if(manager.getObject(id).getGameModel().isUpdateRotation()){
+				manager.getObject(id).getGameModel().getRotation().setValue(VectorTools.quaternionToEuler(body.getWorldTransform(new Transform()).getRotation(new Quat4f())));
+				body.getAngularVelocity(out);
+				manager.getObject(id).getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+			}
 //			Vector3f rot = new Vector3f();
 //			manager.getObject(id).getGameModel().setRotation(VectorTools.vmVec3ftoLwjgl());
 			for(CollisionListener listener : listeners)
@@ -221,11 +220,11 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		if(!objects.containsKey(objectId))
 			return;
 		RigidBody body = objects.get(objectId);
+		body.activate(true);
 		switch(property){
 		case PHYS_POS:
 			if(!(value instanceof org.lwjgl.util.vector.Vector3f))
 				return;
-			body.activate(true);
 			body.setWorldTransform(createTransform(VectorTools.lwjglToVMVec3f((org.lwjgl.util.vector.Vector3f)value)));
 			break;
 		case PHYS_CLEARFORCE:

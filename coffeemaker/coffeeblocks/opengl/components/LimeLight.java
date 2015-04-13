@@ -2,7 +2,7 @@ package coffeeblocks.opengl.components;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.foundation.Vector3Container;
+import coffeeblocks.metaobjects.Vector3Container;
 
 public class LimeLight {
 	private String lightId = "";

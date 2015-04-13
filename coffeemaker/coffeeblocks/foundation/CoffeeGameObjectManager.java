@@ -13,7 +13,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.foundation.physics.CollisionChecker;
-import coffeeblocks.foundation.physics.CollisionListener;
+import coffeeblocks.interfaces.listeners.CoffeeGameObjectManagerListener;
+import coffeeblocks.interfaces.listeners.CollisionListener;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;

@@ -1,4 +1,4 @@
-package coffeeblocks.foundation;
+package coffeeblocks.metaobjects;
 
 import coffeeblocks.opengl.CoffeeAnimator;
 

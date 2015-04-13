@@ -1,4 +1,4 @@
-package coffeeblocks.foundation;
+package coffeeblocks.interfaces.listeners;
 
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.GameObject.PropertyEnumeration;

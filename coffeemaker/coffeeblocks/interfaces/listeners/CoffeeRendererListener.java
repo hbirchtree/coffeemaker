@@ -1,4 +1,4 @@
-package coffeeblocks.foundation;
+package coffeeblocks.interfaces.listeners;
 
 public interface CoffeeRendererListener {
 	default public void onGlfwReady(){}

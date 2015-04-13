@@ -104,6 +104,8 @@ public class CoffeeJsonParsing {
 				gobj.getGameModel().setPhysicalMass(Float.valueOf(obj.toString()));
 			}else if(key.equals("physics.restitution")&&(obj instanceof Integer||obj instanceof Double)){
 				gobj.getGameModel().setRestitution(Float.valueOf(obj.toString()));
+			}else if(key.equals("physics.update-rotation")&&obj instanceof Boolean){
+				gobj.getGameModel().setUpdateRotation((Boolean)obj);
 			}else if(key.equals("physics.friction")&&(obj instanceof Integer||obj instanceof Double)){
 				gobj.getGameModel().setFriction(Float.valueOf(obj.toString()));
 			}else if(key.equals("physics.shape")&&(obj instanceof Integer)){

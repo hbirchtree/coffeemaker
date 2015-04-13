@@ -7,12 +7,12 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
-import coffeeblocks.foundation.CoffeeRendererListener;
-import coffeeblocks.foundation.Vector3Container;
-import coffeeblocks.foundation.input.CoffeeGlfwInputListener;
 import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.general.VectorTools;
+import coffeeblocks.interfaces.listeners.CoffeeGlfwInputListener;
+import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
 import coffeeblocks.metaobjects.GameObject;
+import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.CoffeeVertex;

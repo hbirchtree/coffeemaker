@@ -1,4 +1,4 @@
-package coffeeblocks.foundation.input;
+package coffeeblocks.interfaces.listeners;
 
 import java.util.List;
 

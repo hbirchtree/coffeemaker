@@ -3,6 +3,8 @@ package coffeeblocks.foundation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
 import coffeeblocks.opengl.CoffeeRenderer;
 
 public class CoffeeSceneManager implements CoffeeRendererListener{

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.foundation.FloatContainer;
+import coffeeblocks.metaobjects.FloatContainer;
 
 public class CoffeeMaterial {
 	private boolean multitextured = false;
