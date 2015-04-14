@@ -2,6 +2,7 @@ package coffeeblocks.foundation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -15,6 +16,34 @@ public class GameMetaData {
 	private Map<String,Integer> intValues = new HashMap<>();
 	private Map<String,Vector3f> vectorValues = new HashMap<>();
 	
+	public Set<String> getBoolKeys(){
+		return boolValues.keySet();
+	}
+	public Set<String> getStringKeys(){
+		return stringValues.keySet();
+	}
+	public Set<String> getTimerKeys(){
+		return timerValues.keySet();
+	}
+	public Set<String> getDoubleKeys(){
+		return doubleValues.keySet();
+	}
+	public Set<String> getIntKeys(){
+		return intValues.keySet();
+	}
+	public Set<String> getVectorKeys(){
+		return vectorValues.keySet();
+	}
+	
+	public GameMetaData(GameMetaData data) {
+		data.getBoolKeys().stream().forEach(key -> setBoolValue(key,data.getBoolValue(key)));
+		data.getStringKeys().stream().forEach(key -> setStringValue(key,data.getStringValue(key)));
+		data.getTimerKeys().stream().forEach(key -> setTimerValue(key,data.getTimerValue(key)));
+		data.getIntKeys().stream().forEach(key -> setIntValue(key,data.getIntValue(key)));
+		data.getDoubleKeys().stream().forEach(key -> setDoubleValue(key,data.getDoubleValue(key)));
+		data.getVectorKeys().stream().forEach(key -> setVectorValue(key,data.getVectorValue(key)));
+	}
+	public GameMetaData(){}
 	public void setStringValue(String key, String value){
 		stringValues.put(key, value);
 	}

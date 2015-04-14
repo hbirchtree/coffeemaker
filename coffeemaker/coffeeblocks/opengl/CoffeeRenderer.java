@@ -235,7 +235,13 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	public void loopHandleAudio(){
-		for(SoundObject obj : new ArrayList<>(soundObjects.values()))
+		for(SoundObject obj : new ArrayList<>(soundObjects.values())){
+			if(!obj.isBaked()&&!obj.initSound())
+				soundObjects.remove(obj);
+			if(!obj.hasSource())
+				obj.genSource();
+		}
+		for(SoundObject obj : scene.getInstantiableSounds())
 			if(!obj.isBaked()&&!obj.initSound())
 				soundObjects.remove(obj);
 		
@@ -320,8 +326,13 @@ public class CoffeeRenderer implements Runnable {
 			loopHandleAudio();
 
 //			framebuffer.storeFramebuffer(rendering_resolution);
-			if(draw&&scene!=null) //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
+			if(draw&&scene!=null){ //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
+				for(ModelContainer object : scene.getInstantiableModels())
+					if(!object.isObjectBaked())
+						ShaderHelper.compileShaders(object);
+				
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
+			}
 //			framebuffer.renderFramebuffer(windowres, lights);
 			
 			glfwSwapBuffers(window); // swap the color buffers

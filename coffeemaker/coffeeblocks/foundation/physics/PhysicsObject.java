@@ -14,7 +14,7 @@ public abstract class PhysicsObject {
 		position.increaseValue(position.getVelocity());
 	}
 	
-	private PhysicsType physicsType = PhysicsType.Undefined;
+	protected PhysicsType physicsType = PhysicsType.Undefined;
 	public PhysicsType getPhysicsType(){
 		return physicsType;
 	}
@@ -22,7 +22,7 @@ public abstract class PhysicsObject {
 		this.physicsType = type;
 	}
 	
-	private String collisionMeshFile = null;
+	protected String collisionMeshFile = null;
 	public void setCollisionMeshFile(String collisionMeshFile){
 		this.collisionMeshFile = collisionMeshFile;
 	}
@@ -30,7 +30,7 @@ public abstract class PhysicsObject {
 		return collisionMeshFile;
 	}
 	
-	private float physicalMass = 1.0f;
+	protected float physicalMass = 1.0f;
 	public synchronized void setPhysicalMass(float physicalMass){
 		if(physicalMass<0)
 			return;
@@ -40,7 +40,7 @@ public abstract class PhysicsObject {
 		return physicalMass;
 	}
 	
-	private Vector3f physicalScale = new Vector3f(1.0f,1.0f,1.0f); //Skala for det fysiske objektet
+	protected Vector3f physicalScale = new Vector3f(1.0f,1.0f,1.0f); //Skala for det fysiske objektet
 	public synchronized void setPhysicalScale(Vector3f physicalScale){
 		this.physicalScale = physicalScale;
 	}
@@ -48,8 +48,8 @@ public abstract class PhysicsObject {
 		return physicalScale;
 	}
 	
-	private float restitution = 0f; //Hvor mye objektet gir etter ved støt
-	private float friction = 0.5f; //Friksjon.
+	protected float restitution = 0f; //Hvor mye objektet gir etter ved støt
+	protected float friction = 0.5f; //Friksjon.
 	public float getRestitution() {
 		return restitution;
 	}
@@ -63,7 +63,7 @@ public abstract class PhysicsObject {
 		this.friction = friction;
 	}
 
-	private Vector3f physicalRotation = new Vector3f(0,0,0);
+	protected Vector3f physicalRotation = new Vector3f(0,0,0);
 	public Vector3f getPhysicalRotation() {
 		return physicalRotation;
 	}
@@ -72,7 +72,7 @@ public abstract class PhysicsObject {
 	}
 	
 
-	private Vector3f physicalLinearFactor = new Vector3f(1,1,1);
+	protected Vector3f physicalLinearFactor = new Vector3f(1,1,1);
 	public Vector3f getPhysicalLinearFactor() {
 		return physicalLinearFactor;
 	}
@@ -80,7 +80,7 @@ public abstract class PhysicsObject {
 		this.physicalLinearFactor = physicalLinearFactor;
 	}
 
-	private Vector3Container position = new Vector3Container();
+	protected Vector3Container position = new Vector3Container();
 	public Vector3Container getPosition(){
 		return position;
 	}
@@ -92,8 +92,8 @@ public abstract class PhysicsObject {
 		this.impulse = impulse;
 	}
 
-	private Vector3f impulse = new Vector3f();
-	private Vector3f physicalInertia = new Vector3f();
+	protected Vector3f impulse = new Vector3f();
+	protected Vector3f physicalInertia = new Vector3f();
 	public void setPhysicalInertia(Vector3f inertia) {
 		// TODO Auto-generated method stub
 		if(inertia!=null)
@@ -103,7 +103,7 @@ public abstract class PhysicsObject {
 		return physicalInertia;
 	}
 	
-	private boolean objectDeactivation = true;
+	protected boolean objectDeactivation = true;
 	public boolean getObjectDeactivation(){
 		return objectDeactivation;
 	}
@@ -111,7 +111,7 @@ public abstract class PhysicsObject {
 		this.objectDeactivation = deactivation;
 	}
 	
-	private boolean notifiesForce = false;
+	protected boolean notifiesForce = false;
 	public boolean isNotifyForce(){
 		return notifiesForce;
 	}
@@ -119,7 +119,7 @@ public abstract class PhysicsObject {
 		this.notifiesForce = notify;
 	}
 	
-	private boolean updateRotation = true;
+	protected boolean updateRotation = true;
 	public boolean isUpdateRotation(){
 		return updateRotation;
 	}

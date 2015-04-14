@@ -1,13 +1,10 @@
 package coffeeblocks.metaobjects;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import coffeeblocks.foundation.GameMetaData;
 import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.openal.SoundObject;
 
-public class GameObject{
+public class GameObject extends InstantiableObject{
 	
 	public enum PropertyEnumeration {
 		NONE,
@@ -27,36 +24,22 @@ public class GameObject{
 		
 	}
 	
+	public GameObject(String id,InstantiableObject source){
+		this(source);
+		this.id = id;
+	}
+	public GameObject(InstantiableObject source){
+		gameModel = new ModelContainer(source.getGameModel());
+		gameData = new GameMetaData(source.getGameData());
+		source.getSoundBox().stream().forEach(e -> soundBox.add(new SoundObject(e)));
+	}
+	
 	private String id = null;
 	public synchronized void setObjectId(String id){
 		this.id = id;
 	}
 	public String getObjectId(){
 		return id;
-	}
-	
-	private ModelContainer gameModel = null;
-	public ModelContainer getGameModel(){
-		return gameModel;
-	}
-	public synchronized void setGameModel(ModelContainer gameModel){
-		this.gameModel = gameModel;
-	}
-	
-	private GameMetaData gameData = new GameMetaData();
-	public GameMetaData getGameData(){
-		return gameData;
-	}
-	public synchronized void setGameData(GameMetaData gameData){
-		this.gameData = gameData;
-	}
-	
-	private List<SoundObject> soundBox = new ArrayList<>();
-	public List<SoundObject> getSoundBox() {
-		return soundBox;
-	}
-	public void addSoundBox(SoundObject soundBox) {
-		this.soundBox.add(soundBox);
 	}
 
 }

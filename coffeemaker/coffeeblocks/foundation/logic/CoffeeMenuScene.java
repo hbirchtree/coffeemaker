@@ -5,6 +5,8 @@ import coffeeblocks.opengl.CoffeeAnimator;
 
 public class CoffeeMenuScene extends CoffeeSceneTemplate{
 
+	protected static final String SCENE_ID_SECOND = "second";
+
 	public CoffeeMenuScene(CoffeeSceneManager manager, CoffeeAnimator animator) {
 		super(manager, animator);
 	}

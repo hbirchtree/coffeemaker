@@ -3,7 +3,10 @@ package coffeeblocks.foundation.models;
 import java.nio.FloatBuffer;
 import java.util.List;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import coffeeblocks.foundation.physics.PhysicsObject;
+import coffeeblocks.metaobjects.FloatContainer;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.components.CoffeeMaterial;
 import coffeeblocks.opengl.components.CoffeeVertex;
@@ -11,6 +14,36 @@ import coffeeblocks.opengl.components.ShaderBuilder;
 
 public class ModelContainer extends PhysicsObject {
 	private boolean objectBaked = false; //For å vite om det er lastet inn i minnet
+
+	public ModelContainer(){}
+	public ModelContainer(ModelContainer model) {
+		vertShader = model.getVertShader();
+		fragShader = model.getFragShader();
+		
+		position = new Vector3Container(model.getPosition());
+		rotation = new Vector3Container(model.getRotation());
+		scale = new Vector3Container(model.getScale());
+		physicalScale = new Vector3f(model.getPhysicalScale());
+		physicalRotation = new Vector3f(model.getPhysicalRotation());
+		physicalMass = model.getPhysicalMass();
+		friction = model.getFriction();
+		restitution = model.getRestitution();
+		impulse = new Vector3f(model.getImpulse());
+		
+		physicalInertia = model.getPhysicalInertia();
+		physicalLinearFactor = model.getPhysicalLinearFactor();
+		material = model.getMaterial();
+		shader = model.getShader();
+		animations = model.getAnimationContainer();
+		physicsType = model.getPhysicsType();
+		collisionMeshFile = model.getCollisionMeshFile();
+		
+		updateRotation = model.isUpdateRotation();
+		notifiesForce = model.isNotifyForce();
+		objectDeactivation = model.getObjectDeactivation();
+		
+		objectBaked = model.isObjectBaked();
+	}
 
 	public synchronized void tick(){
 		super.tick();

@@ -32,26 +32,10 @@ public abstract class CoffeeSceneTemplate{
 		return readyStatus;
 	}
 	
-	protected static final String PROPERTY_BOOL_CAN_JUMP = "can-jump";
-	protected static final String PROPERTY_BOOL_RUN_W = "ani.running.w";
-	protected static final String PROPERTY_BOOL_RUN_A = "ani.running.a";
-	protected static final String PROPERTY_BOOL_RUN_S = "ani.running.s";
-	protected static final String PROPERTY_BOOL_RUN_D = "ani.running.d";
-	protected static final String PROPERTY_BOOL_JUMP = "ani.jumping";
-	protected static final String PROPERTY_DUBS_WALK_PACE = "walk-pace";
-	protected static final String PROPERTY_INT_TEXTURE = "texture";
-	protected static final String PROPERTY_TIMER_SWITCH = "switch";
-	protected static final String PROPERTY_TIMER_JUMP_TO = "jump-to";
 	protected static final String PROPERTY_TIMER_TIME_TO_DIE = "time-to-die";
 	protected static final String PROPERTY_TIMER_TIME_TO_LIVE = "time-to-live";
 	protected static final String PROPERTY_VECTOR_SPAWNPOSITION = "spawn-position";
-	protected static final String SCENE_ID_MAIN = "main";
-	protected static final String SCENE_ID_SECOND = "second";
-	protected static final String ANI_RUNCYCLE = "ani.runcycle";
 	protected static final String OBJECT_ID_OVERLAY = "0.overlay";
-	protected static final String OBJECT_ID_TESTBOX = "1.testbox";
-	protected static final String OBJECT_ID_WATER = "2.water";
-	protected static final String OBJECT_ID_SKYBOX = "skybox";
 	protected static final String OBJECT_ID_PLAYER = "player";
 	
 	abstract public String getSceneId();

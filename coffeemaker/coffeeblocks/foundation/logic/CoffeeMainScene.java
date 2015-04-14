@@ -8,9 +8,25 @@ import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.opengl.CoffeeAnimator;
 
 public class CoffeeMainScene extends CoffeeSceneTemplate {
+	
+	protected static final String PROPERTY_BOOL_CAN_JUMP = "can-jump";
+	protected static final String PROPERTY_BOOL_RUN_W = "ani.running.w";
+	protected static final String PROPERTY_BOOL_RUN_A = "ani.running.a";
+	protected static final String PROPERTY_BOOL_RUN_S = "ani.running.s";
+	protected static final String PROPERTY_BOOL_RUN_D = "ani.running.d";
+	protected static final String PROPERTY_BOOL_JUMP = "ani.jumping";
+	protected static final String PROPERTY_DUBS_WALK_PACE = "walk-pace";
+	protected static final String PROPERTY_INT_TEXTURE = "texture";
+	protected static final String PROPERTY_TIMER_SWITCH = "switch";
+	protected static final String PROPERTY_TIMER_JUMP_TO = "jump-to";
+	protected static final String SCENE_ID_MAIN = "main";
+	protected static final String ANI_RUNCYCLE = "ani.runcycle";
+	protected static final String OBJECT_ID_TESTBOX = "1.testbox";
+	protected static final String OBJECT_ID_WATER = "2.water";
+	protected static final String OBJECT_ID_SKYBOX = "skybox";
+	
 	public CoffeeMainScene(CoffeeSceneManager manager, CoffeeAnimator animator) {
 		super(manager, animator);
-		// TODO Auto-generated constructor stub
 	}
 	public String getSceneId(){
 		return SCENE_ID_MAIN;

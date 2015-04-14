@@ -9,6 +9,7 @@ import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeSceneManager;
 import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.metaobjects.GameObject;
+import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
 import coffeeblocks.general.FileImporter;
 import coffeeblocks.openal.SoundObject;
@@ -42,10 +43,16 @@ public class CoffeeJsonParsing {
 				manager.addEntity("camera",cam);
 			}else if (skey.equals("clearcolor")&&sitem instanceof ArrayList){
 				List<Object> coloring = ((ArrayList)sitem);
-				manager.setClearColor(new Vector4f(Float.valueOf(coloring.get(0).toString()),Float.valueOf(coloring.get(1).toString()),Float.valueOf(coloring.get(2).toString()),Float.valueOf(coloring.get(3).toString())));
+				manager.setClearColor(new Vector4f(Float.valueOf(
+						coloring.get(0).toString()),Float.valueOf(coloring.get(1).toString()),Float.valueOf(coloring.get(2).toString()),Float.valueOf(coloring.get(3).toString())));
 			}else if(skey.equals("objects")&&sitem instanceof ArrayList){
-				for(Object model : ((ArrayList)sitem))
-					manager.addObject(parseGameObject(filepath,model));
+				for(Object model : ((ArrayList)sitem)){
+					InstantiableObject obj = parseGameObject(filepath,model);
+					if(!obj.isInstancedObject())
+						manager.addObject(obj.createInstance());
+					else
+						manager.addInstantiableObject(obj.getObjectPreseedName(),obj);
+				}
 			}else if(skey.equals("lights")&&sitem instanceof ArrayList){
 				List<LimeLight> lights = new ArrayList<>();
 				for(Object lightobj : ((ArrayList)sitem)){
@@ -56,11 +63,11 @@ public class CoffeeJsonParsing {
 			}
 		}
 	}
-	public static GameObject parseGameObject(String filepath,Object source){
+	public static InstantiableObject parseGameObject(String filepath,Object source){
 		if(!(source instanceof HashMap))
 			throw new IllegalArgumentException("Ugyldig JSON");
 		Map<String,Object> map = ((HashMap)source);
-		GameObject gobj = new GameObject();
+		InstantiableObject gobj = new GameObject();
 		if(!map.containsKey("model"))
 			throw new IllegalArgumentException("Ugyldig JSON: ingen modell for objekt");
 		String modelFile = filepath+((String)map.get("model"));
@@ -74,57 +81,67 @@ public class CoffeeJsonParsing {
 			if(key.equals("position")){
 				if(obj instanceof ArrayList){
 					List<Object> pos = ((ArrayList)obj);
-					gobj.getGameModel().getPosition().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+					gobj.getGameModel().getPosition().setValue(new Vector3f(
+							Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
 				}
 			}else if(key.equals("rotation")&&obj instanceof ArrayList){
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().getRotation().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-			}else if(key.equals("object-id")&&obj instanceof String){
-				gobj.setObjectId(((String)obj));
-			}else if(key.equals("stream-draw")&&obj instanceof Boolean){
+				gobj.getGameModel().getRotation().setValue(new Vector3f(
+						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+			}else if(key.equals("object-id")&&obj instanceof String){ //Objektets id. kun nødvendig for statiske objekt
+				gobj.setObjectPreseedName(((String)obj));
+			}else if(key.equals("instantiable")&&obj instanceof Boolean){ //Om vi kan klone objektet vårt, f.eks. pistolkuler
+				gobj.setInstancedObject((Boolean)obj);
+			}else if(key.equals("stream-draw")&&obj instanceof Boolean){ //Bestemmer om objektet kan animeres
 				gobj.getGameModel().getAnimationContainer().setStaticDraw(!(Boolean)obj);
-			}else if(key.equals("notify-force")&&obj instanceof Boolean){
+			}else if(key.equals("notify-force")&&obj instanceof Boolean){ //Om kollisjonssystemet skal rapportere kraften påført objektet
 				gobj.getGameModel().setNotifyForce((Boolean)obj);
-			}else if(key.equals("scale")&&obj instanceof ArrayList){
+			}else if(key.equals("scale")&&obj instanceof ArrayList){ //3D-modellens skala
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().getScale().setValue(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-			}else if(key.equals("physics.scale")&&obj instanceof ArrayList){
+				gobj.getGameModel().getScale().setValue(new Vector3f(
+						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+			}else if(key.equals("physics.scale")&&obj instanceof ArrayList){ //Fysisk skala
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().setPhysicalScale(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-			}else if(key.equals("physics.rotation")&&obj instanceof ArrayList){
+				gobj.getGameModel().setPhysicalScale(new Vector3f(
+						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+			}else if(key.equals("physics.rotation")&&obj instanceof ArrayList){ //Fysisk rotasjon
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().setPhysicalRotation(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-			}else if(key.equals("physics.inertia")&&obj instanceof ArrayList){
+				gobj.getGameModel().setPhysicalRotation(new Vector3f(
+						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+			}else if(key.equals("physics.inertia")&&obj instanceof ArrayList){ //Objektets motstand til bevegelse, tenk gyro
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().setPhysicalInertia(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-			}else if(key.equals("physics.linearity")&&obj instanceof ArrayList){
+				gobj.getGameModel().setPhysicalInertia(new Vector3f(
+						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+			}else if(key.equals("physics.linearity")&&obj instanceof ArrayList){ //Objektets motstand til rotasjon, 0,1,0 vil stoppe all rotasjon i X og Z
 				List<Object> pos = ((ArrayList)obj);
-				gobj.getGameModel().setPhysicalLinearFactor(new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-			}else if(key.equals("physics.mass")&&(obj instanceof Integer||obj instanceof Double)){
+				gobj.getGameModel().setPhysicalLinearFactor(new Vector3f(
+						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+			}else if(key.equals("physics.mass")&&(obj instanceof Integer||obj instanceof Double)){ //Objektets masse. Objekter med masse har virtuelt uendelig massetreghet
 				gobj.getGameModel().setPhysicalMass(Float.valueOf(obj.toString()));
-			}else if(key.equals("physics.restitution")&&(obj instanceof Integer||obj instanceof Double)){
+			}else if(key.equals("physics.restitution")&&(obj instanceof Integer||obj instanceof Double)){ //Hvor mye energi bevares ved fall eller lignende
 				gobj.getGameModel().setRestitution(Float.valueOf(obj.toString()));
-			}else if(key.equals("physics.update-rotation")&&obj instanceof Boolean){
+			}else if(key.equals("physics.update-rotation")&&obj instanceof Boolean){ //Om 3D-modellen skal motta oppdateringer fra fysikk-systemet
 				gobj.getGameModel().setUpdateRotation((Boolean)obj);
-			}else if(key.equals("physics.friction")&&(obj instanceof Integer||obj instanceof Double)){
+			}else if(key.equals("physics.friction")&&(obj instanceof Integer||obj instanceof Double)){ //Friksjon.
 				gobj.getGameModel().setFriction(Float.valueOf(obj.toString()));
-			}else if(key.equals("physics.shape")&&(obj instanceof Integer)){
+			}else if(key.equals("physics.shape")&&(obj instanceof Integer)){ //Form, enumerert i PhysicsObject
 				gobj.getGameModel().setPhysicsType(PhysicsObject.PhysicsType.values()[Integer.valueOf(obj.toString())]);
-			}else if(key.equals("physics.collision")&&(obj instanceof String)){
+			}else if(key.equals("physics.collision")&&(obj instanceof String)){ //Kollisjonsmodell ved PhysicsType.Complex
 				gobj.getGameModel().setCollisionMeshFile(filepath+"/"+(String)obj);
-			}else if(key.equals("textures")&&obj instanceof ArrayList){
+			}else if(key.equals("textures")&&obj instanceof ArrayList){ //Alternative teksturer for objektet, kan byttes til via CoffeeMaterial-klassen
 				List<Object> textures = ((ArrayList)obj);
 				for(Object text : textures)
 					if(text instanceof String)
-						gobj.getGameModel().getMaterial().addTexture(filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)text);
+						gobj.getGameModel().getMaterial().addTexture(
+								filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)text);
 				gobj.getGameModel().getMaterial().setMultitextured(true);
-			}else if(key.equals("poses")&&obj instanceof HashMap){
+			}else if(key.equals("poses")&&obj instanceof HashMap){ //Alternative modeller som modellen omformes til ved interpolering
 				Map<String,Object> poses = ((HashMap)obj);
 				for(String pose : poses.keySet()){
 					String modelfile = filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)poses.get(pose);
 					gobj.getGameModel().getAnimationContainer().addState(pose,ModelLoader.loadModel(modelfile).getVertices());
 				}
-			}else if(key.equals("sounds")&&obj instanceof HashMap){
+			}else if(key.equals("sounds")&&obj instanceof HashMap){ //Lydeffekter/musikk for dette objektet, posisjoneres ved dette objektets posisjon i det 3-dimensjonale rommet.
 				Map<String,Object> sounds = ((HashMap)obj);
 				for(String sound : sounds.keySet()){
 					String soundfile = filepath+"/"+(String)sounds.get(sound);

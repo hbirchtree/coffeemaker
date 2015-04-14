@@ -15,6 +15,8 @@ import coffeeblocks.foundation.physics.CollisionChecker;
 import coffeeblocks.interfaces.listeners.CoffeeGameObjectManagerListener;
 import coffeeblocks.interfaces.listeners.CollisionListener;
 import coffeeblocks.metaobjects.GameObject;
+import coffeeblocks.metaobjects.InstantiableObject;
+import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.LimeLight;
 
@@ -37,6 +39,26 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		this.clearColor = clearColor;
 	}
 	
+	private Map<String,InstantiableObject> instantiables = new HashMap<>();
+	public Collection<InstantiableObject> getInstantiableList(){
+		return instantiables.values();
+	}
+	public void addInstantiableObject(String id,InstantiableObject object){
+		instantiables.put(id, object);
+	}
+	public Set<String> getInstantiableIdList(){
+		return instantiables.keySet();
+	}
+	public Collection<ModelContainer> getInstantiableModels(){
+		Collection<ModelContainer> result = new ArrayList<>();
+		getInstantiableList().stream().forEach(o -> result.add(o.getGameModel()));
+		return result;
+	}
+	public Collection<SoundObject> getInstantiableSounds(){
+		Collection<SoundObject> result = new ArrayList<>();
+		getInstantiableList().stream().forEach(o -> result.addAll(o.getSoundBox()));
+		return result;
+	}
 	
 	private Map<String,GameObject> objects = new HashMap<>();
 	public Collection<GameObject> getObjectList(){
