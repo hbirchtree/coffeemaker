@@ -21,6 +21,16 @@ public abstract class CoffeeSceneTemplate{
 	public void updateClock(){
 		clock = System.currentTimeMillis();
 	}
+	public void cleanup(){
+		manager.getRenderer().cleanupAll();
+	}
+	protected boolean readyStatus = false;
+	public void setReadyStatus(boolean readyStatus){
+		this.readyStatus = readyStatus;
+	}
+	public boolean isReady(){
+		return readyStatus;
+	}
 	
 	protected static final String PROPERTY_BOOL_CAN_JUMP = "can-jump";
 	protected static final String PROPERTY_BOOL_RUN_W = "ani.running.w";
@@ -45,17 +55,12 @@ public abstract class CoffeeSceneTemplate{
 	protected static final String OBJECT_ID_PLAYER = "player";
 	
 	abstract public String getSceneId();
-	abstract public void setupSpecifics();
-	abstract public void tickSpecifics();
 	abstract public void handleKeyRelease(int key);
 	abstract public void handleMousePress(int key);
 	abstract public void handleMouseRelease(int key);
 	abstract public void handleCollisions(String body1, String body2);
 	abstract public void onGlfwFrameTick(double currentTime);
 	
-	public void cleanup(){
-		manager.getRenderer().cleanupAll();
-	}
 	
 	public void handleKeyPress(int key){
 		switch(key){
@@ -74,20 +79,24 @@ public abstract class CoffeeSceneTemplate{
 		}
 	}
 	
-	public void playerDie(){
-		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, 0l);
-		animator.addTransition(getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject(), 1f, CoffeeAnimator.TransitionType.ValueLinear, 300f);
-		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, clock+1000);
-	}
-	public void playerRespawn(){
-		getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
-		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_POS,getObject(OBJECT_ID_PLAYER).getGameData().getVectorValue(PROPERTY_VECTOR_SPAWNPOSITION));
-		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
-		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, 0l);
+	public void onGlfwFrameTick(float tickTime){
+		animator.tickTransitions(tickTime);
 	}
 	
+	public void tick(){
+		tickCamera();
+		tickSpecifics();
+		tickPlayer();
+		if(!isReady())
+			readyStatus = true;
+	}
 	
-	public void setupPlayer(){
+	abstract protected void setupSpecifics();
+	protected void tickSpecifics(){
+		if(!isReady())
+			setupSpecifics();
+	}
+	protected void setupPlayer(){
 		//Skjermoverlegget
 		billboard(OBJECT_ID_OVERLAY, true);
 		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().bindValue(getScene().getCamera().getCameraPos());
@@ -101,7 +110,9 @@ public abstract class CoffeeSceneTemplate{
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE,0l);
 		getObject(OBJECT_ID_PLAYER).getGameModel().setObjectDeactivation(false);
 	}
-	public void tickPlayer(){
+	protected void tickPlayer(){
+		if(!isReady())
+			setupPlayer();
 		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().setValueOffset(getScene().getCamera().getCameraForwardVec(0.5f));
 		if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&
 				getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)!=0)
@@ -110,18 +121,28 @@ public abstract class CoffeeSceneTemplate{
 				getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_LIVE)!=0)
 			playerRespawn();
 	}
-	
-	public void onGlfwFrameTick(float tickTime){
-		animator.tickTransitions(tickTime);
-	}
-	
-	public void setupCamera(){
+	protected void setupCamera(){
 		getScene().getCamera().getCameraPos().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 	}
-	public void tickCamera(){
+	protected void tickCamera(){
+		if(!isReady())
+			setupCamera();
 		//Kameraets posisjon relativt til spilleren endrer seg, derfor må vi endre offset for kameraets posisjon for å holde det i bane rundt spilleren.
 		getScene().getCamera().getCameraPos().setValueOffset(Vector3f.add(
 				VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(-5f),null));
+	}
+	
+	
+	public void playerDie(){
+		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, 0l);
+		animator.addTransition(getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject(), 1f, CoffeeAnimator.TransitionType.ValueLinear, 300f);
+		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, clock+1000);
+	}
+	public void playerRespawn(){
+		getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
+		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_POS,getObject(OBJECT_ID_PLAYER).getGameData().getVectorValue(PROPERTY_VECTOR_SPAWNPOSITION));
+		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
+		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, 0l);
 	}
 	
 	//Nyttefunksjoner

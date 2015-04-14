@@ -27,20 +27,22 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 
 	private void applyScene(CoffeeSceneTemplate scene){
-		if(this.scene!=null)
+		if(this.scene!=null){
 			this.scene.cleanup();
+			this.scene.setReadyStatus(false);
+		}
 		manager.applyScene(scene.getSceneId());
 		manager.getRenderer().addSounds(scene.getScene()); //Yes, sound in the renderer.
 		manager.getRenderer().setRendering_swaps(1);
 		manager.getRenderer().setWindowres(1280, 720);
 		manager.getRenderer().addCoffeeListener(this); //fordi listen av lyttere blir tømt
-		//		manager.getRenderer().addCoffeeListener(poser);
 		manager.getScene(scene.getSceneId()).getPhysicsSystem().addCollisionListener(this);
-		this.scene = scene; 
 		
 		scene.setupCamera();
 		scene.setupPlayer();
 		scene.setupSpecifics();
+		scene.setReadyStatus(true);
+		this.scene = scene;
 	}
 	
 	private CoffeeSceneTemplate mainScene;
@@ -51,15 +53,13 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	private List<Integer> inputKeys = new ArrayList<>();
 	private boolean liveInDreamLand = true;
 
-	public void eventLoop(){
+	public void eventLoop() throws InterruptedException{
 		manager.getRenderer().addInputListener(this);
 		applyScene(menuScene);
-
+		
 		while(liveInDreamLand){
 			scene.updateClock();
-			scene.tickCamera();
-			scene.tickSpecifics();
-			scene.tickPlayer();
+			scene.tick();
 		}
 	}
 	

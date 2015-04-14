@@ -48,7 +48,12 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		
 		CoffeeLogicLoop logic = new CoffeeShop(sceneManager);
 		renderer.addCoffeeListener(logic);
-		logic.eventLoop();
+		try {
+			logic.eventLoop();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	@Override
 	public void onGlfwQuit() {

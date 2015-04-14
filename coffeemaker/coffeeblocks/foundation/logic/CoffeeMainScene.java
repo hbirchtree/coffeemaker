@@ -16,7 +16,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		return SCENE_ID_MAIN;
 	}
 	@Override
-	public void setupSpecifics() {
+	protected void setupSpecifics() {
 		getObject(OBJECT_ID_WATER).getGameData().setTimerValue(PROPERTY_TIMER_SWITCH,0l);
 		getObject(OBJECT_ID_WATER).getGameData().setIntValue(PROPERTY_INT_TEXTURE,0);
 
@@ -24,7 +24,10 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_SKYBOX).getGameData().setIntValue(PROPERTY_INT_TEXTURE,0);
 	}
 	@Override
-	public void tickSpecifics() {
+	protected void tickSpecifics() {
+		super.tickSpecifics();
+		if(!isReady())
+			setupSpecifics();
 		//Miljø
 		if(getObject(OBJECT_ID_WATER).getGameData().getTimerValue(PROPERTY_TIMER_SWITCH)==null||
 				clock>=getObject(OBJECT_ID_WATER).getGameData().getTimerValue(PROPERTY_TIMER_SWITCH)){
@@ -44,11 +47,11 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 	}
 	@Override
-	public void setupPlayer() {
+	protected void setupPlayer() {
+		super.setupPlayer();
 		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 		
-		super.setupPlayer();
 		
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,12d);
@@ -60,7 +63,9 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
 	}
 	@Override
-	public void tickPlayer() {
+	protected void tickPlayer() {
+		if(!isReady())
+			setupPlayer();
 		super.tickPlayer();
 		//Spillervariabler
 		if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP)&&
@@ -177,7 +182,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_LIVE)) //Slik at tiden ikke utvider seg uendelig. Hvis dødstimeren allerede er aktivert vil den ikke sette den på nytt.
 				getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, clock+250);
 		}else if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain")||doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain.walkway")){
-			System.out.println(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().toString());
+			if(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().y>30)
+				playerDie();
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP, true);
 			getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_JUMP_TO, clock+150);
 		}

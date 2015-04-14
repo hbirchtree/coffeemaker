@@ -10,5 +10,5 @@ public abstract class CoffeeLogicLoop implements CoffeeGlfwInputListener,CoffeeR
 	public CoffeeLogicLoop(CoffeeSceneManager manager){
 		this.manager = manager;
 	}
-	public abstract void eventLoop();
+	public abstract void eventLoop() throws InterruptedException;
 }

@@ -19,6 +19,8 @@ public class GameMetaData {
 		stringValues.put(key, value);
 	}
 	public String getStringValue(String key){
+		if(!stringValues.containsKey(key))
+			return "EMPTY STRING!!!";
 		return stringValues.get(key);
 	}
 	
@@ -26,6 +28,8 @@ public class GameMetaData {
 		boolValues.put(key, value);
 	}
 	public Boolean getBoolValue(String key){
+		if(!boolValues.containsKey(key))
+			return false;
 		return boolValues.get(key);
 	}
 	
@@ -33,6 +37,8 @@ public class GameMetaData {
 		timerValues.put(key, value);
 	}
 	public Long getTimerValue(String key){
+		if(!timerValues.containsKey(key))
+			return Long.MAX_VALUE;
 		return timerValues.get(key);
 	}
 	
@@ -40,6 +46,8 @@ public class GameMetaData {
 		doubleValues.put(key, value);
 	}
 	public Double getDoubleValue(String key){
+		if(!doubleValues.containsKey(key))
+			return Double.POSITIVE_INFINITY;
 		return doubleValues.get(key);
 	}
 	
@@ -47,6 +55,8 @@ public class GameMetaData {
 		intValues.put(key, value);
 	}
 	public Integer getIntValue(String key){
+		if(!intValues.containsKey(key))
+			return Integer.MAX_VALUE;
 		return intValues.get(key);
 	}
 	
