@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
 
 import coffeeblocks.foundation.CoffeeSceneManager;
+import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.opengl.CoffeeAnimator;
 
@@ -19,6 +20,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	protected static final String PROPERTY_INT_TEXTURE = "texture";
 	protected static final String PROPERTY_TIMER_SWITCH = "switch";
 	protected static final String PROPERTY_TIMER_JUMP_TO = "jump-to";
+	protected static final String PROPERTY_TIMER_EXPIRY = "expire-time";
 	protected static final String SCENE_ID_MAIN = "main";
 	protected static final String ANI_RUNCYCLE = "ani.runcycle";
 	protected static final String OBJECT_ID_TESTBOX = "1.testbox";
@@ -60,7 +62,16 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getScene().getObject(OBJECT_ID_WATER).getGameModel().getMaterial().selectTexture = 
 					getObject(OBJECT_ID_WATER).getGameData().getIntValue(PROPERTY_INT_TEXTURE);
 			getObject(OBJECT_ID_WATER).getGameData().setTimerValue(PROPERTY_TIMER_SWITCH,clock+400);
+			
+//			spawnBullet();
 		}
+		
+		//Vi sletter prosjektiler som er gamle
+//		for(GameObject object : new ArrayList<>(getScene().getObjectList()))
+//			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
+//			clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
+//				getScene().deleteInstance(object.getObjectId());
+//			}
 	}
 	@Override
 	protected void setupPlayer() {
@@ -68,14 +79,13 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 		
-		
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP,false);
-		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,12d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_A,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_S,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_D,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_JUMP,false);
+		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,12d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
 	}
 	@Override
@@ -123,36 +133,45 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		switch(key){
 		case GLFW.GLFW_KEY_W:{
 			Vector3f accel = getScene().getCamera().
-					getCameraForwardVec(
-							getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
+					getCameraForwardVec(1f);
 			accel.y = 0;
+			accel.normalise();
+			accel = VectorTools.vectorMul(accel, 
+					getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
+			System.out.println("Got it");
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W, true);
 			return;
 		}
 		case GLFW.GLFW_KEY_A:{
 			Vector3f accel = getScene().getCamera().
-					getCameraRightVec(
-							-getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
+					getCameraRightVec(1f);
 			accel.y = 0;
+			accel.normalise();
+			accel = VectorTools.vectorMul(accel, 
+					-getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_A, true);
 			return;
 		}
 		case GLFW.GLFW_KEY_S:{
 			Vector3f accel = getScene().getCamera().
-					getCameraForwardVec(
-							-getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
+					getCameraForwardVec(1f);
 			accel.y = 0;
+			accel.normalise();
+			accel = VectorTools.vectorMul(accel, 
+					-getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_S, true);
 			return;
 		}
 		case GLFW.GLFW_KEY_D:{
 			Vector3f accel = getScene().getCamera().
-					getCameraRightVec(
-							getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
+					getCameraRightVec(1f);
 			accel.y = 0;
+			accel.normalise();
+			accel = VectorTools.vectorMul(accel, 
+					getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_D, true);
 			return;
@@ -188,9 +207,22 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	}
 	@Override
 	public void handleMousePress(int key) {
+		if(key==GLFW.GLFW_MOUSE_BUTTON_1){
+			//Hvis flere objekter opprettes i samme millisekund vil den ene bli overskrevet. Sånt skjer (ikke).
+			spawnBullet();
+		}
 	}
-	@Override
-	public void handleMouseRelease(int key) {
+	public void spawnBullet(){
+		GameObject obj = getScene().getInstantiable("testbox").createInstance(".testytestybox"+clock,true);
+		Vector3f dir = getScene().getCamera().getCameraForwardVec(1f);
+		dir.y = 0f;
+		dir.normalise(); //Vi normaliserer vektoren for å få en jevn avstand fra spilleren uavhengig av vinkel kameraet kan ha
+		dir = VectorTools.vectorMul(dir, 3f);
+		obj.getGameModel().getPosition().setValue(Vector3f.add(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue(),dir,null));
+		obj.getGameModel().getPosition().setVelocity(new Vector3f(0,1,0));
+		obj.getGameModel().getRotation().setValue(new Vector3f(0,45,0));
+		obj.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY, clock+500);
+		getScene().addObject(obj);
 	}
 	@Override
 	public void handleCollisions(String body1, String body2) {
@@ -203,5 +235,10 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP, true);
 			getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_JUMP_TO, clock+150);
 		}
+	}
+	@Override
+	public void handleMouseRelease(int key) {
+		// TODO Auto-generated method stub
+		
 	}
 }

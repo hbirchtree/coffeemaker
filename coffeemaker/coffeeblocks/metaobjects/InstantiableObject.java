@@ -33,10 +33,15 @@ public class InstantiableObject {
 	}
 	
 	public GameObject createInstance(){ //Brukes for å lage statiske objekter
-		return createInstance(preseedName,false);
+		return object_factory(false,preseedName,false);
 	}
-	public GameObject createInstance(String id,boolean prefix){ //Brukes for alle objekter, inkludert instanser
+	public GameObject createInstance(String id, boolean prefixed){
+		return object_factory(true,id,prefixed);
+	}
+	private GameObject object_factory(boolean instanced,String id,boolean prefix){ //Brukes for alle objekter, inkludert instanser
 		GameObject result = new GameObject(this);
+		if(instanced)
+			result.setInstancedObject(true);
 		if(prefix)
 			result.setObjectId(objectPrefix+id);
 		else

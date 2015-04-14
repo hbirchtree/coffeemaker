@@ -6,7 +6,6 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector3f;
 
 import coffeeblocks.foundation.physics.PhysicsObject;
-import coffeeblocks.metaobjects.FloatContainer;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.components.CoffeeMaterial;
 import coffeeblocks.opengl.components.CoffeeVertex;

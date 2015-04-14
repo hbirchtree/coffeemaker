@@ -49,6 +49,9 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public Set<String> getInstantiableIdList(){
 		return instantiables.keySet();
 	}
+	public InstantiableObject getInstantiable(String key){
+		return instantiables.get(key);
+	}
 	public Collection<ModelContainer> getInstantiableModels(){
 		Collection<ModelContainer> result = new ArrayList<>();
 		getInstantiableList().stream().forEach(o -> result.add(o.getGameModel()));
@@ -60,19 +63,37 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		return result;
 	}
 	
+	private List<GameObject> instances = new ArrayList<>();
+	public Collection<GameObject> getInstanceList(){
+		return new ArrayList<>(instances);
+	}
+	public void addInstance(GameObject instance){
+		instances.add(instance);
+	}
+	public void deleteInstance(String objectId){
+		getInstanceList().stream().filter(o -> (o.getObjectId()==objectId)).forEach(o -> instances.remove(o));
+	}
+	
 	private Map<String,GameObject> objects = new HashMap<>();
 	public Collection<GameObject> getObjectList(){
 		return objects.values();
 	}
+	public Collection<GameObject> getRenderablesObjects(){
+		Collection<GameObject> result = new ArrayList<>();
+		getObjectList().stream().forEach(o -> result.add(o));
+		getInstanceList().stream().forEach(o -> result.add(o));
+		return result;
+	}
 	public Collection<ModelContainer> getRenderables(){
 		Collection<ModelContainer> result = new ArrayList<>();
 		getObjectList().stream().forEach(o -> result.add(o.getGameModel()));
+		getInstanceList().stream().forEach(o -> result.add(o.getGameModel()));
 		return result;
 	}
 	public Collection<ModelContainer> getRenderablesOrdered(){
 		Comparator<GameObject> byId = (o1,o2) -> o2.getObjectId().compareTo(o1.getObjectId());
 		Collection<ModelContainer> result = new ArrayList<>();
-		getObjectList().stream().sorted(byId).forEach(o -> result.add(o.getGameModel()));
+		getRenderablesObjects().stream().sorted(byId).forEach(o -> result.add(o.getGameModel()));
 		return result;
 	}
 	public Set<String> getRenderableIds(){

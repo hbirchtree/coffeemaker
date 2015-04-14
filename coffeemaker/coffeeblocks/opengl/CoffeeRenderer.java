@@ -39,7 +39,9 @@ public class CoffeeRenderer implements Runnable {
 
 	// We need to strongly reference callback instances.
 	private GLFWErrorCallback errorCallback;
-//	private GLFWKeyCallback   keyCallback;
+	private GLFWKeyCallback keyCallback;
+	private GLFWMouseButtonCallback mouseCallback;
+	private GLFWCursorPosCallback mousePosCallback;
 	
 	private Vector4f clearColor = new Vector4f(0.8f,0.8f,1.0f,0f);
 	private CoffeeCamera camera = null;
@@ -128,7 +130,7 @@ public class CoffeeRenderer implements Runnable {
 			// Release window and window callbacks
 			glfwDestroyWindow(window);
 			alContext.destroy();
-//			keyCallback.release();
+			keyCallback.release();
 		} finally {
 			// Terminate GLFW and release the GLFWerrorfun
 			glfwTerminate();
@@ -169,13 +171,38 @@ public class CoffeeRenderer implements Runnable {
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
-//		glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
-//			@Override
-//			public void invoke(long window, int key, int scancode, int action, int mods) {
-//				
-//			}
-//		});
-		
+		glfwSetKeyCallback(window, keyCallback = GLFWKeyCallback((window, key, scancode, action, mods) ->  {
+			for(CoffeeGlfwInputListener listener : inputListeners)
+				if(listener.getRegisteredKeys().contains(key)){
+					if(action == GLFW_PRESS){
+						listener.coffeeReceiveKeyPress(key);
+					}else if(action == GLFW_REPEAT){
+						listener.coffeeReceiveKeyPress(key);
+					}else if(action == GLFW_RELEASE)
+						listener.coffeeReceiveKeyRelease(key);
+				}
+			if(glfwGetTime()>=controlDelay){
+				if(key==GLFW_KEY_F9&&action==GLFW_PRESS){
+					toggleGrabMouse();
+					controlDelay=glfwGetTime()+0.5d;
+				}
+			}
+		}));
+		glfwSetCursorPosCallback(window, mousePosCallback = GLFWCursorPosCallback((window,xpos,ypos) -> {
+			for(CoffeeGlfwInputListener listener : inputListeners)
+				if(listener.getMouseEvents()&&mouseGrabbed)
+					listener.coffeeReceiveMouseMove(xpos, ypos);
+		}));
+		glfwSetMouseButtonCallback(window, mouseCallback = GLFWMouseButtonCallback((window,button,action,mods) -> {
+			for(CoffeeGlfwInputListener listener : inputListeners)
+				if(listener.getRegisteredMouseButtons().contains(button))
+					if(action==GLFW_PRESS){
+						listener.coffeeReceiveMousePress(button);
+					}else{
+						listener.coffeeReceiveMouseRelease(button);
+					}
+		}));
+
 
 		// Get the resolution of the primary monitor
 		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -212,27 +239,15 @@ public class CoffeeRenderer implements Runnable {
 		double x,y;
 		x = xb.get();
 		y = yb.get();
-		camera.offsetOrientation(mouseSensitivity*(float)x, mouseSensitivity*(float)y);
+		
+		
+	}
+	
+	public void glfwResetCursor(){
 		glfwSetCursorPos(window,0,0);
 	}
 	
 	private double controlDelay = 0;
-	
-	public void loopHandleKeyboardInput(){
-		for(CoffeeGlfwInputListener listener : inputListeners)
-			for(int key : listener.getRegisteredKeys()){
-				if(glfwGetKey(window,key)==1)
-					listener.coffeeReceiveKeyPress(key);
-				else
-					listener.coffeeReceiveKeyRelease(key);
-			}
-		if(glfwGetTime()>=controlDelay){
-			if(glfwGetKey(window,GLFW_KEY_F9)==1){
-				toggleGrabMouse();
-				controlDelay=glfwGetTime()+0.5d;
-			}
-		}
-	}
 	
 	public void loopHandleAudio(){
 		for(SoundObject obj : new ArrayList<>(soundObjects.values())){
@@ -253,7 +268,8 @@ public class CoffeeRenderer implements Runnable {
 		if(fpscounter){
 			framecount++;
 			if(glfwGetTime()>=fpsTimer){
-				System.out.println("FPS: "+framecount+"\nTriangles: "+triCount+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
+				System.out.println("FPS: "+framecount+"\nTriangles: "+triCount
+						+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
 				framecount = 0;
 				triCount = 0;
 				fpsTimer = glfwGetTime()+1;
@@ -316,18 +332,16 @@ public class CoffeeRenderer implements Runnable {
 				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
 			for(CoffeeRendererListener listener : listeners)
 				listener.onGlfwFrameTick(lastTick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
-			tick = glfwGetTime(); //Vi bruker den midlertidig
 			for(CoffeeRendererListener listener : listeners)
 				listener.onGlfwFrameTick(glfwGetTime()); //Vi vil ha oversikt over spilltiden i de andre trådene
 
 			if(mouseGrabbed&&scene!=null&&doMouseGrab)
 				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende
-			loopHandleKeyboardInput(); //Håndterer hendelser for tastatur, sender hendelser til lyttere om deres registrerte knapper
 			loopHandleAudio();
 
 //			framebuffer.storeFramebuffer(rendering_resolution);
 			if(draw&&scene!=null){ //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
-				for(ModelContainer object : scene.getInstantiableModels())
+				for(ModelContainer object : scene.getInstantiableModels()) //Vi vil forhåndslaste shaders og teksturer for disse objektene slik at de ikke forårsaker problemer
 					if(!object.isObjectBaked())
 						ShaderHelper.compileShaders(object);
 				

@@ -31,6 +31,8 @@ public abstract class CoffeeSceneTemplate{
 	public boolean isReady(){
 		return readyStatus;
 	}
+
+	protected float mouseSensitivity = 0.1f;
 	
 	protected static final String PROPERTY_TIMER_TIME_TO_DIE = "time-to-die";
 	protected static final String PROPERTY_TIMER_TIME_TO_LIVE = "time-to-live";
@@ -39,6 +41,10 @@ public abstract class CoffeeSceneTemplate{
 	protected static final String OBJECT_ID_PLAYER = "player";
 	
 	abstract public String getSceneId();
+	public void handleMouseMove(double x, double y){
+		getScene().getCamera().offsetOrientation(mouseSensitivity*(float)x, mouseSensitivity*(float)y);
+		manager.getRenderer().glfwResetCursor();
+	}
 	abstract public void handleKeyRelease(int key);
 	abstract public void handleMousePress(int key);
 	abstract public void handleMouseRelease(int key);

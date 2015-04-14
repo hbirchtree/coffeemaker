@@ -97,6 +97,11 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 			}
 		}, null);
 	}
+	public void deleteObject(String objectId){
+		if(objects.containsKey(objectId))
+			dynamicsWorld.removeRigidBody(objects.remove(objectId));
+	}
+	
 	public void createCollisionObject(GameObject object){
 		if(objects.containsKey(object.getObjectId()))
 			throw new IllegalArgumentException("Object "+object.getObjectId()+" has already been added to the physics world!");
@@ -136,6 +141,9 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		if(!(shape instanceof BvhTriangleMeshShape)){
 			body.setInvInertiaDiagLocal(VectorTools.lwjglToVMVec3f(object.getGameModel().getPhysicalLinearFactor()));
 			body.updateInertiaTensor();
+			body.setLinearVelocity(object.getGameModel().getPosition().getVelocityVM());
+			if(object.getGameModel().getPosition().getAccelerationVM().length()!=0)
+				body.setGravity(object.getGameModel().getPosition().getAccelerationVM());
 		}
 		body.setUserPointer(object);
 		objects.put(object.getObjectId(), body);
@@ -165,8 +173,6 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 				body.getAngularVelocity(out);
 				manager.getObject(id).getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
 			}
-//			Vector3f rot = new Vector3f();
-//			manager.getObject(id).getGameModel().setRotation(VectorTools.vmVec3ftoLwjgl());
 			for(CollisionListener listener : listeners)
 				listener.updateObject(id);
 		}

@@ -143,6 +143,23 @@
 			"physics.restitution": 0.0
 		},
 		{
+			"instantiable": true,
+			"object-id": "testbox",
+			"model": "models/3dbox_bumped.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_bumpmap.txt",
+			"position": [0,17,5],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 1,
+			"physics.mass": 0.1,
+			"physics.scale": [1,1,1],
+			"physics.rotation": [0,0,0],
+			"physics.friction": 0,
+			"physics.restitution": 0.1,
+			"physics.update-rotation": true
+		},
+		{
 			"object-id": "death.imwatchingyou",
 			"model": "models/nothing-ness.obj",
 			"vshader": "shaders/vsh.txt",

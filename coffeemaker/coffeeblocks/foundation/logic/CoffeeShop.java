@@ -18,12 +18,17 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		inputKeys.add(GLFW.GLFW_KEY_A);
 		inputKeys.add(GLFW.GLFW_KEY_S);
 		inputKeys.add(GLFW.GLFW_KEY_D);
+		inputKeys.add(GLFW.GLFW_KEY_F);
 		inputKeys.add(GLFW.GLFW_KEY_KP_0);
 		inputKeys.add(GLFW.GLFW_KEY_KP_1);
 		inputKeys.add(GLFW.GLFW_KEY_KP_8);
 		inputKeys.add(GLFW.GLFW_KEY_KP_9);
 		inputKeys.add(GLFW.GLFW_KEY_SPACE);
 		inputKeys.add(GLFW.GLFW_KEY_ESCAPE);
+		
+		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_1);
+		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_2);
+		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_3);
 	}
 
 	private void applyScene(CoffeeSceneTemplate scene){
@@ -51,11 +56,12 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	private CoffeeSceneTemplate scene = null;
 	private CoffeeAnimator anim = new CoffeeAnimator();
 	private List<Integer> inputKeys = new ArrayList<>();
+	private List<Integer> inputButtons = new ArrayList<>();
 	private boolean liveInDreamLand = true;
 
 	public void eventLoop() throws InterruptedException{
 		manager.getRenderer().addInputListener(this);
-		applyScene(menuScene);
+		applyScene(mainScene);
 		
 		while(liveInDreamLand){
 			scene.updateClock();
@@ -80,14 +86,28 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		scene.handleKeyRelease(key);
 	}
 	@Override
+	public void coffeeReceiveMousePress(int btn){
+		scene.handleMousePress(btn);
+	}
+	@Override
+	public void coffeeReceiveMouseRelease(int btn){
+		scene.handleMouseRelease(btn);
+	}
+	@Override
+	public void coffeeReceiveMouseMove(double x,double y){
+		scene.handleMouseMove(x, y);
+	}
+	@Override
 	public void coffeeReceiveKeyPress(int key){
 		switch(key){
 		case GLFW.GLFW_KEY_KP_8:
 			applyScene(mainScene);
-			break;
+			return;
 		}
 		scene.handleKeyPress(key);
 	}
+	@Override
+	public boolean getMouseEvents(){return true;}
 	@Override
 	public void getCollisionNotification(String body1, String body2){
 		scene.handleCollisions(body1, body2);
@@ -95,5 +115,10 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	@Override
 	public void onGlfwQuit(){
 		System.exit(0);
+	}
+	
+	@Override
+	public List<Integer> getRegisteredMouseButtons() {
+		return inputButtons;
 	}
 }
