@@ -345,6 +345,7 @@ public class CoffeeRenderer implements Runnable {
 			GL30.glDeleteVertexArrays(object.getMaterial().getVaoHandle());
 		if(object.getShader().getProgramId()!=0)
 			GL20.glDeleteProgram(object.getShader().getProgramId());
+		object.setObjectBaked(false);
 	}
 	
 	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(4*3);
