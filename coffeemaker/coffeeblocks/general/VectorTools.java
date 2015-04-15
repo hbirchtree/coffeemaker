@@ -82,20 +82,20 @@ public class VectorTools {
 		float test = quat.x*quat.y + quat.z*quat.w;
 		if(!(test<=0.5*unit)){
 			return vectorMul(new Vector3f(
-					(float)Math.atan2(quat.x, quat.w)*2f,
-					(float)Math.PI/2f,
-					0f),180/(float)Math.PI);
+					0f,
+					2*(float)Math.atan2(quat.x, quat.w),
+					(float)Math.PI/2f),180/(float)Math.PI);
 		}
 		if(!(test>=-0.5*unit)){
 			return vectorMul(new Vector3f(
+					0f,
 					-(float)Math.atan2(quat.x, quat.w)*2f,
-					-(float)Math.PI/2f,
-					0f),180/(float)Math.PI);
+					-(float)Math.PI/2f),180/(float)Math.PI);
 		}
 		
 		return vectorMul(new Vector3f(
+				(float)Math.atan2(2*quat.x*quat.w-2*quat.y*quat.z, -sqx+sqy-sqz+sqw),
 				(float)Math.atan2(2*quat.y*quat.w-2*quat.x*quat.z, sqx-sqy-sqz+sqw),
-				(float)Math.asin(2*test/unit),
-				(float)Math.atan2(2*quat.x*quat.w-2*quat.y*quat.z, -sqx+sqy-sqz+sqw)),180/(float)Math.PI);
+				(float)Math.asin(2*test/unit)),180/(float)Math.PI);
 	}
 }

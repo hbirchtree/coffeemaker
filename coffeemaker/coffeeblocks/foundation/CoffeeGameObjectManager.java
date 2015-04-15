@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.lwjgl.util.vector.Vector4f;
 
@@ -63,15 +64,20 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		return result;
 	}
 	
-	private List<GameObject> instances = new ArrayList<>();
+	private Map<String,GameObject> instances = new HashMap<>();
 	public Collection<GameObject> getInstanceList(){
-		return new ArrayList<>(instances);
+		return new ArrayList<>(instances.values());
 	}
 	public void addInstance(GameObject instance){
-		instances.add(instance);
+		instances.put(instance.getObjectId(),instance);
+		listeners.stream().forEach(listener -> listener.newGameObjectAdded(instance));
 	}
 	public void deleteInstance(String objectId){
-		getInstanceList().stream().filter(o -> (o.getObjectId()==objectId)).forEach(o -> instances.remove(o));
+		if(instances.containsKey(objectId))
+			instances.remove(objectId);
+	}
+	public GameObject getInstancedObject(String objectId){
+		return instances.get(objectId);
 	}
 	
 	private Map<String,GameObject> objects = new HashMap<>();
@@ -79,21 +85,18 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		return objects.values();
 	}
 	public Collection<GameObject> getRenderablesObjects(){
-		Collection<GameObject> result = new ArrayList<>();
-		getObjectList().stream().forEach(o -> result.add(o));
-		getInstanceList().stream().forEach(o -> result.add(o));
+		Collection<GameObject> result = getObjectList().stream().sequential().collect(Collectors.toList());
+		result.addAll(getInstanceList().stream().sequential().collect(Collectors.toList()));
 		return result;
 	}
 	public Collection<ModelContainer> getRenderables(){
-		Collection<ModelContainer> result = new ArrayList<>();
-		getObjectList().stream().forEach(o -> result.add(o.getGameModel()));
-		getInstanceList().stream().forEach(o -> result.add(o.getGameModel()));
+		List<ModelContainer> result = getObjectList().stream().map(GameObject::getGameModel).sequential().collect(Collectors.toList());
+		result.addAll(getInstanceList().stream().map(GameObject::getGameModel).sequential().collect(Collectors.toList()));
 		return result;
 	}
 	public Collection<ModelContainer> getRenderablesOrdered(){
 		Comparator<GameObject> byId = (o1,o2) -> o2.getObjectId().compareTo(o1.getObjectId());
-		Collection<ModelContainer> result = new ArrayList<>();
-		getRenderablesObjects().stream().sorted(byId).forEach(o -> result.add(o.getGameModel()));
+		List<ModelContainer> result = getRenderablesObjects().stream().sorted(byId).map(GameObject::getGameModel).sequential().collect(Collectors.toList());
 		return result;
 	}
 	public Set<String> getRenderableIds(){
@@ -106,8 +109,7 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		if(object==null&&!objects.values().contains(object))
 			throw new IllegalArgumentException();
 		objects.put(object.getObjectId(),object);
-		for(CoffeeGameObjectManagerListener listener : listeners)
-			listener.newGameObjectAdded(object);
+		listeners.parallelStream().forEach(listener -> listener.newGameObjectAdded(object));
 	}
 	
 	public void requestObjectUpdate(String objectId, GameObject.PropertyEnumeration prop,Object value){

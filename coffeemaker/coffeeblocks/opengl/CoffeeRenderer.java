@@ -21,7 +21,6 @@ import coffeeblocks.opengl.components.ShaderHelper;
 import coffeeblocks.opengl.components.VAOHelper;
 
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -39,7 +38,7 @@ public class CoffeeRenderer implements Runnable {
 
 	// We need to strongly reference callback instances.
 	private GLFWErrorCallback errorCallback;
-	private GLFWKeyCallback keyCallback;
+//	private GLFWKeyCallback keyCallback;
 	private GLFWMouseButtonCallback mouseCallback;
 	private GLFWCursorPosCallback mousePosCallback;
 	
@@ -63,6 +62,7 @@ public class CoffeeRenderer implements Runnable {
 	private long framecount = 0;
 	private long triCount = 0;
 	private double tick = 0;
+	private float lastTick = 0f;
 	private boolean fpscounter = true;
 	
 	private float mouseSensitivity = 0.1f;
@@ -125,12 +125,20 @@ public class CoffeeRenderer implements Runnable {
 	public synchronized void run() {
 		try {
 			init();
-			loop();
+			try{
+				//Vi gjør dette fordi feilen ellers vil forsvinne ut i intet og ikke bli printet i det hele tatt.
+				//Dette gjør debugging MYE enklere
+				loop();
+			}catch(RuntimeException e){
+				e.printStackTrace();
+			}
 
 			// Release window and window callbacks
 			glfwDestroyWindow(window);
 			alContext.destroy();
-			keyCallback.release();
+//			keyCallback.release();
+			mouseCallback.release();
+			mousePosCallback.release();
 		} finally {
 			// Terminate GLFW and release the GLFWerrorfun
 			glfwTerminate();
@@ -171,23 +179,23 @@ public class CoffeeRenderer implements Runnable {
 			throw new RuntimeException("Failed to create the GLFW window");
 
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
-		glfwSetKeyCallback(window, keyCallback = GLFWKeyCallback((window, key, scancode, action, mods) ->  {
-			for(CoffeeGlfwInputListener listener : inputListeners)
-				if(listener.getRegisteredKeys().contains(key)){
-					if(action == GLFW_PRESS){
-						listener.coffeeReceiveKeyPress(key);
-					}else if(action == GLFW_REPEAT){
-						listener.coffeeReceiveKeyPress(key);
-					}else if(action == GLFW_RELEASE)
-						listener.coffeeReceiveKeyRelease(key);
-				}
-			if(glfwGetTime()>=controlDelay){
-				if(key==GLFW_KEY_F9&&action==GLFW_PRESS){
-					toggleGrabMouse();
-					controlDelay=glfwGetTime()+0.5d;
-				}
-			}
-		}));
+//		glfwSetKeyCallback(window, keyCallback = GLFWKeyCallback((window, key, scancode, action, mods) ->  {
+//			for(CoffeeGlfwInputListener listener : inputListeners)
+//				if(listener.getRegisteredKeys().contains(key)){
+//					if(action == GLFW_PRESS){
+//						listener.coffeeReceiveKeyPress(key);
+//					}else if(action == GLFW_REPEAT){
+//						listener.coffeeReceiveKeyPress(key);
+//					}else if(action == GLFW_RELEASE)
+//						listener.coffeeReceiveKeyRelease(key);
+//				}
+//			if(glfwGetTime()>=controlDelay){
+//				if(key==GLFW_KEY_F9&&action==GLFW_PRESS){
+//					toggleGrabMouse();
+//					controlDelay=glfwGetTime()+0.5d;
+//				}
+//			}
+//		}));
 		glfwSetCursorPosCallback(window, mousePosCallback = GLFWCursorPosCallback((window,xpos,ypos) -> {
 			for(CoffeeGlfwInputListener listener : inputListeners)
 				if(listener.getMouseEvents()&&mouseGrabbed)
@@ -231,24 +239,29 @@ public class CoffeeRenderer implements Runnable {
 	public void requestClose(){
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-
-	public void loopHandleMouseInput(){
-		DoubleBuffer xb = BufferUtils.createDoubleBuffer(1);
-		DoubleBuffer yb = BufferUtils.createDoubleBuffer(1);
-		glfwGetCursorPos(window,xb,yb);
-		double x,y;
-		x = xb.get();
-		y = yb.get();
-		
-		
-	}
 	
 	public void glfwResetCursor(){
 		glfwSetCursorPos(window,0,0);
 	}
 	
 	private double controlDelay = 0;
-	
+
+	public void loopHandleKeyboardInput(){
+		for(CoffeeGlfwInputListener listener : inputListeners)
+			for(int key : listener.getRegisteredKeys()){
+				if(glfwGetKey(window,key)==1)
+					listener.coffeeReceiveKeyPress(key);
+				else
+					listener.coffeeReceiveKeyRelease(key);
+			}
+		if(glfwGetTime()>=controlDelay){
+			if(glfwGetKey(window,GLFW_KEY_F9)==1){
+				toggleGrabMouse();
+				controlDelay=glfwGetTime()+0.5d;
+			}
+		}
+	}
+
 	public void loopHandleAudio(){
 		for(SoundObject obj : new ArrayList<>(soundObjects.values())){
 			if(!obj.isBaked()&&!obj.initSound())
@@ -321,22 +334,26 @@ public class CoffeeRenderer implements Runnable {
 		
 		fpsTimer = glfwGetTime()+1;
 		
-		float lastTick = 0f;
-		
 		while (glfwWindowShouldClose(window)==GL_FALSE){
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 			fpsCount(); //Skriver ut FPS og tikke-tid
 			lastTick = (float)tick;
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
-			for(CoffeeRendererListener listener : new ArrayList<>(listeners))
-				listener.onGlfwFrameTick(); //Vi varsler lyttere om at et nytt tikk har skjedd
-			for(CoffeeRendererListener listener : listeners)
-				listener.onGlfwFrameTick(lastTick); //Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
-			for(CoffeeRendererListener listener : listeners)
-				listener.onGlfwFrameTick(glfwGetTime()); //Vi vil ha oversikt over spilltiden i de andre trådene
 
-			if(mouseGrabbed&&scene!=null&&doMouseGrab)
-				loopHandleMouseInput(); //Tar inn handlinger gjort med mus og endrer kameravinkel følgende
+			//Under testing senket dette prosessorbruk i forhold til vanlige for-looper
+			listeners.parallelStream().forEach(listener -> {
+				//Vi varsler lyttere om at et nytt tikk har skjedd
+				listener.onGlfwFrameTick();
+				//Vi vil ha oversikt over spilltiden i de andre trådene
+				listener.onGlfwFrameTick(glfwGetTime());
+			});
+			//Dersom prosessene ikke skapte problemer med ComodificationException kunne dette gitt en grei ytelsesøkning
+			listeners.stream().sequential().forEach(listener -> {
+				//Dette for lyttere som avhenger av mengden tid passert (fysikk bl.a)
+				listener.onGlfwFrameTick(lastTick);
+			});
+			
+			loopHandleKeyboardInput();
 			loopHandleAudio();
 
 //			framebuffer.storeFramebuffer(rendering_resolution);
@@ -477,14 +494,13 @@ public class CoffeeRenderer implements Runnable {
 		soundObjects.put(obj.getSoundId(), obj);
 	}
 	public void addSounds(CoffeeGameObjectManager manager){
-		for(GameObject object : manager.getObjectList()){
-				for(SoundObject obj : object.getSoundBox())
-					try{
-						addSoundObject(obj);
-					}catch(IllegalArgumentException e){
-						System.err.println(e.getMessage());
-					}
-		}
+		manager.getObjectList().parallelStream().forEach(object -> object.getSoundBox().stream().forEach(sound -> {
+			try{
+				addSoundObject(sound);
+			}catch(IllegalArgumentException e){
+				System.err.println(e.getMessage());
+			}
+		}));
 	}
 
 	public void al_playSound(String id){

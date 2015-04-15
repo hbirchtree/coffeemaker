@@ -1,5 +1,7 @@
 package coffeeblocks.foundation.logic;
 
+import java.util.ArrayList;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -17,6 +19,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	protected static final String PROPERTY_BOOL_RUN_D = "ani.running.d";
 	protected static final String PROPERTY_BOOL_JUMP = "ani.jumping";
 	protected static final String PROPERTY_DUBS_WALK_PACE = "walk-pace";
+	protected static final String PROPERTY_DUBS_SPEEDLIMIT = "speed-limit";
 	protected static final String PROPERTY_INT_TEXTURE = "texture";
 	protected static final String PROPERTY_TIMER_SWITCH = "switch";
 	protected static final String PROPERTY_TIMER_JUMP_TO = "jump-to";
@@ -67,11 +70,11 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 		
 		//Vi sletter prosjektiler som er gamle
-//		for(GameObject object : new ArrayList<>(getScene().getObjectList()))
-//			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
-//			clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
-//				getScene().deleteInstance(object.getObjectId());
-//			}
+		for(GameObject object : new ArrayList<>(getScene().getInstanceList()))
+			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
+			clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
+				getScene().deleteInstance(object.getObjectId());
+			}
 	}
 	@Override
 	protected void setupPlayer() {
@@ -85,7 +88,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_S,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_D,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_JUMP,false);
-		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,12d);
+		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,24d);
+		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_SPEEDLIMIT,25d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
 	}
 	@Override
@@ -108,7 +112,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 				getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("run.1", 0.01f);
 			else
 				getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("run.2", 0.01f);
-		}else if(!getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_JUMP))
+		}else if(!getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_JUMP)&&
+				getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP))
 			//Uten dette vil spilleren gli overalt, hvilket er ekstremt plagsomt.
 			//Bi-effekten er at spilleren har en stor massetreghet som om den var uendelig tung, og kan derfor ikke dyttes av andre objekter.
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null); 
@@ -132,18 +137,21 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		super.handleKeyPress(key);
 		switch(key){
 		case GLFW.GLFW_KEY_W:{
+			if(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().length()>getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_SPEEDLIMIT).floatValue())
+				return;
 			Vector3f accel = getScene().getCamera().
 					getCameraForwardVec(1f);
 			accel.y = 0;
 			accel.normalise();
 			accel = VectorTools.vectorMul(accel, 
 					getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
-			System.out.println("Got it");
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W, true);
 			return;
 		}
 		case GLFW.GLFW_KEY_A:{
+			if(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().length()>getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_SPEEDLIMIT).floatValue())
+				return;
 			Vector3f accel = getScene().getCamera().
 					getCameraRightVec(1f);
 			accel.y = 0;
@@ -155,6 +163,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			return;
 		}
 		case GLFW.GLFW_KEY_S:{
+			if(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().length()>getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_SPEEDLIMIT).floatValue())
+				return;
 			Vector3f accel = getScene().getCamera().
 					getCameraForwardVec(1f);
 			accel.y = 0;
@@ -166,6 +176,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			return;
 		}
 		case GLFW.GLFW_KEY_D:{
+			if(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().length()>getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_SPEEDLIMIT).floatValue())
+				return;
 			Vector3f accel = getScene().getCamera().
 					getCameraRightVec(1f);
 			accel.y = 0;
@@ -209,20 +221,19 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	public void handleMousePress(int key) {
 		if(key==GLFW.GLFW_MOUSE_BUTTON_1){
 			//Hvis flere objekter opprettes i samme millisekund vil den ene bli overskrevet. Sånt skjer (ikke).
-			spawnBullet();
+			spawnProjectile("testbox","testytestybox"+clock,300f);
 		}
 	}
-	public void spawnBullet(){
-		GameObject obj = getScene().getInstantiable("testbox").createInstance(".testytestybox"+clock,true);
+	public void spawnProjectile(String instanceId,String identifier,float speed){
+		GameObject obj = getScene().getInstantiable(instanceId).createInstance(identifier,true);
 		Vector3f dir = getScene().getCamera().getCameraForwardVec(1f);
 		dir.y = 0f;
 		dir.normalise(); //Vi normaliserer vektoren for å få en jevn avstand fra spilleren uavhengig av vinkel kameraet kan ha
-		dir = VectorTools.vectorMul(dir, 3f);
-		obj.getGameModel().getPosition().setValue(Vector3f.add(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue(),dir,null));
-		obj.getGameModel().getPosition().setVelocity(new Vector3f(0,1,0));
+		obj.getGameModel().getPosition().setValue(Vector3f.add(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue(),VectorTools.vectorMul(dir, 3f),null));
+		obj.getGameModel().getPosition().setVelocity(VectorTools.vectorMul(dir, speed));
 		obj.getGameModel().getRotation().setValue(new Vector3f(0,45,0));
 		obj.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY, clock+500);
-		getScene().addObject(obj);
+		getScene().addInstance(obj);
 	}
 	@Override
 	public void handleCollisions(String body1, String body2) {

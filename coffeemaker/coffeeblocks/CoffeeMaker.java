@@ -1,5 +1,6 @@
 package coffeeblocks;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Map;
 
 import coffeeblocks.foundation.CoffeeSceneManager;
@@ -15,6 +16,16 @@ public class CoffeeMaker implements CoffeeRendererListener{
 	private CoffeeSceneManager sceneManager = new CoffeeSceneManager();
 	private CoffeeRenderer renderer = null;
 	private Thread renderingThread = null;
+	
+	private UncaughtExceptionHandler rendererEH = new UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				// TODO Auto-generated method stub
+				System.err.println(e.getMessage());
+				System.exit(1);
+			}
+		};
 	
 	public static void main(String[] args){
 		CoffeeMaker main = new CoffeeMaker();
@@ -44,6 +55,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 	}
 	public void rendererSpawn(){
 		renderingThread = new Thread(renderer);
+		renderingThread.setUncaughtExceptionHandler(rendererEH);
 		renderingThread.start();
 		
 		CoffeeLogicLoop logic = new CoffeeShop(sceneManager);

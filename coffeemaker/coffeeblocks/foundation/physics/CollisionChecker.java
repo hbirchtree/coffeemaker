@@ -157,25 +157,35 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		return t;
 	}
 	
+	private List<String> expired = new ArrayList<>();
 	@Override
 	public void onGlfwFrameTick(float tickTime){
 		dynamicsWorld.stepSimulation(tickTime*100f);
-		for(String id : objects.keySet()){
+		objects.keySet().parallelStream().forEach(id -> {
+			GameObject object = manager.getObject(id);
+			if(object==null)
+				object = manager.getInstancedObject(id);
+			if(object==null){
+				expired.add(id);
+				return;
+			}
 			RigidBody body = objects.get(id);
-			manager.getObject(id).getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
+			object.getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
 			Vector3f out = new Vector3f();
 			body.getLinearVelocity(out);
-			manager.getObject(id).getGameModel().getPosition().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+			object.getGameModel().getPosition().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
 			body.getGravity(out);
-			manager.getObject(id).getGameModel().getPosition().setAcceleration(VectorTools.vmVec3ftoLwjgl(out));
-			if(manager.getObject(id).getGameModel().isUpdateRotation()){
-				manager.getObject(id).getGameModel().getRotation().setValue(VectorTools.quaternionToEuler(body.getWorldTransform(new Transform()).getRotation(new Quat4f())));
+			object.getGameModel().getPosition().setAcceleration(VectorTools.vmVec3ftoLwjgl(out));
+			if(object.getGameModel().isUpdateRotation()){
+				object.getGameModel().getRotation().setValue(VectorTools.quaternionToEuler(body.getWorldTransform(new Transform()).getRotation(new Quat4f())));
 				body.getAngularVelocity(out);
-				manager.getObject(id).getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+				object.getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
 			}
 			for(CollisionListener listener : listeners)
 				listener.updateObject(id);
-		}
+		});
+		expired.stream().sequential().forEach(e -> objects.remove(e));
+		expired.clear();
 	}
 	
 	private List<CollisionListener> listeners = new ArrayList<>();

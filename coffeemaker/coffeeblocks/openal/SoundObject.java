@@ -79,7 +79,7 @@ public class SoundObject {
 		this.pitch = e.getPitch();
 		this.gain = e.getGain();
 		this.buffer = e.getBuffer();
-		this.soundId = e.getSoundId()+"."+this.source;
+		this.soundId = e.getSoundId();
 	}
 
 	public boolean initSound(){
