@@ -20,6 +20,7 @@ public class CoffeeAnimationContainer {
 		this.staticDraw = animationContainer.isStaticallyDrawn();
 		this.base = animationContainer.getBaseMesh();
 		this.vboHandle = animationContainer.getVboHandle();
+		this.states = animationContainer.states;
 	}
 	public static FloatBuffer convertVerticesToFloatBuffer(List<CoffeeVertex> vertices,int size,int vsize){
 		float[] floatsArray = new float[size];

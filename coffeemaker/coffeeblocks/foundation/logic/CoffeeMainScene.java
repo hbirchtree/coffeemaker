@@ -102,13 +102,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 					getObject(OBJECT_ID_WATER).getGameData().getIntValue(PROPERTY_INT_TEXTURE);
 			getObject(OBJECT_ID_WATER).getGameData().setTimerValue(PROPERTY_TIMER_SWITCH,clock+400);
 		}
-		
-		//Vi sletter prosjektiler som er gamle
-		for(GameObject object : new ArrayList<>(getScene().getInstanceList()))
-			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
-			clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
-				getScene().deleteInstance(object.getObjectId());
-			}
 	}
 	@Override protected void setupPlayer() {
 		super.setupPlayer();
@@ -345,16 +338,20 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 				if(logic_objectCanSeeOther(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING),target.getObjectId())){
 
 					if(clock%800>400)
-						target.getGameModel().getAnimationContainer().setAnimationState("stand.1", 0.1f);
+						target.getGameModel().getAnimationContainer().setAnimationState("stand.1", 0.01f);
 					else
-						target.getGameModel().getAnimationContainer().setAnimationState("stand.2", 0.1f);
+						target.getGameModel().getAnimationContainer().setAnimationState("stand.2", 0.01f);
 					float distance = pingDistance(target.getObjectId(),target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING));
-					Vector3f vec = Vector3f.sub(getObject(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING)).getGameModel().getPosition().getValue(),
-							target.getGameModel().getPosition().getValue(), null);
-					vec.y = 0;
-					vec.normalise(); //Skal ikke skalere med avstand
-					getScene().requestObjectUpdate(target.getObjectId(), GameObject.PropertyEnumeration.PHYS_ACCEL, 
-							VectorTools.vectorMul(vec,500-distance));
+					
+					if(distance<200){
+						Vector3f vec = Vector3f.sub(getObject(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING)).getGameModel().getPosition().getValue(),
+								target.getGameModel().getPosition().getValue(), null);
+						vec.y = 0;
+						vec.normalise(); //Skal ikke skalere med avstand
+						getScene().requestObjectUpdate(target.getObjectId(), GameObject.PropertyEnumeration.PHYS_ACCEL, 
+								VectorTools.vectorMul(vec,500-distance));
+					}
+					
 				}else{
 					//Hvis ikke innenfor synsfelt, slutt
 					target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,null);
@@ -371,7 +368,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			}else{
 				target.getGameModel().getAnimationContainer().setAnimationState(null, 0.01f);
 			}
-			System.out.println(target.getGameModel().getAnimationContainer().getAnimationState());
 			target.getGameModel().getAnimationContainer().morphToState();
 		}
 		public void handleCollision(String body){

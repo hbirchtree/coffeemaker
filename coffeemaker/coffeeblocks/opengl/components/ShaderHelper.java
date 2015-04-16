@@ -104,7 +104,7 @@ public class ShaderHelper {
 		FloatBuffer result = BufferUtils.createFloatBuffer(16);
 		
 		Matrix4f modelMatrix = new Matrix4f();
-		Matrix4f.translate(object.getPosition().getValue(), modelMatrix, modelMatrix);
+		Matrix4f.translate(Vector3f.add(object.getPosition().getValue(),object.getModelOffset(),null), modelMatrix, modelMatrix);
 		Matrix4f.scale(object.getScale().getValue(), modelMatrix, modelMatrix);
 		Vector3f rotation = object.getRotation().getValue();
 		Matrix4f.rotate(rotation.y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);

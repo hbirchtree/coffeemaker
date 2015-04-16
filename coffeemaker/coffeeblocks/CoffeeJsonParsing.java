@@ -67,6 +67,10 @@ public class CoffeeJsonParsing {
 			}
 		}
 	}
+	private static Vector3f readVector(Object obj){
+		List<Object> pos = ((ArrayList<Object>)obj);
+		return new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString()));
+	}
 	@SuppressWarnings("unchecked")
 	public static InstantiableObject parseGameObject(String filepath,Object source){
 		if(!(source instanceof HashMap))
@@ -83,16 +87,12 @@ public class CoffeeJsonParsing {
 		for(String key : map.keySet()){
 			Object obj = map.get(key);
 			//Vi aner ikke hvilke datatyper brukeren kommer til å skrive inn; string, int, double: vi gjør det enkelt.
-			if(key.equals("position")){
-				if(obj instanceof ArrayList){
-					List<Object> pos = ((ArrayList<Object>)obj);
-					gobj.getGameModel().getPosition().setValue(new Vector3f(
-							Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
-				}
+			if(key.equals("position")&&obj instanceof ArrayList){
+				gobj.getGameModel().getPosition().setValue(readVector(obj));
 			}else if(key.equals("rotation")&&obj instanceof ArrayList){
-				List<Object> pos = ((ArrayList<Object>)obj);
-				gobj.getGameModel().getRotation().setValue(new Vector3f(
-						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().getRotation().setValue(readVector(obj));
+			}else if(key.equals("position.offset")&&obj instanceof ArrayList){
+				gobj.getGameModel().setModelOffset(readVector(obj));
 			}else if(key.equals("object-id")&&obj instanceof String){ //Objektets id. kun nødvendig for statiske objekt
 				gobj.setObjectPreseedName(((String)obj));
 			}else if(key.equals("instantiable")&&obj instanceof Boolean){ //Om vi kan klone objektet vårt, f.eks. pistolkuler
@@ -102,25 +102,15 @@ public class CoffeeJsonParsing {
 			}else if(key.equals("notify-force")&&obj instanceof Boolean){ //Om kollisjonssystemet skal rapportere kraften påført objektet
 				gobj.getGameModel().setNotifyForce((Boolean)obj);
 			}else if(key.equals("scale")&&obj instanceof ArrayList){ //3D-modellens skala
-				List<Object> pos = ((ArrayList<Object>)obj);
-				gobj.getGameModel().getScale().setValue(new Vector3f(
-						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().getScale().setValue(readVector(obj));
 			}else if(key.equals("physics.scale")&&obj instanceof ArrayList){ //Fysisk skala
-				List<Object> pos = ((ArrayList<Object>)obj);
-				gobj.getGameModel().setPhysicalScale(new Vector3f(
-						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().setPhysicalScale(readVector(obj));
 			}else if(key.equals("physics.rotation")&&obj instanceof ArrayList){ //Fysisk rotasjon
-				List<Object> pos = ((ArrayList<Object>)obj);
-				gobj.getGameModel().setPhysicalRotation(new Vector3f(
-						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().setPhysicalRotation(readVector(obj));
 			}else if(key.equals("physics.inertia")&&obj instanceof ArrayList){ //Objektets motstand til bevegelse, tenk gyro
-				List<Object> pos = ((ArrayList<Object>)obj);
-				gobj.getGameModel().setPhysicalInertia(new Vector3f(
-						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().setPhysicalInertia(readVector(obj));
 			}else if(key.equals("physics.linearity")&&obj instanceof ArrayList){ //Objektets motstand til rotasjon, 0,1,0 vil stoppe all rotasjon i X og Z
-				List<Object> pos = ((ArrayList<Object>)obj);
-				gobj.getGameModel().setPhysicalLinearFactor(new Vector3f(
-						Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString())));
+				gobj.getGameModel().setPhysicalLinearFactor(readVector(obj));
 			}else if(key.equals("physics.mass")&&(obj instanceof Integer||obj instanceof Double)){ //Objektets masse. Objekter med masse har virtuelt uendelig massetreghet
 				gobj.getGameModel().setPhysicalMass(Float.valueOf(obj.toString()));
 			}else if(key.equals("physics.restitution")&&(obj instanceof Integer||obj instanceof Double)){ //Hvor mye energi bevares ved fall eller lignende

@@ -1,11 +1,15 @@
 package coffeeblocks.foundation.models;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.vecmath.Vector3d;
 
 import coffeeblocks.general.FileImporter;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.opengl.components.CoffeeMaterial;
+import coffeeblocks.opengl.components.CoffeeVertex;
 
 public class WavefrontModelReader implements ModelReader{
 	
@@ -40,17 +44,21 @@ public class WavefrontModelReader implements ModelReader{
 		
 		List<String> mtls = new ArrayList<>();
 		List<String> usedmtl = new ArrayList<>();
-		
-		for(String line : data){
-			if(line.startsWith("mtllib ")){
-				mtls.add(line.split(" ")[1]);
-				continue;
+		{
+			Iterator<String> it = data.iterator();
+			String itv;
+			while(it.hasNext()){
+				itv = it.next();
+				if(itv.startsWith("mtllib ")){
+					mtls.add(itv.split(" ")[1]);
+					continue;
+				}
+				if(itv.startsWith("usemtl ")){
+					usedmtl.add(itv.split(" ")[1]);
+					continue;
+				}
+				interpretLine(itv);
 			}
-			if(line.startsWith("usemtl ")){
-				usedmtl.add(line.split(" ")[1]);
-				continue;
-			}
-			interpretLine(line);
 		}
 		for(String mtlfile : mtls)
 			for(String mtl : usedmtl)
@@ -71,6 +79,7 @@ public class WavefrontModelReader implements ModelReader{
 		emptyNormal.add(1f);
 		
 		for(List<Integer> face : faces){
+			CoffeeVertex vert = new CoffeeVertex();
 			for(int i=0;i<vertexOffset;i++){
 				int texCoordOffset = vertexOffset+i;
 				int normalOffset = vertexOffset*2+i;

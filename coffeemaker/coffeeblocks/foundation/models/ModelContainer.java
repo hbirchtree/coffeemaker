@@ -20,17 +20,19 @@ public class ModelContainer extends PhysicsObject {
 		fragShader = model.getFragShader();
 		
 		position = new Vector3Container(model.getPosition());
+		modelOffset = model.getModelOffset();
 		rotation = new Vector3Container(model.getRotation());
 		scale = new Vector3Container(model.getScale());
+		
 		physicalScale = new Vector3f(model.getPhysicalScale());
 		physicalRotation = new Vector3f(model.getPhysicalRotation());
 		physicalMass = model.getPhysicalMass();
 		friction = model.getFriction();
 		restitution = model.getRestitution();
 		impulse = new Vector3f(model.getImpulse());
-		
 		physicalInertia = model.getPhysicalInertia();
 		physicalLinearFactor = model.getPhysicalLinearFactor();
+		
 		material = model.getMaterial();
 		shader = model.getShader();
 		animations = new CoffeeAnimationContainer(model.getAnimationContainer());
@@ -116,6 +118,7 @@ public class ModelContainer extends PhysicsObject {
 			throw new IllegalArgumentException("Not a valid array of vertices");
 		this.faces = faces;
 		
+		//Vi leser listen og lager tangenter med det samme
 		List<CoffeeVertex> converted = CoffeeAnimationContainer.convertFloatListToVertices(faces);
 		clearVertices();
 		addVertices(converted);
@@ -127,10 +130,10 @@ public class ModelContainer extends PhysicsObject {
 	public int getVertexDataSize(){
 		return animations.getBaseMeshSize();
 	}
-	
 	public FloatBuffer getVertexData(){
 		return animations.getBaseVertexData();
 	}
+	
 	private Vector3Container scale = new Vector3Container();
 	public Vector3Container getScale() {
 		return scale;
@@ -138,5 +141,13 @@ public class ModelContainer extends PhysicsObject {
 	private Vector3Container rotation = new Vector3Container(); //i GRADER
 	public Vector3Container getRotation() {
 		return rotation;
+	}
+	
+	private Vector3f modelOffset = new Vector3f(); //Offset fra fysikkmodellen
+	public Vector3f getModelOffset(){
+		return modelOffset;
+	}
+	public void setModelOffset(Vector3f offset){
+		this.modelOffset = offset;
 	}
 }

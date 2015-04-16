@@ -49,6 +49,9 @@ public class Vector3Container {
 			result = VectorTools.vectorMul(result, valueMultiplier);
 		return result;
 	}
+	public Vector3f getRawValue(){
+		return value;
+	}
 	public void setValue(Vector3f value) {
 		unbindValue();
 		if(valueMax!=null)
