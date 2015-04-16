@@ -26,6 +26,7 @@ out vec4 finalColor;
 void main() {
     vec3 normal = normalize(transpose(inverse(mat3(model))) * fragNormal);
     vec3 surfacePos = vec3(model * vec4(fragVert, 1));
+    vec4 eyePos = model * vec4(fragVert, 1);
     vec4 surfaceColor = texture(materialTex, fragTexCoord);
     vec3 surfaceToLight = normalize(light.position - surfacePos);
     vec3 surfaceToCamera = normalize(cameraPosition - surfacePos);

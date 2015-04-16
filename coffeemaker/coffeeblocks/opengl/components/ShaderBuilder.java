@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 public class ShaderBuilder {
 	private int programId;
@@ -40,10 +41,19 @@ public class ShaderBuilder {
 		uniforms.put(uniformName, uniform);
 		return uniform;
 	}
+	public void getUniforms(String... uniformNames){
+		for(String name : uniformNames)
+			getUniform(name);
+	}
 	public void setUniform(String uniformName,Vector3f value){
 		Integer loc = uniforms.get(uniformName);
 		if(loc!=null)
 			GL20.glUniform3f(loc, value.x, value.y, value.z);
+	}
+	public void setUniform(String uniformName,Vector4f value){
+		Integer loc = uniforms.get(uniformName);
+		if(loc!=null)
+			GL20.glUniform4f(loc, value.x, value.y, value.z,value.w);
 	}
 	public void setUniform(String uniformName,float value){
 		Integer loc = uniforms.get(uniformName);
@@ -65,6 +75,10 @@ public class ShaderBuilder {
 		int attrib = GL20.glGetAttribLocation(programId, attribName);
 		attributes.put(attribName, attrib);
 		return attrib;
+	}
+	public void getAttribs(String... attribNames){
+		for(String name : attribNames)
+			getAttrib(name);
 	}
 	
 	public int getProgramId(){

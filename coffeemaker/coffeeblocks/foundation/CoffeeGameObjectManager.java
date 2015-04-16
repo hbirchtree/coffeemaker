@@ -79,6 +79,15 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public GameObject getInstancedObject(String objectId){
 		return instances.get(objectId);
 	}
+	public GameObject getAnyObject(String objectId){
+		GameObject obj = getObject(objectId);
+		if(obj!=null)
+			return obj;
+		obj = getInstancedObject(objectId);
+		if(obj!=null)
+			return obj;
+		return null;
+	}
 	
 	private Map<String,GameObject> objects = new HashMap<>();
 	public Collection<GameObject> getObjectList(){

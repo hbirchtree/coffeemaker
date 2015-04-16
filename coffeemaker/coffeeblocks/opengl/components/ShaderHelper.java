@@ -25,29 +25,35 @@ public class ShaderHelper {
 		GL20.glUseProgram(shader.getProgramId());
 
 		try{
-			if(object.getMaterial().hasBumpMap()&&object.getMaterial().hasHighlightMap()&&
-					object.getMaterial().hasSpecularMap()&&object.getMaterial().hasTransparencyMap()){
-				shader.getUniform("materialBump");
-				shader.getUniform("materialSpecular");
-				shader.getUniform("materialHighlight");
-				shader.getUniform("materialTransparency");
-			}
-			shader.getUniform("materialTex");
-			shader.getUniform("camera");
-			shader.getUniform("model");
+			shader.getUniforms(
+					//For spesielt detaljerte objekter
+					"materialBump",
+					"materialSpecular",
+					"materialHighlight",
+					"materialTransparency",
+					
+					//Standard
+					"materialTex",
+					"camera",
+					"model",
+					"fogParams.fDensity",
+					"fogParams.vFogColor",
 
-			shader.getUniform("materialShininess");
-			shader.getUniform("materialTransparencyValue");
-			shader.getUniform("materialSpecularColor");
-			shader.getUniform("light.position");
-			shader.getUniform("light.attenuation");
-			shader.getUniform("light.ambientCoefficient");
-			shader.getUniform("light.intensities");
+					//Materialegenskaper
+					"materialShininess",
+					"materialTransparencyValue",
+					"materialSpecularColor",
+					
+					//Belysning					
+					"light.position",
+					"light.attenuation",
+					"light.ambientCoefficient",
+					"light.intensities");
 
-			shader.getAttrib("vert");
-			shader.getAttrib("vertTexCoord");
-			shader.getAttrib("vertNormal");
-			shader.getAttrib("vertTangent");
+			shader.getAttribs("vert",
+					"vertTexCoord",
+					"vertNormal",
+					"vertTangent");
 		}catch(RuntimeException e){
 			System.err.println(e.getMessage());
 		}

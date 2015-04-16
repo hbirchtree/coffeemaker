@@ -7,6 +7,7 @@ import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeSceneManager;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
+import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.CoffeeAnimator;
 
 public abstract class CoffeeSceneTemplate{
@@ -94,7 +95,7 @@ public abstract class CoffeeSceneTemplate{
 		
 		billboard(OBJECT_ID_PLAYER, false); //Vi vil at spilleren skal vende seg fra kameraet, dette ved å binde rotasjonen mot kameraet
 		getObject(OBJECT_ID_PLAYER).getGameData().setVectorValue(PROPERTY_VECTOR_SPAWNPOSITION,
-				new Vector3f(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue()));
+				new Vector3Container(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue()));
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACTIVATION,null);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE,0l);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE,0l);
@@ -130,7 +131,7 @@ public abstract class CoffeeSceneTemplate{
 	}
 	public void playerRespawn(){
 		getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
-		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_POS,getObject(OBJECT_ID_PLAYER).getGameData().getVectorValue(PROPERTY_VECTOR_SPAWNPOSITION));
+		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_POS,getObject(OBJECT_ID_PLAYER).getGameData().getVectorValue(PROPERTY_VECTOR_SPAWNPOSITION).getValue());
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, 0l);
 	}
@@ -140,6 +141,15 @@ public abstract class CoffeeSceneTemplate{
 		//Vi vet ikke hvilken rekkefølge objektene blir listet
 		return (body1.equals(target1)&&body2.equals(target2))||(body2.equals(target2)&&body1.equals(target1));
 	}
+	protected boolean doTypedBodiesCollide(String body1, String body2, String identifier1, String identifier2){
+		return (body1.startsWith(identifier1)&&body2.startsWith(identifier2))||(body2.startsWith(identifier2)&&body1.startsWith(identifier1));
+	}
+	protected String choosePrefixed(String prefix, String... opts){
+		for(String opt : opts)
+			if(opt.startsWith(prefix))
+					return opt;
+		return null;
+	}
 	public CoffeeGameObjectManager getScene(){
 		return manager.getScene(getSceneId());
 	}
@@ -148,6 +158,30 @@ public abstract class CoffeeSceneTemplate{
 	}
 	protected boolean performRaytest(String object,Vector3f startPoint){ //Skyter fra startPoint til objektet
 		return getScene().getPhysicsSystem().performRaytest(startPoint,object);
+	}
+	protected float pingDistance(String from,String to){ //Skyter fra startPoint til objektet
+		return getScene().getPhysicsSystem().performRaytestDistance(from, to);
+	}
+	protected float pingDistance(String from,Vector3f to){ //Skyter fra startPoint til objektet
+		return getScene().getPhysicsSystem().performRaytestDistancePoint(from, VectorTools.lwjglToVMVec3f(to));
+	}
+	protected boolean logic_objectCanSeeOtherInRange(String from, String to,float range){
+		if(from==null||to==null)
+			return false;
+		float distance = pingDistance(from,to);
+		if(distance>range)
+			return false;
+		if(distance==Float.NaN)
+			return false;
+		return true;
+	}
+	protected boolean logic_objectCanSeeOther(String from, String to){
+		GameObject fromO = getObject(from);
+		if(fromO==null)
+			getScene().getInstancedObject(to);
+		if(fromO==null)
+			return false;
+		return performRaytest(to,fromO.getGameModel().getPosition().getValue());
 	}
 	protected void billboard(String objectId,boolean spherical){
 		getObject(objectId).getGameModel().getRotation().bindValue(getScene().getCamera().getCameraRotation());

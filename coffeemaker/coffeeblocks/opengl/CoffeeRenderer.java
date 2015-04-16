@@ -42,7 +42,7 @@ public class CoffeeRenderer implements Runnable {
 	private GLFWMouseButtonCallback mouseCallback;
 	private GLFWCursorPosCallback mousePosCallback;
 	
-	private Vector4f clearColor = new Vector4f(0.8f,0.8f,1.0f,0f);
+	private Vector4f clearColor = new Vector4f(0.8f,0.8f,1.0f,1f);
 	private CoffeeCamera camera = null;
 	private List<LimeLight> lights = null;
 	public CoffeeCamera getCamera() {
@@ -64,6 +64,9 @@ public class CoffeeRenderer implements Runnable {
 	private double tick = 0;
 	private float lastTick = 0f;
 	private boolean fpscounter = true;
+	
+	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(4*3);
+	private float fogDensity = 0.5f;
 	
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
@@ -390,8 +393,6 @@ public class CoffeeRenderer implements Runnable {
 		object.setObjectBaked(false);
 	}
 	
-	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(4*3);
-	
 	private void loopRenderObjects(){
 		for(ModelContainer object : scene.getRenderablesOrdered()){
 			
@@ -428,6 +429,9 @@ public class CoffeeRenderer implements Runnable {
 			object.getShader().setUniform("materialShininess", object.getMaterial().getShininess());
 			object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
 			object.getShader().setUniform("materialTransparencyValue", object.getMaterial().getTransparency());
+			
+			object.getShader().setUniform("fogParams.fDensity", fogDensity);
+			object.getShader().setUniform("fogParams.vFogColor", getClearColor());
 			
 			//Vi legger inn teksturene i minne for å kunne bruke de
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);

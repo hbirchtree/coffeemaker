@@ -16,14 +16,6 @@ public class InstantiableObject {
 		this.instancedObject = instancedObject;
 	}
 	
-	private String objectPrefix = null;
-	public String getObjectPrefix() {
-		return objectPrefix;
-	}
-	public void setObjectPrefix(String objectPrefix) {
-		this.objectPrefix = objectPrefix;
-	}
-	
 	private String preseedName = null;
 	public String getObjectPreseedName(){
 		return preseedName; 
@@ -43,7 +35,7 @@ public class InstantiableObject {
 		if(instanced)
 			result.setInstancedObject(true);
 		if(prefix)
-			result.setObjectId(objectPrefix+id);
+			result.setObjectId(getObjectPreseedName()+id);
 		else
 			result.setObjectId(id);
 		return result;

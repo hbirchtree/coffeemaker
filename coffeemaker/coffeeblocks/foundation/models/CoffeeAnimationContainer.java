@@ -15,6 +15,12 @@ import coffeeblocks.opengl.components.VAOHelper;
 public class CoffeeAnimationContainer {
 	public static final int FLOATLIST_VERTEX_DATA_SIZE = 8;
 	
+	public CoffeeAnimationContainer(){}
+	public CoffeeAnimationContainer(CoffeeAnimationContainer animationContainer) {
+		this.staticDraw = animationContainer.isStaticallyDrawn();
+		this.base = animationContainer.getBaseMesh();
+		this.vboHandle = animationContainer.getVboHandle();
+	}
 	public static FloatBuffer convertVerticesToFloatBuffer(List<CoffeeVertex> vertices,int size,int vsize){
 		float[] floatsArray = new float[size];
 		size = 0;

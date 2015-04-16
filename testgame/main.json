@@ -1,7 +1,11 @@
 {
-	"logic": "scripts/testgame.lua",
+	"font": {
+		"source": "font.png",
+		"map": 0,
+		"tile-size": 64
+	},
 	"scene:main":{
-		"clearcolor": [0,1,1,0],
+		"clearcolor": [0,1,1,1],
 		"camera": {
 			"fov": 85
 		},
@@ -85,14 +89,25 @@
 			"physics.update-rotation": false
 		},
 		{
-			"object-id": "1.testbox",
-			"model": "models/3dbox_bumped.obj",
+			"instantiable": true,
+			"stream-draw": true,
+			"object-id": "monster.golem",
+			"model": "models/golem_idle.obj",
+			"poses": {
+				"stand.1": "golem_standing_1.obj",
+				"stand.2": "golem_standing_2.obj",
+				"detect": "golem_detect.obj"
+			},
 			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_bumpmap.txt",
+			"fshader": "shaders/fsh.txt",
 			"position": [0,17,5],
 			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 0
+			"scale": [2,2,2],
+			"physics.shape": 5,
+			"physics.mass": 50,
+			"physics.scale": [3,4,1],
+			"physics.linearity": [0,1,0],
+			"physics.update-rotation": false
 		},
 		{
 			"object-id": "0.overlay",
@@ -118,13 +133,16 @@
 		},
 		{
 			"object-id": "tree1",
-			"model": "models/test.obj",
+			"model": "models/tree_1.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [55.351,11.5,13.1511],
 			"rotation": [0,0,0],
 			"scale": [0.5,0.5,0.5],
-			"physics.shape": 0
+			"physics.shape": 5,
+			"physics.mass": 0,
+			"physics.scale": [1,4,1],
+			"physics.update-rotation": false
 		},
 		{
 			"object-id": "death",
@@ -144,8 +162,8 @@
 		},
 		{
 			"instantiable": true,
-			"object-id": "testbox",
-			"model": "models/3dbox_bumped.obj",
+			"object-id": "bullet",
+			"model": "models/bullet.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_bumpmap.txt",
 			"position": [0,17,5],
@@ -157,7 +175,7 @@
 			"physics.rotation": [0,0,0],
 			"physics.friction": 0,
 			"physics.restitution": 0.1,
-			"physics.update-rotation": true
+			"physics.update-rotation": false
 		},
 		{
 			"object-id": "death.imwatchingyou",

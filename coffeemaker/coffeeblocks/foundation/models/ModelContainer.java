@@ -33,7 +33,7 @@ public class ModelContainer extends PhysicsObject {
 		physicalLinearFactor = model.getPhysicalLinearFactor();
 		material = model.getMaterial();
 		shader = model.getShader();
-		animations = model.getAnimationContainer();
+		animations = new CoffeeAnimationContainer(model.getAnimationContainer());
 		physicsType = model.getPhysicsType();
 		collisionMeshFile = model.getCollisionMeshFile();
 		

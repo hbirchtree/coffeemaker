@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import coffeeblocks.metaobjects.Vector3Container;
+
 public class GameMetaData {
 	//Meningen med denne klassen er å holde verdier relatert til objektet. Dette kan programmeres fra og benyttes i en eventloop, men er ikke knyttet opp mot et spesifik formål.
 	//Den skal heller være et generelt grunnlag å bygge på, som tillater flere muligheter og samtidig ordnet kode
@@ -14,7 +16,7 @@ public class GameMetaData {
 	private Map<String,Long> timerValues = new HashMap<>();
 	private Map<String,Double> doubleValues = new HashMap<>();
 	private Map<String,Integer> intValues = new HashMap<>();
-	private Map<String,Vector3f> vectorValues = new HashMap<>();
+	private Map<String,Vector3Container> vectorValues = new HashMap<>();
 	
 	public Set<String> getBoolKeys(){
 		return boolValues.keySet();
@@ -89,10 +91,10 @@ public class GameMetaData {
 		return intValues.get(key);
 	}
 	
-	public void setVectorValue(String key, Vector3f value){
+	public void setVectorValue(String key, Vector3Container value){
 		vectorValues.put(key, value);
 	}
-	public Vector3f getVectorValue(String key){
+	public Vector3Container getVectorValue(String key){
 		return vectorValues.get(key);
 	}
 }

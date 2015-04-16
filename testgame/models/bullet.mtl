@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Material.002
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Ks textures/bullet_spechigh.png
+map_Kd textures/bullet_texture.png
+map_Ns textures/bullet_spechigh.png
+map_Bump textures/bullet_normals.png

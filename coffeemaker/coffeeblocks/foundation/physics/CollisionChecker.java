@@ -222,6 +222,33 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		return Float.NaN;
 	}
 	
+	public float performRaytestDistance(String from, String to){
+		RigidBody fromB = objects.get(from);
+		RigidBody toB = objects.get(to);
+		Vector3f start = fromB.getWorldTransform(new Transform()).origin;
+		Vector3f end = toB.getWorldTransform(new Transform()).origin;
+		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(start, end);
+		dynamicsWorld.rayTest(start, end, ray);
+		if(ray.hasHit()&&toB==(RigidBody)ray.collisionObject){ //Vi vil vite at det er det absolutt samme objektet vi spør etter. Strålen kan treffe mye annet.
+			Vector3f distance = ray.hitPointWorld;
+			distance.sub(start);
+			return distance.length();
+		}
+		return Float.NaN;
+	}
+	public float performRaytestDistancePoint(String from, Vector3f end){
+		RigidBody fromB = objects.get(from);
+		Vector3f start = fromB.getWorldTransform(new Transform()).origin;
+		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(start, end);
+		dynamicsWorld.rayTest(start, end, ray);
+		if(ray.hasHit()){ //Vi vil vite at det er det absolutt samme objektet vi spør etter. Strålen kan treffe mye annet.
+			Vector3f distance = ray.hitPointWorld;
+			distance.sub(start);
+			return distance.length();
+		}
+		return Float.NaN;
+	}
+	
 	public String performRaytestId(org.lwjgl.util.vector.Vector3f start,org.lwjgl.util.vector.Vector3f end){
 		CollisionWorld.ClosestRayResultCallback ray = new CollisionWorld.ClosestRayResultCallback(VectorTools.lwjglToVMVec3f(start), VectorTools.lwjglToVMVec3f(end));
 		dynamicsWorld.rayTest(VectorTools.lwjglToVMVec3f(start), VectorTools.lwjglToVMVec3f(end), ray);
