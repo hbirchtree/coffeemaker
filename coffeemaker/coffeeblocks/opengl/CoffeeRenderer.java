@@ -15,6 +15,7 @@ import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
+import coffeeblocks.opengl.components.CoffeeRenderableObject;
 import coffeeblocks.opengl.components.CoffeeVertex;
 import coffeeblocks.opengl.components.LimeLight;
 import coffeeblocks.opengl.components.ShaderHelper;
@@ -361,8 +362,8 @@ public class CoffeeRenderer implements Runnable {
 
 //			framebuffer.storeFramebuffer(rendering_resolution);
 			if(draw&&scene!=null){ //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
-				for(ModelContainer object : scene.getInstantiableModels()) //Vi vil forhåndslaste shaders og teksturer for disse objektene slik at de ikke forårsaker problemer
-					if(!object.isObjectBaked())
+				for(CoffeeRenderableObject object : scene.getInstantiableModels()) //Vi vil forhåndslaste shaders og teksturer for disse objektene slik at de ikke forårsaker problemer
+					if(!object.isBaked())
 						ShaderHelper.compileShaders(object);
 				
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
@@ -394,21 +395,18 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	private void loopRenderObjects(){
-		for(ModelContainer object : scene.getRenderablesOrdered()){
+		for(CoffeeRenderableObject object : scene.getRenderablesOrdered()){
 			
-			if(!object.isObjectBaked()){
+			if(!object.isBaked()){
 				ShaderHelper.compileShaders(object);
-			}
-			if(object.isNoDepthRendering()){
-				glDisable(GL_DEPTH_TEST);
 			}
 			GL20.glUseProgram(object.getShader().getProgramId());
 
 			//Animasjon ved å endre modellen fra en annen tråd
-			if(!object.getAnimationContainer().isStaticallyDrawn()){
+			if(!object.isStaticDraw()){
 				//Vi bruker en enkel ByteBuffer for alle for å unngå tonnevis med allokasjoner per sekund. Vi tilbakestiller denne hver gang vi skal rendre på nytt.
 				//Dersom vi ikke gjør dette synker ytelsen *dramatisk*
-				VAOHelper.modifyVbo(object.getAnimationContainer().getVboHandle(), object.getAnimationContainer().getCurrentMesh(),vertBuffer);
+				VAOHelper.modifyVbo(object.getVboHandle(), object.getVertices(),vertBuffer);
 			}
 			
 			object.getShader().setUniform("camera", camera.matrix());
@@ -464,8 +462,6 @@ public class CoffeeRenderer implements Runnable {
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 			GL20.glUseProgram(0);
 			
-			if(object.isNoDepthRendering())
-				glEnable(GL_DEPTH_TEST);
 		}
 	}
 	private List<CoffeeRendererListener> listeners = new ArrayList<>();

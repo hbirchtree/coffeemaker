@@ -79,7 +79,6 @@ public class WavefrontModelReader implements ModelReader{
 		emptyNormal.add(1f);
 		
 		for(List<Integer> face : faces){
-			CoffeeVertex vert = new CoffeeVertex();
 			for(int i=0;i<vertexOffset;i++){
 				int texCoordOffset = vertexOffset+i;
 				int normalOffset = vertexOffset*2+i;

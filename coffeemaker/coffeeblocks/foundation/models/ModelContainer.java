@@ -8,16 +8,17 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.foundation.physics.PhysicsObject;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.components.CoffeeMaterial;
+import coffeeblocks.opengl.components.CoffeeRenderableObject;
 import coffeeblocks.opengl.components.CoffeeVertex;
 import coffeeblocks.opengl.components.ShaderBuilder;
 
-public class ModelContainer extends PhysicsObject {
+public class ModelContainer extends PhysicsObject implements CoffeeRenderableObject{
 	private boolean objectBaked = false; //For å vite om det er lastet inn i minnet
 
 	public ModelContainer(){}
 	public ModelContainer(ModelContainer model) {
-		vertShader = model.getVertShader();
-		fragShader = model.getFragShader();
+		vertShader = model.getVertShaderFilename();
+		fragShader = model.getFragShaderFilename();
 		
 		position = new Vector3Container(model.getPosition());
 		modelOffset = model.getModelOffset();
@@ -43,7 +44,7 @@ public class ModelContainer extends PhysicsObject {
 		notifiesForce = model.isNotifyForce();
 		objectDeactivation = model.getObjectDeactivation();
 		
-		objectBaked = model.isObjectBaked();
+		objectBaked = model.isBaked();
 	}
 
 	public synchronized void tick(){
@@ -52,7 +53,7 @@ public class ModelContainer extends PhysicsObject {
 		rotation.increaseValue(rotation.getVelocity());
 	}
 	
-	public boolean isObjectBaked() {
+	public boolean isBaked() {
 		return objectBaked;
 	}
 	public void setObjectBaked(boolean objectBaked) {
@@ -78,10 +79,10 @@ public class ModelContainer extends PhysicsObject {
 		this.vertShader = vertShader;
 		this.fragShader = fragShader;
 	}
-	public String getFragShader(){
+	public String getFragShaderFilename(){
 		return fragShader;
 	}
-	public String getVertShader(){
+	public String getVertShaderFilename(){
 		return vertShader;
 	}
 	
@@ -100,7 +101,7 @@ public class ModelContainer extends PhysicsObject {
 		return animations;
 	}
 	public List<CoffeeVertex> getVertices(){
-		return animations.getBaseMesh();
+		return animations.getCurrentMesh();
 	}
 	public synchronized void addVertex(CoffeeVertex vertex){
 		animations.getBaseMesh().add(vertex);
@@ -149,5 +150,39 @@ public class ModelContainer extends PhysicsObject {
 	}
 	public void setModelOffset(Vector3f offset){
 		this.modelOffset = offset;
+	}
+	@Override
+	public Vector3f getPositionVector() {
+		// TODO Auto-generated method stub
+		return Vector3f.add(position.getValue(),modelOffset,null);
+	}
+	@Override
+	public Vector3f getRotationVector() {
+		// TODO Auto-generated method stub
+		return rotation.getValue();
+	}
+	@Override
+	public Vector3f getScaleVector() {
+		// TODO Auto-generated method stub
+		return scale.getValue();
+	}
+	@Override
+	public boolean isStaticDraw() {
+		// TODO Auto-generated method stub
+		return animations.isStaticallyDrawn();
+	}
+	@Override
+	public int getVboHandle() {
+		// TODO Auto-generated method stub
+		return animations.getVboHandle();
+	}
+	@Override
+	public void setVboHandle(int handle) {
+		animations.setVboHandle(handle);
+	}
+	@Override
+	public void cleanupObject() {
+		// TODO Auto-generated method stub
+		
 	}
 }

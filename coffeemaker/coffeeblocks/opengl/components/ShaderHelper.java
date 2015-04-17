@@ -12,10 +12,10 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.foundation.models.ModelContainer;
 
 public class ShaderHelper {
-	public static ShaderBuilder setupShader(ModelContainer object){
+	public static ShaderBuilder setupShader(CoffeeRenderableObject object){
 		ShaderBuilder shader = new ShaderBuilder();
 		try{
-			shader.buildShader(object.getVertShader(), object.getFragShader());
+			shader.buildShader(object.getVertShaderFilename(), object.getFragShaderFilename());
 		}catch(RuntimeException e){
 			System.err.println(e.getMessage());
 			System.exit(1);
@@ -63,7 +63,7 @@ public class ShaderHelper {
 				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"),shader.getAttrib("vertTangent"));
 		return shader;
 	}
-	public static ShaderBuilder compileShaders(ModelContainer object){
+	public static ShaderBuilder compileShaders(CoffeeRenderableObject object){
 		ShaderBuilder shader = setupShader(object);
 		
 		if(object.getMaterial().isMultitextured()){
@@ -100,13 +100,13 @@ public class ShaderHelper {
 		return shader;
 	}
 	
-	public static FloatBuffer rotateMatrice(ModelContainer object){
+	public static FloatBuffer rotateMatrice(CoffeeRenderableObject object){
 		FloatBuffer result = BufferUtils.createFloatBuffer(16);
 		
 		Matrix4f modelMatrix = new Matrix4f();
-		Matrix4f.translate(Vector3f.add(object.getPosition().getValue(),object.getModelOffset(),null), modelMatrix, modelMatrix);
-		Matrix4f.scale(object.getScale().getValue(), modelMatrix, modelMatrix);
-		Vector3f rotation = object.getRotation().getValue();
+		Matrix4f.translate(object.getPositionVector(), modelMatrix, modelMatrix);
+		Matrix4f.scale(object.getScaleVector(), modelMatrix, modelMatrix);
+		Vector3f rotation = object.getRotationVector();
 		Matrix4f.rotate(rotation.y*(float)Math.PI/180f, new Vector3f(0,1,0), modelMatrix, modelMatrix);
 		Matrix4f.rotate(rotation.z*(float)Math.PI/180f, new Vector3f(0,0,1), modelMatrix, modelMatrix);
 		Matrix4f.rotate(rotation.x*(float)Math.PI/180f, new Vector3f(1,0,0), modelMatrix, modelMatrix);

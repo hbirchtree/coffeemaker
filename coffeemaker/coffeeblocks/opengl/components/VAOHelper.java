@@ -15,7 +15,7 @@ import coffeeblocks.foundation.models.ModelContainer;
 public class VAOHelper {
 	public static int VERT_STRIDE = 4*(3+2+3+3);
 	
-	public static void genVAO(ModelContainer object,FloatBuffer vertices, int vertLocation, int vertTexCoordLocation, int vertNormalLocation, int vertTangentLocation){
+	public static void genVAO(CoffeeRenderableObject object,FloatBuffer vertices, int vertLocation, int vertTexCoordLocation, int vertNormalLocation, int vertTangentLocation){
 		int vbo = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertices, GL15.GL_STREAM_DRAW);
@@ -43,7 +43,7 @@ public class VAOHelper {
 		GL30.glBindVertexArray(0);
 		
 		object.getMaterial().setVaoHandle(vao);
-		object.getAnimationContainer().setVboHandle(vbo);
+		object.setVboHandle(vbo);
 	}
 	
 	public static List<CoffeeVertex> genTangents(List<CoffeeVertex> inputFace){
