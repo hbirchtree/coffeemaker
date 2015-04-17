@@ -9,6 +9,11 @@
 		"camera": {
 			"fov": 85
 		},
+		"models":{
+			"canyon-scene": "models/canyon_scene.obj",
+			"quad": "models/quad.obj",
+			"playermesh": "models/playermesh.obj"
+		},
 		"objects": [
 		{
 			"object-id": "terrain",

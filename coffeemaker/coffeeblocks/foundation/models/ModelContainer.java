@@ -72,6 +72,9 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	public CoffeeMaterial getMaterial() {
 		return material;
 	}
+	public void setMaterial(CoffeeMaterial material) {
+		this.material = material;
+	}
 
 	private String vertShader = ""; //Punkt-programmet for å vise modellen
 	private String fragShader = ""; //Fargeleggings-programmet

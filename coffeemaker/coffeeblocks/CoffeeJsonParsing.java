@@ -8,6 +8,7 @@ import java.util.Map;
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeSceneManager;
 import coffeeblocks.foundation.models.ModelLoader;
+import coffeeblocks.foundation.models.ModelLoader.CoffeeModel;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
@@ -36,10 +37,38 @@ public class CoffeeJsonParsing {
 			}
 		}
 	}
+	public static void parseModels(Object source,String filepath,Map<String,Map<String,CoffeeModel>> modelsIndex){
+		if(!(source instanceof HashMap))
+			throw new IllegalArgumentException("Ugyldig JSON");
+		Map<String,Object> map = ((HashMap<String, Object>)source);
+		for(String key : map.keySet()){
+			String modelFile = filepath+((String)map.get(key));
+			String modelName = key;
+			if(!modelsIndex.containsKey(modelFile))
+				modelsIndex.put(modelName,ModelLoader.loadModelLibrary(modelFile));
+		}
+	}
+	private static CoffeeModel readModelSource(String source,Map<String,Map<String,CoffeeModel>> modelsIndex){
+		String[] modelblargh = source.split(":");
+		String modelSrc = modelblargh[0];
+		String modelName = modelblargh[1];
+		if(modelsIndex.containsKey(modelSrc))
+			for(String key : modelsIndex.get(modelSrc).keySet())
+				if(key.startsWith(modelName))
+						return modelsIndex.get(modelSrc).get(key);
+		
+		throw new IllegalStateException("3D object "+modelSrc+":"+modelName+" could not be found in set: "+modelsIndex);
+	}
 	@SuppressWarnings("unchecked")
 	public static void parseSceneObject(String sceneId, Map<String,Object> scene,CoffeeSceneManager sceneManager,String filepath){
 		sceneManager.createNewScene(sceneId);
+		Map<String,Map<String,CoffeeModel>> modelsIndex = new HashMap<>();
 		CoffeeGameObjectManager manager = sceneManager.getScene(sceneId);
+		for(String skey : scene.keySet()){
+			Object sitem = scene.get(skey);
+			if(skey.equals("models"))
+				parseModels(sitem,filepath,modelsIndex);
+		}
 		for(String skey : scene.keySet()){
 			Object sitem = scene.get(skey);
 			if(skey.equals("camera")){
@@ -51,7 +80,7 @@ public class CoffeeJsonParsing {
 						coloring.get(0).toString()),Float.valueOf(coloring.get(1).toString()),Float.valueOf(coloring.get(2).toString()),Float.valueOf(coloring.get(3).toString())));
 			}else if(skey.equals("objects")&&sitem instanceof ArrayList){
 				for(Object model : ((ArrayList<?>)sitem)){
-					InstantiableObject obj = parseGameObject(filepath,model);
+					InstantiableObject obj = parseGameObject(filepath,model,modelsIndex);
 					if(!obj.isInstancedObject())
 						manager.addObject(obj.createInstance());
 					else
@@ -72,7 +101,7 @@ public class CoffeeJsonParsing {
 		return new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString()));
 	}
 	@SuppressWarnings("unchecked")
-	public static InstantiableObject parseGameObject(String filepath,Object source){
+	public static InstantiableObject parseGameObject(String filepath,Object source,Map<String,Map<String,CoffeeModel>> modelsIndex){
 		if(!(source instanceof HashMap))
 			throw new IllegalArgumentException("Ugyldig JSON");
 		Map<String,Object> map = ((HashMap<String, Object>)source);

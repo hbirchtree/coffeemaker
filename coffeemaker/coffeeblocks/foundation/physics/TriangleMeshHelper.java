@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.vecmath.Vector3f;
 
+import coffeeblocks.foundation.models.ModelReader.ModelIntermediate;
 import coffeeblocks.foundation.models.WavefrontModelReader;
 import coffeeblocks.general.FileImporter;
 
@@ -26,10 +27,10 @@ public class TriangleMeshHelper {
 		if(meshData==null)
 			return null;
 		WavefrontModelReader reader = new WavefrontModelReader();
-		reader.interpretFile(meshData, meshFile);
+		ModelIntermediate mdl = reader.interpretFile(meshData, meshFile);
 		
-		List<List<Integer>> indices = reader.getIndices();
-		List<List<Float>> vertices = reader.getVertices();
+		List<List<Integer>> indices = mdl.faces;
+		List<List<Float>> vertices = mdl.vertices;
 		
 		ByteBuffer verticesB = ByteBuffer.allocateDirect(vertices.size()*VERTEX_STRIDE).order(ByteOrder.nativeOrder());
 		ByteBuffer indicesB = ByteBuffer.allocateDirect(indices.size()*INDEX_STRIDE).order(ByteOrder.nativeOrder());
@@ -52,28 +53,29 @@ public class TriangleMeshHelper {
 		return new BvhTriangleMeshShape(mesh,true);
 	}
 	public static ConvexHullShape createConvexMesh(String meshFile, Vector3f scale){
-		if(meshFile==null)
-			return null;
-		//Vi utnytter noe av funksjonaliteten ved Wavefront-parseren, å ta ut indeksering og vertex-data.
-		List<String> meshData = FileImporter.readFile(meshFile);
-		if(meshData==null)
-			return null;
-		WavefrontModelReader reader = new WavefrontModelReader();
-		reader.interpretFile(meshData, meshFile);
-		
-		List<List<Float>> vertices = reader.getVertices();
-		
-		ObjectArrayList<Vector3f> pointCloud = new ObjectArrayList<>();
-		int total_i = 0;
-		while(total_i<vertices.size()){
-			Vector3f point = new Vector3f();
-			point.x = vertices.get(total_i).get(0)*scale.x;
-			point.y = vertices.get(total_i).get(1)*scale.y;
-			point.z = vertices.get(total_i).get(2)*scale.z;
-			pointCloud.add(point);
-			total_i++;
-		}
-		
-		return new ConvexHullShape(pointCloud);
+		return null;
+//		if(meshFile==null)
+//			return null;
+//		//Vi utnytter noe av funksjonaliteten ved Wavefront-parseren, å ta ut indeksering og vertex-data.
+//		List<String> meshData = FileImporter.readFile(meshFile);
+//		if(meshData==null)
+//			return null;
+//		WavefrontModelReader reader = new WavefrontModelReader();
+//		reader.interpretFile(meshData, meshFile);
+//		
+//		List<List<Float>> vertices = reader.getVertices();
+//		
+//		ObjectArrayList<Vector3f> pointCloud = new ObjectArrayList<>();
+//		int total_i = 0;
+//		while(total_i<vertices.size()){
+//			Vector3f point = new Vector3f();
+//			point.x = vertices.get(total_i).get(0)*scale.x;
+//			point.y = vertices.get(total_i).get(1)*scale.y;
+//			point.z = vertices.get(total_i).get(2)*scale.z;
+//			pointCloud.add(point);
+//			total_i++;
+//		}
+//		
+//		return new ConvexHullShape(pointCloud);
 	}
 }
