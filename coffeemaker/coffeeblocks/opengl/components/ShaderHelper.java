@@ -9,8 +9,6 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.foundation.models.ModelContainer;
-
 public class ShaderHelper {
 	public static ShaderBuilder setupShader(CoffeeRenderableObject object){
 		ShaderBuilder shader = new ShaderBuilder();
@@ -57,15 +55,11 @@ public class ShaderHelper {
 		}catch(RuntimeException e){
 			System.err.println(e.getMessage());
 		}
+		GL20.glUseProgram(0);
 		
-		
-		VAOHelper.genVAO(object,object.getVertexData(),shader.getAttrib("vert"),
-				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"),shader.getAttrib("vertTangent"));
 		return shader;
 	}
-	public static ShaderBuilder compileShaders(CoffeeRenderableObject object){
-		ShaderBuilder shader = setupShader(object);
-		
+	public static void loadTextures(CoffeeRenderableObject object){
 		if(object.getMaterial().isMultitextured()){
 			List<Integer> textures = new ArrayList<>();
 			for(String file : object.getMaterial().getMultitexture())
@@ -92,12 +86,24 @@ public class ShaderHelper {
 			int specMap = TextureHelper.genTexture(object.getMaterial().getSpecularTexture());
 			object.getMaterial().setSpecularTextureHandle(specMap);
 		}
-
-		GL20.glUseProgram(0);
+		object.setTextureLoaded(true);
+	}
+	public static void uploadVertices(CoffeeRenderableObject object){
+		ShaderBuilder shader = object.getShader();
+		VAOHelper.genVAO(object,object.getVertexData(),shader.getAttrib("vert"),
+				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"),shader.getAttrib("vertTangent"));
+	}
+	public static void compileShaders(CoffeeRenderableObject object){
+		if(!object.isTextureLoaded()){
+			ShaderBuilder shader = setupShader(object);
+			loadTextures(object);
+		}
+		
+		uploadVertices(object);
 		
 		object.setObjectBaked(true);
 		
-		return shader;
+//		return shader;
 	}
 	
 	public static FloatBuffer rotateMatrice(CoffeeRenderableObject object){

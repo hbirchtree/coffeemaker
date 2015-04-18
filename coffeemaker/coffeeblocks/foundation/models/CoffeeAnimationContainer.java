@@ -19,7 +19,7 @@ public class CoffeeAnimationContainer {
 	public CoffeeAnimationContainer(CoffeeAnimationContainer animationContainer) {
 		this.staticDraw = animationContainer.isStaticallyDrawn();
 		this.base = animationContainer.getBaseMesh();
-		this.vboHandle = animationContainer.getVboHandle();
+		this.vboHandle = 0; //Vi vil ikke arve denne, animasjonene ville blitt de samme
 		this.states = animationContainer.states;
 	}
 	public static FloatBuffer convertVerticesToFloatBuffer(List<CoffeeVertex> vertices,int size,int vsize){

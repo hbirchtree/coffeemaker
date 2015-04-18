@@ -28,4 +28,6 @@ public interface CoffeeRenderableObject {
 	public void setObjectBaked(boolean baked);
 	
 	public void cleanupObject();
+	public boolean isTextureLoaded();
+	public void setTextureLoaded(boolean textureLoaded);
 }

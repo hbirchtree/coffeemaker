@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.vecmath.Vector3d;
-
 import coffeeblocks.general.FileImporter;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.opengl.components.CoffeeMaterial;
-import coffeeblocks.opengl.components.CoffeeVertex;
 
 public class WavefrontModelReader implements ModelReader{
 	
@@ -70,7 +67,6 @@ public class WavefrontModelReader implements ModelReader{
 						if(itv.startsWith("o "))
 							break;
 					}
-					System.out.println(itv+it.hasNext());
 					models.put(model.name, model);
 					vertOffset.put(model.name, vertexCount);
 					texcOffset.put(model.name, texcrdCount);
@@ -107,7 +103,7 @@ public class WavefrontModelReader implements ModelReader{
 				int texCoordOffset = vertexOffset+i;
 				int normalOffset = vertexOffset*2+i;
 				model.addAll(vertices.get(face.get(i)-1-vertOffset));
-				if(face.get(texCoordOffset)!=0&&texCoords.size()>=face.get(texCoordOffset)){
+				if(face.get(texCoordOffset)!=0&&texCoords.size()>=face.get(texCoordOffset)-texcOffset){
 					model.addAll(texCoords.get(face.get(texCoordOffset)-1-texcOffset));
 				}else{
 					if(i==0)
@@ -117,7 +113,7 @@ public class WavefrontModelReader implements ModelReader{
 					if(i==2)
 						model.addAll(emptyTC2);
 				}
-				if(face.get(normalOffset)!=0&&normals.size()>=face.get(normalOffset)){
+				if(face.get(normalOffset)!=0&&normals.size()>=face.get(normalOffset)-normOffset){
 					model.addAll(normals.get(face.get(normalOffset)-1-normOffset));
 				}else
 					model.addAll(emptyNormal);

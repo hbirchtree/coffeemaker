@@ -11,7 +11,6 @@ import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.interfaces.listeners.CoffeeGlfwInputListener;
 import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
-import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
@@ -363,8 +362,10 @@ public class CoffeeRenderer implements Runnable {
 //			framebuffer.storeFramebuffer(rendering_resolution);
 			if(draw&&scene!=null){ //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
 				for(CoffeeRenderableObject object : scene.getInstantiableModels()) //Vi vil forhåndslaste shaders og teksturer for disse objektene slik at de ikke forårsaker problemer
-					if(!object.isBaked())
-						ShaderHelper.compileShaders(object);
+					if(!object.isTextureLoaded()){
+						ShaderHelper.loadTextures(object);
+						ShaderHelper.setupShader(object);
+					}
 				
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
 			}
@@ -380,18 +381,27 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	public void cleanupAll(){
-		for(ModelContainer object : scene.getRenderables())
+		for(CoffeeRenderableObject object : scene.getRenderables())
 			cleanupObject(object);
 	}
 	
-	private void cleanupObject(ModelContainer object){
+	private void cleanupObject(CoffeeRenderableObject object){
 		if(object.getMaterial().getTextureHandle()!=0)
 			GL11.glDeleteTextures(object.getMaterial().getTextureHandle());
+		if(object.getMaterial().getBumpTextureHandle()!=0)
+			GL11.glDeleteTextures(object.getMaterial().getBumpTextureHandle());
+		if(object.getMaterial().getHighlightTextureHandle()!=0)
+			GL11.glDeleteTextures(object.getMaterial().getHighlightTextureHandle());
+		if(object.getMaterial().getSpecularTextureHandle()!=0)
+			GL11.glDeleteTextures(object.getMaterial().getSpecularTextureHandle());
+		if(object.getMaterial().getTransparencyTextureHandle()!=0)
+			GL11.glDeleteTextures(object.getMaterial().getTransparencyTextureHandle());
 		if(object.getMaterial().getVaoHandle()!=0)
 			GL30.glDeleteVertexArrays(object.getMaterial().getVaoHandle());
 		if(object.getShader().getProgramId()!=0)
 			GL20.glDeleteProgram(object.getShader().getProgramId());
 		object.setObjectBaked(false);
+		object.setTextureLoaded(false);
 	}
 	
 	private void loopRenderObjects(){

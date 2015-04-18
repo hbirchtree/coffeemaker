@@ -37,10 +37,10 @@ public class ModelLoader {
 		
 		return container;
 	}
-	public static Map<String,CoffeeModel> loadModelLibrary(String filename){
+	public static Map<String,ModelContainer> loadModelLibrary(String filename){
 		List<String> data = FileImporter.readFile(filename);
 		
-		Map<String,CoffeeModel> container = new HashMap<>();
+		Map<String,ModelContainer> container = new HashMap<>();
 		ModelReader reader = null;
 		if(filename.endsWith(".obj"))
 			reader = new WavefrontModelReader();
@@ -54,9 +54,9 @@ public class ModelLoader {
 			return null;
 		}
 		reader.getModels().values().stream().forEach(e -> {
-			CoffeeModel mdl = new CoffeeModel();
-			mdl.material = e.material;
-			mdl.model = CoffeeAnimationContainer.convertFloatListToVertices(e.model);
+			ModelContainer mdl = new ModelContainer();
+			mdl.setMaterial(e.material);
+			mdl.setModelFaces(e.model);
 			container.put(e.name, mdl);
 		});
 		

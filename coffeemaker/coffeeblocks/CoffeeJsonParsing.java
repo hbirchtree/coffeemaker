@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeSceneManager;
+import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.foundation.models.ModelLoader;
-import coffeeblocks.foundation.models.ModelLoader.CoffeeModel;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
@@ -37,7 +38,8 @@ public class CoffeeJsonParsing {
 			}
 		}
 	}
-	public static void parseModels(Object source,String filepath,Map<String,Map<String,CoffeeModel>> modelsIndex){
+	@SuppressWarnings("unchecked")
+	public static void parseModels(Object source,String filepath,Map<String,Map<String,ModelContainer>> modelsIndex){
 		if(!(source instanceof HashMap))
 			throw new IllegalArgumentException("Ugyldig JSON");
 		Map<String,Object> map = ((HashMap<String, Object>)source);
@@ -48,27 +50,32 @@ public class CoffeeJsonParsing {
 				modelsIndex.put(modelName,ModelLoader.loadModelLibrary(modelFile));
 		}
 	}
-	private static CoffeeModel readModelSource(String source,Map<String,Map<String,CoffeeModel>> modelsIndex){
+	private static ModelContainer readModelSource(String source,Map<String,Map<String,ModelContainer>> modelsIndex){
 		String[] modelblargh = source.split(":");
 		String modelSrc = modelblargh[0];
-		String modelName = modelblargh[1];
-		if(modelsIndex.containsKey(modelSrc))
+		String modelName = "";
+		if(modelblargh.length>1)
+			modelName = modelblargh[1];
+		if(modelsIndex.containsKey(modelSrc)){
 			for(String key : modelsIndex.get(modelSrc).keySet())
-				if(key.startsWith(modelName))
+				if(key.startsWith(modelName)&&!modelName.isEmpty())
 						return modelsIndex.get(modelSrc).get(key);
-		
+			if(modelName.isEmpty()&&modelsIndex.get(modelSrc).size()==1)
+				return modelsIndex.get(modelSrc).values().stream().collect(Collectors.toList()).get(0);
+		}
 		throw new IllegalStateException("3D object "+modelSrc+":"+modelName+" could not be found in set: "+modelsIndex);
 	}
 	@SuppressWarnings("unchecked")
 	public static void parseSceneObject(String sceneId, Map<String,Object> scene,CoffeeSceneManager sceneManager,String filepath){
 		sceneManager.createNewScene(sceneId);
-		Map<String,Map<String,CoffeeModel>> modelsIndex = new HashMap<>();
+		Map<String,Map<String,ModelContainer>> modelsIndex = new HashMap<>();
 		CoffeeGameObjectManager manager = sceneManager.getScene(sceneId);
 		for(String skey : scene.keySet()){
 			Object sitem = scene.get(skey);
 			if(skey.equals("models"))
 				parseModels(sitem,filepath,modelsIndex);
 		}
+			
 		for(String skey : scene.keySet()){
 			Object sitem = scene.get(skey);
 			if(skey.equals("camera")){
@@ -96,20 +103,27 @@ public class CoffeeJsonParsing {
 			}
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private static Vector3f readVector(Object obj){
 		List<Object> pos = ((ArrayList<Object>)obj);
 		return new Vector3f(Float.valueOf(pos.get(0).toString()),Float.valueOf(pos.get(1).toString()),Float.valueOf(pos.get(2).toString()));
 	}
 	@SuppressWarnings("unchecked")
-	public static InstantiableObject parseGameObject(String filepath,Object source,Map<String,Map<String,CoffeeModel>> modelsIndex){
+	public static InstantiableObject parseGameObject(String filepath,Object source,Map<String,Map<String,ModelContainer>> modelsIndex){
 		if(!(source instanceof HashMap))
 			throw new IllegalArgumentException("Ugyldig JSON");
 		Map<String,Object> map = ((HashMap<String, Object>)source);
 		InstantiableObject gobj = new GameObject();
-		if(!map.containsKey("model"))
+		if(map.containsKey("model")){
+			String modelFile = filepath+((String)map.get("model"));
+			gobj.setGameModel(ModelLoader.loadModel(modelFile));
+		}else if(map.containsKey("model-i")){
+			ModelContainer mct = new ModelContainer(readModelSource((String)map.get("model-i"),modelsIndex));
+			gobj.setGameModel(mct);
+		}
+		else
 			throw new IllegalArgumentException("Ugyldig JSON: ingen modell for objekt");
-		String modelFile = filepath+((String)map.get("model"));
-		gobj.setGameModel(ModelLoader.loadModel(modelFile));
+		
 		if(!(map.containsKey("vshader")&&map.containsKey("fshader")))
 			throw new IllegalArgumentException("Ugyldig JSON: ingen shaders for objekt");
 		gobj.getGameModel().setShaderFiles(filepath+((String)map.get("vshader")), filepath+((String)map.get("fshader")));

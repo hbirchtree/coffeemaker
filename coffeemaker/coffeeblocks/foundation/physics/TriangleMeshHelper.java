@@ -14,7 +14,6 @@ import coffeeblocks.general.FileImporter;
 import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
-import com.bulletphysics.util.ObjectArrayList;
 
 public class TriangleMeshHelper {
 	private final static int VERTEX_STRIDE = 4*3;

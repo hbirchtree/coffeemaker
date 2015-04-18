@@ -8,6 +8,7 @@ public class FloatContainer {
 		setValue(value);
 	}
 	public FloatContainer(FloatContainer binding){
+		this.value = binding.getValue();
 		bindValue(binding);
 	}
 	

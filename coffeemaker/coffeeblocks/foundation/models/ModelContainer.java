@@ -14,6 +14,7 @@ import coffeeblocks.opengl.components.ShaderBuilder;
 
 public class ModelContainer extends PhysicsObject implements CoffeeRenderableObject{
 	private boolean objectBaked = false; //For å vite om det er lastet inn i minnet
+	private boolean textureLoaded = false;
 
 	public ModelContainer(){}
 	public ModelContainer(ModelContainer model) {
@@ -34,7 +35,7 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 		physicalInertia = model.getPhysicalInertia();
 		physicalLinearFactor = model.getPhysicalLinearFactor();
 		
-		material = model.getMaterial();
+		material = new CoffeeMaterial(model.getMaterial());
 		shader = model.getShader();
 		animations = new CoffeeAnimationContainer(model.getAnimationContainer());
 		physicsType = model.getPhysicsType();
@@ -44,7 +45,7 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 		notifiesForce = model.isNotifyForce();
 		objectDeactivation = model.getObjectDeactivation();
 		
-		objectBaked = model.isBaked();
+		objectBaked = false;
 	}
 
 	public synchronized void tick(){
@@ -53,6 +54,12 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 		rotation.increaseValue(rotation.getVelocity());
 	}
 	
+	public boolean isTextureLoaded(){
+		return textureLoaded;
+	}
+	public void setTextureLoaded(boolean textureLoaded){
+		this.textureLoaded = textureLoaded;
+	}
 	public boolean isBaked() {
 		return objectBaked;
 	}
@@ -87,14 +94,6 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	}
 	public String getVertShaderFilename(){
 		return vertShader;
-	}
-	
-	private boolean noDepthRendering = false; //Om elementet skal tegnes over andre eller om dybdebufferet skal brukes
-	public boolean isNoDepthRendering() {
-		return noDepthRendering;
-	}
-	public void setNoDepthRendering(boolean noDepthRendering) {
-		this.noDepthRendering = noDepthRendering;
 	}
 	
 	private CoffeeAnimationContainer animations = new CoffeeAnimationContainer(); 

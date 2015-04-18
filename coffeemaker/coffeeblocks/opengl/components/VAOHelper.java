@@ -10,8 +10,6 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector3f;
 
-import coffeeblocks.foundation.models.ModelContainer;
-
 public class VAOHelper {
 	public static int VERT_STRIDE = 4*(3+2+3+3);
 	

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import coffeeblocks.foundation.models.ModelReader.ModelIntermediate;
 import coffeeblocks.opengl.components.CoffeeMaterial;
 
 public interface ModelReader {

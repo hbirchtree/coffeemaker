@@ -8,8 +8,57 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.metaobjects.FloatContainer;
 
 public class CoffeeMaterial {
+	public CoffeeMaterial(){}
+	public CoffeeMaterial(CoffeeMaterial material){
+		this.textureHandles = material.getTextureHandles();
+		this.multitextured = material.isMultitextured();
+		this.multitexture = material.getMultitexture();
+		
+		this.bumpTexture = material.getBumpTexture();
+		this.highlightTexture = material.getHighlightTexture();
+		this.diffuseTexture = material.getDiffuseTexture();
+		this.specularTexture = material.getSpecularTexture();
+		this.alphaTexture = material.getTransparencyTexture();
+		
+		this.bumpTextureHandle = material.getBumpTextureHandle();
+		this.transparencyTextureHandle = material.getTransparencyTextureHandle();
+		this.specularTextureHandle = material.getSpecularTextureHandle();
+		this.highlightTextureHandle = material.getHighlightTextureHandle();
+		
+		this.shininess = material.getShininessObject();
+		this.transparency = material.getTransparencyObject();
+		this.dissolution = material.dissolution;
+		this.illum = material.illum;
+		
+		this.specularColor = new Vector3f(material.specularColor);
+		
+		this.selectTexture = material.selectTexture;
+	}
+	
 	private boolean multitextured = false;
 	private List<String> multitexture = new ArrayList<>();
+	
+	private FloatContainer shininess = new FloatContainer(500f);
+	private FloatContainer transparency = new FloatContainer(1f);
+	public float dissolution = 0f; //Unimplemented
+	public int illum = 0; //Unimplemented
+	
+	private String diffuseTexture = "";
+	public String ambientTexture = ""; //Unimplemented
+	private String specularTexture = "";
+	private String highlightTexture = "";
+	private String alphaTexture = "";
+	private String bumpTexture = "";
+	
+	private Vector3f specularColor = new Vector3f(1,1,1);
+	public Vector3f ambientColor = new Vector3f(1,1,1); //Unimplemented
+	public Vector3f diffuseColor = new Vector3f(1,1,1); //Unimplemented
+	
+	private int specularTextureHandle = 0;
+	private int transparencyTextureHandle = 0;
+	private int highlightTextureHandle = 0;
+	private int bumpTextureHandle = 0;
+	
 	public boolean isMultitextured() {
 		return multitextured;
 	}
@@ -23,18 +72,11 @@ public class CoffeeMaterial {
 		this.multitexture.add(textureFile);
 	}
 	
-	private FloatContainer shininess = new FloatContainer(500f);
-	private FloatContainer transparency = new FloatContainer(1f);
-	public float dissolution = 0f; //Unimplemented
-	public int illum = 0; //Unimplemented
 	
-	private String diffuseTexture = "/home/havard/texture.png"; //Texture
-	public String ambientTexture = ""; //Unimplemented
-
-	private String specularTexture = "";
-	private String highlightTexture = "";
-	private String alphaTexture = "";
-	private String bumpTexture = "";
+	
+	public int selectTexture = 0;
+	private List<Integer> textureHandles = new ArrayList<>();
+	private int vaoHandle = 0;
 	
 	public boolean hasBumpMap(){
 		return !bumpTexture.isEmpty();
@@ -67,9 +109,6 @@ public class CoffeeMaterial {
 	public void setTransparencyTexture(String alphaTexture) {
 		this.alphaTexture = alphaTexture;
 	}
-	private Vector3f specularColor = new Vector3f(1,1,1);
-	public Vector3f ambientColor = new Vector3f(1,1,1); //Unimplemented
-	public Vector3f diffuseColor = new Vector3f(1,1,1); //Unimplemented
 	public String getDiffuseTexture() {
 		return diffuseTexture;
 	}
@@ -106,9 +145,6 @@ public class CoffeeMaterial {
 		this.transparency.setValue(transparency);
 	}
 	
-	private int specularTextureHandle = 0;
-	private int transparencyTextureHandle = 0;
-	private int highlightTextureHandle = 0;
 	
 	public int getSpecularTextureHandle() {
 		return specularTextureHandle;
@@ -129,7 +165,6 @@ public class CoffeeMaterial {
 		this.highlightTextureHandle = highlightTextureHandle;
 	}
 
-	private int bumpTextureHandle = 0;
 	public int getBumpTextureHandle() {
 		return bumpTextureHandle;
 	}
@@ -137,7 +172,6 @@ public class CoffeeMaterial {
 		this.bumpTextureHandle = bumpTextureHandle;
 	}
 	
-	private int vaoHandle = 0;
 	public int getVaoHandle() {
 		return vaoHandle;
 	}
@@ -145,8 +179,6 @@ public class CoffeeMaterial {
 		this.vaoHandle = vaoHandle;
 	}
 	
-	public int selectTexture = 0;
-	private List<Integer> textureHandles = new ArrayList<>();
 	public int getTextureHandle(){
 		if(isMultitextured())
 			return textureHandles.get(selectTexture);
