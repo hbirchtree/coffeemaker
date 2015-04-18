@@ -13,9 +13,9 @@ import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
-import coffeeblocks.general.FileImporter;
 import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
+import coffeeblocks.opengl.components.CoffeeText;
 import coffeeblocks.opengl.components.LimeLight;
 
 import org.lwjgl.util.vector.Vector3f;
@@ -34,7 +34,21 @@ public class CoffeeJsonParsing {
 					continue;
 				parseSceneObject(key.split(":")[1],map,sceneManager,filepath);
 			}else if(key.equals("font")){
+				CoffeeText defaultText = new CoffeeText();
 				Map<String,Object> map = ((HashMap<String,Object>)item);
+				for(String fkey : map.keySet()){
+					if(fkey.equals("source"))
+						defaultText.getMaterial().setDiffuseTexture(filepath+(String)map.get(fkey));
+					else if(fkey.equals("tile-size"))
+						defaultText.setTileSize((Integer)map.get(fkey));
+					else if(fkey.equals("vshader"))
+						defaultText.setVertShader(filepath+(String)map.get(fkey));
+					else if(fkey.equals("fshader"))
+						defaultText.setFragShader(filepath+(String)map.get(fkey));
+				}
+				defaultText.getPosition().setValue(new Vector3f(0,25,0));
+				defaultText.getScale().setValue(new Vector3f(4,4,4));
+				sceneManager.setTextObject(defaultText);
 			}
 		}
 	}
@@ -171,12 +185,12 @@ public class CoffeeJsonParsing {
 				for(Object text : textures)
 					if(text instanceof String)
 						gobj.getGameModel().getMaterial().addTexture(
-								filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)text);
+								filepath+(String)text);
 				gobj.getGameModel().getMaterial().setMultitextured(true);
 			}else if(key.equals("poses")&&obj instanceof HashMap){ //Alternative modeller som modellen omformes til ved interpolering
 				Map<String,Object> poses = ((HashMap<String, Object>)obj);
 				for(String pose : poses.keySet()){
-					String modelfile = filepath+FileImporter.getBasename((String)map.get("model"))+"/"+(String)poses.get(pose);
+					String modelfile = filepath+(String)poses.get(pose);
 					gobj.getGameModel().getAnimationContainer().addState(pose,ModelLoader.loadModel(modelfile).getVertices());
 				}
 			}else if(key.equals("sounds")&&obj instanceof HashMap){ //Lydeffekter/musikk for dette objektet, posisjoneres ved dette objektets posisjon i det 3-dimensjonale rommet.

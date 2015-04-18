@@ -1,5 +1,6 @@
 package coffeeblocks;
 
+import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Map;
 
@@ -34,26 +35,29 @@ public class CoffeeMaker implements CoffeeRendererListener{
 					+"Vær vennlig og spesifiser en slik fil, ofte under navnet main.json");
 			return;
 		}
-		main.parseMainFile(args[0]);
-		main.rendererSpawn();
+		main.lhcStart(args[0]);
 	}
-	public void parseMainFile(String filename){
+	public void lhcStart(String filename){
+		//Viktig! Brukes for å hente LWJGL's biblioteker uten å spesifisere obskure argumenter til Java hver gang!
+		System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
+		
 		Map<String,Object> properties = JsonParser.parseFile(filename);
 
 		if(properties.isEmpty())
 			throw new IllegalStateException("Ingen data");
-		
-		renderer = new CoffeeRenderer();
-		sceneManager.setRenderer(renderer);
-		renderer.addCoffeeListener(this);
 		
 		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.indexOf("/", -1)+1),properties, sceneManager);
 		if(sceneManager.getScenes().size()==0){
 			System.out.println("Kunne ikke finne noen scene å rendre!");
 			System.exit(1);
 		}
+		renderer = new CoffeeRenderer();
+		sceneManager.setRenderer(renderer);
+		renderer.addCoffeeListener(this);
+		
+		mayThyComputerNotBurn();
 	}
-	public void rendererSpawn(){
+	public void mayThyComputerNotBurn(){
 		renderingThread = new Thread(renderer);
 		renderingThread.setUncaughtExceptionHandler(rendererEH);
 		renderingThread.start();

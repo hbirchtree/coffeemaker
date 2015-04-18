@@ -11,6 +11,7 @@ import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.CoffeeAnimator;
+import coffeeblocks.opengl.components.CoffeeVertex;
 
 public class CoffeeMainScene extends CoffeeSceneTemplate {
 	
@@ -289,6 +290,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		playerDieFull("You were killed by "+reason+"!");
 	}
 	public void playerDieFull(String reason){
+		for(CoffeeVertex vert : getObject("terrain.walls").getGameModel().getVertices())
+			System.out.println("Vert: "+vert.position.toString()+vert.texCoord.toString()+vert.normal.toString()+vert.tangent.toString());
 		System.out.println(reason);
 		super.playerDie();
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,false);

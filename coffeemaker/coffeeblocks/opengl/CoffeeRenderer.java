@@ -7,7 +7,6 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
-import coffeeblocks.foundation.models.ModelContainer;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.interfaces.listeners.CoffeeGlfwInputListener;
 import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
@@ -15,6 +14,7 @@ import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
 import coffeeblocks.opengl.components.CoffeeRenderableObject;
+import coffeeblocks.opengl.components.CoffeeText;
 import coffeeblocks.opengl.components.CoffeeVertex;
 import coffeeblocks.opengl.components.LimeLight;
 import coffeeblocks.opengl.components.ShaderHelper;
@@ -57,6 +57,14 @@ public class CoffeeRenderer implements Runnable {
 	public void setLights(List<LimeLight> lights) {
 		this.lights = lights;
 	}
+	
+	private CoffeeText defaultTextObject = null;
+	public CoffeeText createTextObject(){
+		return new CoffeeText(defaultTextObject);
+	}
+	public void setDefaultTextObject(CoffeeText obj){
+		this.defaultTextObject = obj;
+	}
 
 	private double fpsTimer = 0;
 	private long framecount = 0;
@@ -66,7 +74,7 @@ public class CoffeeRenderer implements Runnable {
 	private boolean fpscounter = true;
 	
 	private ByteBuffer vertBuffer = BufferUtils.createByteBuffer(4*3);
-	private float fogDensity = 0.5f;
+	private float fogDensity = 0.005f;
 	
 	private float mouseSensitivity = 0.1f;
 	private boolean draw = true;
@@ -368,6 +376,9 @@ public class CoffeeRenderer implements Runnable {
 					}
 				
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
+				if(defaultTextObject!=null){
+					renderObject(defaultTextObject);
+				}
 			}
 //			framebuffer.renderFramebuffer(windowres, lights);
 			
@@ -405,75 +416,76 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	private void loopRenderObjects(){
-		for(CoffeeRenderableObject object : scene.getRenderablesOrdered()){
-			
-			if(!object.isBaked()){
-				ShaderHelper.compileShaders(object);
-			}
-			GL20.glUseProgram(object.getShader().getProgramId());
-
-			//Animasjon ved å endre modellen fra en annen tråd
-			if(!object.isStaticDraw()){
-				//Vi bruker en enkel ByteBuffer for alle for å unngå tonnevis med allokasjoner per sekund. Vi tilbakestiller denne hver gang vi skal rendre på nytt.
-				//Dersom vi ikke gjør dette synker ytelsen *dramatisk*
-				VAOHelper.modifyVbo(object.getVboHandle(), object.getVertices(),vertBuffer);
-			}
-			
-			object.getShader().setUniform("camera", camera.matrix());
-
-			object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
-			for(LimeLight light : lights){ //Selv om vi kun støtter ett lys for øyeblikket skriver vi koden som om vi støttet flere. Vi kan legge til flere lys i fremtiden om nødvendig.
-				object.getShader().setUniform("light.position", light.getPosition().getValue());
-				object.getShader().setUniform("light.intensities", light.getIntensities());
-				object.getShader().setUniform("light.attenuation", light.getAttenuation());
-				object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
-			}
-
-			object.getShader().setUniform("materialTex", 0); //Vi leser fargetekstur fra GL_TEXTURE(0), samme med de under
-			object.getShader().setUniform("materialBump", 1);
-			object.getShader().setUniform("materialSpecular", 2);
-			object.getShader().setUniform("materialHighlight", 3);
-			object.getShader().setUniform("materialTransparency", 4);
-			object.getShader().setUniform("materialShininess", object.getMaterial().getShininess());
-			object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
-			object.getShader().setUniform("materialTransparencyValue", object.getMaterial().getTransparency());
-			
-			object.getShader().setUniform("fogParams.fDensity", fogDensity);
-			object.getShader().setUniform("fogParams.vFogColor", getClearColor());
-			
-			//Vi legger inn teksturene i minne for å kunne bruke de
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTextureHandle());
-			GL13.glActiveTexture(GL13.GL_TEXTURE1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getBumpTextureHandle());
-			GL13.glActiveTexture(GL13.GL_TEXTURE2);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getSpecularTextureHandle());
-			GL13.glActiveTexture(GL13.GL_TEXTURE3);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getHighlightTextureHandle());
-			GL13.glActiveTexture(GL13.GL_TEXTURE4);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTransparencyTextureHandle());
-
-			//Vi bind'er lokasjonen i minne hvor punktene befinner seg og tegner det på skjermen
-			GL30.glBindVertexArray(object.getMaterial().getVaoHandle());
-			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getVertexDataSize());
-			triCount+=object.getVertexDataSize()/(CoffeeVertex.VERTEX_DATA_SIZE)/3; //Vi vil vite hvor mange polygoner vi har på skjermen
-
-			//Vi ber tilstandsmaskinen om å tilbakestilles for å unngå mulige feil
-			GL30.glBindVertexArray(0);
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-			GL13.glActiveTexture(GL13.GL_TEXTURE1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-			GL13.glActiveTexture(GL13.GL_TEXTURE2);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-			GL13.glActiveTexture(GL13.GL_TEXTURE3);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-			GL13.glActiveTexture(GL13.GL_TEXTURE4);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-			GL20.glUseProgram(0);
-			
-		}
+		scene.getRenderablesOrdered().stream().sequential().forEach(e -> renderObject(e));
 	}
+	private void renderObject(CoffeeRenderableObject object){
+		if(!object.isBaked()){
+			ShaderHelper.compileShaders(object);
+		}
+		GL20.glUseProgram(object.getShader().getProgramId());
+
+		//Animasjon ved å endre modellen fra en annen tråd
+		if(!object.isStaticDraw()){
+			//Vi bruker en enkel ByteBuffer for alle for å unngå tonnevis med allokasjoner per sekund. Vi tilbakestiller denne hver gang vi skal rendre på nytt.
+			//Dersom vi ikke gjør dette synker ytelsen *dramatisk*
+			VAOHelper.modifyVbo(object.getVboHandle(), object.getVertices(),vertBuffer);
+		}
+		
+		object.getShader().setUniform("camera", camera.matrix());
+		object.getShader().setUniform("cameraPosition", camera.getCameraPos().getValue());
+
+		object.getShader().setUniform("model", ShaderHelper.rotateMatrice(object));
+		for(LimeLight light : lights){ //Selv om vi kun støtter ett lys for øyeblikket skriver vi koden som om vi støttet flere. Vi kan legge til flere lys i fremtiden om nødvendig.
+			object.getShader().setUniform("light.position", light.getPosition().getValue());
+			object.getShader().setUniform("light.intensities", light.getIntensities());
+			object.getShader().setUniform("light.attenuation", light.getAttenuation());
+			object.getShader().setUniform("light.ambientCoefficient", light.getAmbientCoefficient());
+		}
+
+		object.getShader().setUniform("materialTex", 0); //Vi leser fargetekstur fra GL_TEXTURE(0), samme med de under
+		object.getShader().setUniform("materialBump", 1);
+		object.getShader().setUniform("materialSpecular", 2);
+		object.getShader().setUniform("materialHighlight", 3);
+		object.getShader().setUniform("materialTransparency", 4);
+		object.getShader().setUniform("materialShininess", object.getMaterial().getShininess());
+		object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
+		object.getShader().setUniform("materialTransparencyValue", object.getMaterial().getTransparency());
+		
+		object.getShader().setUniform("fogParams.fDensity", fogDensity);
+		object.getShader().setUniform("fogParams.fColor", getClearColor());
+		
+		//Vi legger inn teksturene i minne for å kunne bruke de
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTextureHandle());
+		GL13.glActiveTexture(GL13.GL_TEXTURE1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getBumpTextureHandle());
+		GL13.glActiveTexture(GL13.GL_TEXTURE2);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getSpecularTextureHandle());
+		GL13.glActiveTexture(GL13.GL_TEXTURE3);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getHighlightTextureHandle());
+		GL13.glActiveTexture(GL13.GL_TEXTURE4);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, object.getMaterial().getTransparencyTextureHandle());
+
+		//Vi bind'er lokasjonen i minne hvor punktene befinner seg og tegner det på skjermen
+		GL30.glBindVertexArray(object.getMaterial().getVaoHandle());
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, object.getVertexDataSize());
+		triCount+=object.getVertexDataSize()/(CoffeeVertex.VERTEX_DATA_SIZE)/3; //Vi vil vite hvor mange polygoner vi har på skjermen
+
+		//Vi ber tilstandsmaskinen om å tilbakestilles for å unngå mulige feil
+		GL30.glBindVertexArray(0);
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		GL13.glActiveTexture(GL13.GL_TEXTURE1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		GL13.glActiveTexture(GL13.GL_TEXTURE2);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		GL13.glActiveTexture(GL13.GL_TEXTURE3);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		GL13.glActiveTexture(GL13.GL_TEXTURE4);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		GL20.glUseProgram(0);
+	}
+	
 	private List<CoffeeRendererListener> listeners = new ArrayList<>();
 	private List<CoffeeGlfwInputListener> inputListeners = new ArrayList<>();	
 	public void addCoffeeListener(CoffeeRendererListener listener){

@@ -21,6 +21,10 @@ public class Vector3Container {
 		bindValue(value);
 	}
 	
+	public Vector3Container(float f, float g, float h) {
+		value.x = f;value.y=g;value.z=h;
+	}
+
 	private Vector3f value = new Vector3f();
 	private Vector3f valueOffset = null;
 	private Vector3f valueMultiplier = null;

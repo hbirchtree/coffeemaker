@@ -2,17 +2,22 @@
 	"font": {
 		"source": "font.png",
 		"map": 0,
-		"tile-size": 64
+		"tile-size": 64,
+		"vshader": "shaders/vsh.txt",
+		"fshader": "shaders/fsh_nolight.txt"
 	},
 	"scene:main":{
-		"clearcolor": [0,1,1,1],
+		"clearcolor": [0.17,0.57,0.79,1],
 		"camera": {
 			"fov": 85
 		},
 		"models":{
 			"canyon-scene": "models/canyon_scene.obj",
 			"quad": "models/quad.obj",
-			"playermesh": "models/playermesh.obj"
+			"playermesh": "models/playermesh.obj",
+			"golem": "models/golem_idle.obj",
+			"overlay": "models/overlay.obj",
+			"tree1": "models/tree_1.obj"
 		},
 		"objects": [
 		{
@@ -33,7 +38,7 @@
 		},
 		{
 			"object-id": "terrain.walkway",
-			"model": "models/canyon_walkway.obj",
+			"model-i": "canyon-scene:canyon.walkway",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0.0,0,0.0],
@@ -49,7 +54,7 @@
 		},
 		{
 			"object-id": "terrain.walls",
-			"model": "models/quad.obj",
+			"model-i": "quad",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [0.0,0,0.0],
@@ -65,13 +70,13 @@
 		},
 		{
 			"object-id": "player",
-			"model": "models/playermesh.obj",
+			"model-i": "playermesh",
 			"poses": {
-				"run.1": "playermesh_run1.obj",
-				"run.2": "playermesh_run2.obj",
-				"walk.1": "playermesh_walk1.obj",
-				"walk.2": "playermesh_walk2.obj",
-				"jump": "playermesh_jump.obj"
+				"run.1": "models/playermesh_run1.obj",
+				"run.2": "models/playermesh_run2.obj",
+				"walk.1": "models/playermesh_walk1.obj",
+				"walk.2": "models/playermesh_walk2.obj",
+				"jump": "models/playermesh_jump.obj"
 			},
 			"sounds": {
 			"test": "sounds/test.wav",
@@ -97,11 +102,11 @@
 			"instantiable": true,
 			"stream-draw": true,
 			"object-id": "monster.golem",
-			"model": "models/golem_idle.obj",
+			"model-i": "golem",
 			"poses": {
-				"stand.1": "golem_standing_1.obj",
-				"stand.2": "golem_standing_2.obj",
-				"detect": "golem_detect.obj"
+				"stand.1": "models/golem_standing_1.obj",
+				"stand.2": "models/golem_standing_2.obj",
+				"detect": "models/golem_detect.obj"
 			},
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
@@ -117,7 +122,7 @@
 		},
 		{
 			"object-id": "0.overlay",
-			"model": "models/overlay.obj",
+			"model-i": "overlay",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0,0,0],
@@ -126,9 +131,9 @@
 		},
 		{
 			"object-id": "2.water",
-			"model": "models/canyon_water.obj",
+			"model-i": "canyon-scene:canyon.water",
 			"textures": [
-			"textures/water.png","textures/water_2.png"
+			"models/textures/water.png","models/textures/water_2.png"
 			],
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
@@ -139,7 +144,7 @@
 		},
 		{
 			"object-id": "tree1",
-			"model": "models/tree_1.obj",
+			"model-i": "tree1",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [55.351,11.5,13.1511],
@@ -152,7 +157,7 @@
 		},
 		{
 			"object-id": "death",
-			"model": "models/nothing.obj",
+			"model-i": "canyon-scene:death",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0,-20,0],
@@ -201,9 +206,9 @@
 		},
 		{
 			"object-id": "skybox",
-			"model": "models/skybox.obj",
+			"model-i": "canyon-scene:skybox",
 			"textures": [
-			"textures/skybox.png","textures/skybox_green.png","textures/skybox_pink.png"
+			"models/textures/skybox.png","models/textures/skybox_green.png","models/textures/skybox_pink.png"
 			],
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
@@ -216,133 +221,6 @@
 		{
 			"object-id": "light.sun",
 			"position": [0,250,0],
-			"color": "#ffffff",
-			"attenuation": 0.00005,
-			"ambientcoeff": 0.007
-		}
-		]
-	},
-	"scene:second":{
-		"clearcolor": [0,1,1,0],
-		"camera": {
-			"fov": 85
-		},
-		"objects": [
-		{
-			"object-id": "terrain",
-			"model": "models/terrain.obj",
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh.txt",
-			"position": [0.0,0,0.0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 3,
-			"physics.collision": "models/canyon_floor.obj",
-			"physics.mass": 0,
-			"physics.scale": [1,1,1],
-			"physics.friction": 1,
-			"physics.restitution": 0.0,
-			"physics.rotation": [0,1,0]
-		},
-		{
-			"object-id": "terrain.walkway",
-			"model": "models/canyon_walkway.obj",
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh.txt",
-			"position": [0.0,0,0.0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 3,
-			"physics.collision": "models/canyon_walkway.obj",
-			"physics.mass": 0,
-			"physics.scale": [1,1,1],
-			"physics.friction": 1,
-			"physics.restitution": 0.0,
-			"physics.rotation": [0,1,0]
-		},
-		{
-			"object-id": "terrain.walls",
-			"model": "models/quad.obj",
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh.txt",
-			"position": [0.0,0,0.0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 3,
-			"physics.collision": "models/canyon_walls.obj",
-			"physics.mass": 0,
-			"physics.scale": [1,1,1],
-			"physics.friction": 1,
-			"physics.restitution": 0.0,
-			"physics.rotation": [0,1,0]
-		},
-		{
-			"object-id": "player",
-			"model": "models/playermesh.obj",
-			"poses": {
-				"run.1": "playermesh_run1.obj",
-				"run.2": "playermesh_run2.obj",
-				"walk.1": "playermesh_walk1.obj",
-				"walk.2": "playermesh_walk2.obj",
-				"jump": "playermesh_jump.obj"
-			},
-			"sounds": {
-			"test": "sounds/test.wav",
-			"test2": "sounds/test.wav"
-			},
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh.txt",
-			"position": [93.575,84.232,-138.666],
-			"stream-draw": true,
-			"notify-force": true,
-			"rotation": [0.0,0,0],
-			"scale": [0.20,0.20,0.20],
-			"physics.shape": 5,
-			"physics.mass": 1,
-			"physics.scale": [0.6,1.2,1],
-			"physics.rotation": [0,0,0],
-			"physics.linearity": [0,1,0],
-			"physics.friction": 1,
-			"physics.restitution": 0.1,
-			"physics.update-rotation": false
-		},
-		{
-			"object-id": "1.testbox",
-			"model": "models/3dbox_bumped.obj",
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_bumpmap.txt",
-			"position": [0,17,5],
-			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 0
-		},
-		{
-			"object-id": "0.overlay",
-			"model": "models/overlay.obj",
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_nolight.txt",
-			"position": [0,0,0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1]
-		},
-		{
-			"object-id": "2.water",
-			"model": "models/canyon_water.obj",
-			"textures": [
-			"textures/water.png","textures/water_2.png"
-			],
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_nolight.txt",
-			"position": [0.0,0,0.0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1],
-			"physics.shape": 0
-		}
-		],
-		"lights": [
-		{
-			"object-id": "light.sun",
-			"position": [0,125,0],
 			"color": "#ffffff",
 			"attenuation": 0.00005,
 			"ambientcoeff": 0.007

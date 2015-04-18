@@ -131,7 +131,7 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	}
 	
 	public int getVertexDataSize(){
-		return animations.getBaseMeshSize();
+		return animations.getBaseMeshSize()*CoffeeVertex.VERTEX_DATA_SIZE;
 	}
 	public FloatBuffer getVertexData(){
 		return animations.getBaseVertexData();
@@ -186,5 +186,13 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	public void cleanupObject() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private boolean trackPhysics = true;
+	public boolean doTrackPhysics(){
+		return trackPhysics;
+	}
+	public void setTrackPhysics(boolean trackPhysics){
+		this.trackPhysics = trackPhysics;
 	}
 }

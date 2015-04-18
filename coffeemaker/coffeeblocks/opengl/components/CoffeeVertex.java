@@ -11,6 +11,14 @@ public class CoffeeVertex {
 		this.normal = new Vector3f(otherVertex.normal);
 		this.tangent = new Vector3f(otherVertex.tangent);
 	}
+	public CoffeeVertex(Vector3f pos, Vector2f texCrd, Vector3f normal){
+		this.position = pos;
+		this.texCoord = texCrd;
+		this.normal = normal;
+	}
+	public CoffeeVertex(float pX,float pY,float pZ,float tX,float tY,float nX,float nY,float nZ){
+		this(new Vector3f(pX,pY,pZ),new Vector2f(tX,tY),new Vector3f(nX,nY,nZ));
+	}
 	
 	public static int VERTEX_DATA_SIZE = 11;
 	

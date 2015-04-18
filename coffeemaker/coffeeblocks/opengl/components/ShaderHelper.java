@@ -33,9 +33,10 @@ public class ShaderHelper {
 					//Standard
 					"materialTex",
 					"camera",
+					"cameraPosition",
 					"model",
 					"fogParams.fDensity",
-					"fogParams.vFogColor",
+					"fogParams.fColor",
 
 					//Materialegenskaper
 					"materialShininess",
@@ -48,7 +49,8 @@ public class ShaderHelper {
 					"light.ambientCoefficient",
 					"light.intensities");
 
-			shader.getAttribs("vert",
+			shader.getAttribs(
+					"vert",
 					"vertTexCoord",
 					"vertNormal",
 					"vertTangent");
@@ -95,7 +97,7 @@ public class ShaderHelper {
 	}
 	public static void compileShaders(CoffeeRenderableObject object){
 		if(!object.isTextureLoaded()){
-			ShaderBuilder shader = setupShader(object);
+			setupShader(object);
 			loadTextures(object);
 		}
 		

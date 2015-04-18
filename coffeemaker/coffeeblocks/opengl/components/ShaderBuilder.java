@@ -110,7 +110,7 @@ public class ShaderBuilder {
 	private int compileShader(String filename,int shaderType){
 		int handle = glCreateShader(shaderType);
 		if(handle==0)
-			throw new RuntimeException("Failed to create shader: "+filename+" \nLog: "+glGetProgramInfoLog(handle, 1000));
+			throw new RuntimeException("Failed to create shader: "+filename+" \nLog: "+glGetShaderInfoLog(handle, 1000));
 		
 		String code = FileImporter.readFileToString(filename);
 		glShaderSource(handle,code);
@@ -120,7 +120,7 @@ public class ShaderBuilder {
 		int shaderStatus = glGetShaderi(handle,GL20.GL_COMPILE_STATUS);
 		
 		if(shaderStatus == GL11.GL_FALSE){
-			throw new RuntimeException("Failed to compile shader: "+filename+" \nLog: "+glGetProgramInfoLog(handle, 1000));
+			throw new RuntimeException("Failed to compile shader: "+filename+" \nLog: "+glGetShaderInfoLog(handle, 1000));
 		}
 		
 		return handle;

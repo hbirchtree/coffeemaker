@@ -169,20 +169,22 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 				expired.add(id);
 				return;
 			}
-			RigidBody body = objects.get(id);
-			object.getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
-			Vector3f out = new Vector3f();
-			body.getLinearVelocity(out);
-			object.getGameModel().getPosition().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
-			body.getGravity(out);
-			object.getGameModel().getPosition().setAcceleration(VectorTools.vmVec3ftoLwjgl(out));
-			if(object.getGameModel().isUpdateRotation()){
-				object.getGameModel().getRotation().setValue(VectorTools.quaternionToEuler(body.getWorldTransform(new Transform()).getRotation(new Quat4f())));
-				body.getAngularVelocity(out);
-				object.getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+			if(object.getGameModel().doTrackPhysics()){
+				RigidBody body = objects.get(id);
+				object.getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
+				Vector3f out = new Vector3f();
+				body.getLinearVelocity(out);
+				object.getGameModel().getPosition().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+				body.getGravity(out);
+				object.getGameModel().getPosition().setAcceleration(VectorTools.vmVec3ftoLwjgl(out));
+				if(object.getGameModel().isUpdateRotation()){
+					object.getGameModel().getRotation().setValue(VectorTools.quaternionToEuler(body.getWorldTransform(new Transform()).getRotation(new Quat4f())));
+					body.getAngularVelocity(out);
+					object.getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
+				}
+				for(CollisionListener listener : listeners)
+					listener.updateObject(id);
 			}
-			for(CollisionListener listener : listeners)
-				listener.updateObject(id);
 		});
 		expired.stream().sequential().forEach(e -> objects.remove(e));
 		expired.clear();
