@@ -48,6 +48,9 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 	}
 	
+	private static final boolean GAME_BOOL_FALLDAMAGE = false;
+	private static final boolean GAME_BOOL_GODMODE = false;
+	
 	private List<GameCharacter> characters = new ArrayList<>();
 	
 	public CoffeeMainScene(CoffeeSceneManager manager, CoffeeAnimator animator) {
@@ -262,13 +265,13 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		obj.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY, clock+500);
 		getScene().addInstance(obj);
 	}
-	@Override public void handleCollisions(String body1, String body2) {
+	@SuppressWarnings("unused") @Override public void handleCollisions(String body1, String body2) {
 		if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"death")&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
 			if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_LIVE)) //Slik at tiden ikke utvider seg uendelig. Hvis dødstimeren allerede er aktivert vil den ikke sette den på nytt.
 				getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, clock+250);
 		}else if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain")||doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain.walkway")){
-//			if(Math.abs(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().y)>30)
-//				playerDieFull("You didn't learn to fly in time!");
+			if(GAME_BOOL_FALLDAMAGE&&Math.abs(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().y)>30)
+				playerDieFull("You didn't learn to fly in time!");
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP, true);
 			getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_JUMP_TO, clock+150);
 		}else if(doTypedBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"bullet.")){
@@ -290,8 +293,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		playerDieFull("You were killed by "+reason+"!");
 	}
 	public void playerDieFull(String reason){
-		for(CoffeeVertex vert : getObject("terrain.walls").getGameModel().getVertices())
-			System.out.println("Vert: "+vert.position.toString()+vert.texCoord.toString()+vert.normal.toString()+vert.tangent.toString());
+		if(GAME_BOOL_GODMODE)
+			return;
 		System.out.println(reason);
 		super.playerDie();
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,false);

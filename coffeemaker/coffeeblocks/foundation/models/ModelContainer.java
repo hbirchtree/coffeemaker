@@ -131,7 +131,7 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	}
 	
 	public int getVertexDataSize(){
-		return animations.getBaseMeshSize()*CoffeeVertex.VERTEX_DATA_SIZE;
+		return animations.getBaseMeshSize();
 	}
 	public FloatBuffer getVertexData(){
 		return animations.getBaseVertexData();

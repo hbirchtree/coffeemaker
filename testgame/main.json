@@ -1,6 +1,6 @@
 {
 	"font": {
-		"source": "font.png",
+		"source": "models/elements/font.png",
 		"map": 0,
 		"tile-size": 64,
 		"vshader": "shaders/vsh.txt",
@@ -126,6 +126,15 @@
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
 			"position": [0,0,0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1]
+		},
+		{
+			"object-id": "0.test-letter",
+			"model": "models/letter-test.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [93.575,83.24,-138.666],
 			"rotation": [0,0,0],
 			"scale": [1,1,1]
 		},
