@@ -17,11 +17,22 @@ public class CoffeeText{
 	private int gridSizeY = 20;
 	private float unitSizeX = 0f;
 	private float unitSizeY = 0f;
+	private String fontSource = null;
 	
+	public String getFontSource() {
+		return fontSource;
+	}
+
+	public void setFontSource(String fontSource) {
+		this.fontSource = fontSource;
+	}
+
 	public GameObject createLetter(char letter){
 		int gridX = letter%gridSizeX;
 		int gridY = letter/gridSizeX;
 		GameObject out = letterSource.createInstance("."+letter, true);
+		if(fontSource!=null)
+			out.getGameModel().getMaterial().setDiffuseTexture(fontSource);
 		float crd_min_x = (float)gridX*unitSizeX;
 		float crd_min_y = ((float)gridY)*(unitSizeY+1f/70f);
 		float crd_max_x = crd_min_x+unitSizeX;

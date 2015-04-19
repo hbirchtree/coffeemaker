@@ -16,6 +16,7 @@ public interface CoffeeRenderableObject {
 	public Vector3f getScaleVector();
 	
 	public boolean isStaticDraw();
+	public boolean isDrawObject();
 	public int getVboHandle();
 	public void setVboHandle(int handle);
 	

@@ -1,7 +1,9 @@
 package coffeeblocks.foundation.logic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
@@ -50,7 +52,7 @@ public abstract class CoffeeSceneTemplate{
 	protected static final String PROPERTY_TIMER_TIME_TO_DIE = "time-to-die";
 	protected static final String PROPERTY_TIMER_TIME_TO_LIVE = "time-to-live";
 	protected static final String PROPERTY_VECTOR_SPAWNPOSITION = "spawn-position";
-	protected static final String OBJECT_ID_OVERLAY = "0.overlay";
+	protected static final String OBJECT_ID_OVERLAY = "1.overlay";
 	protected static final String OBJECT_ID_PLAYER = "player";
 	protected static final String PROPERTY_INSTANCE_DELETEME = "delete-me";
 	
@@ -91,12 +93,14 @@ public abstract class CoffeeSceneTemplate{
 		tickCamera();
 		tickSpecifics();
 		tickPlayer();
-//		if(!isReady())
-//			readyStatus = true;
+		if(!isReady())
+			readyStatus = true;
 	}
 	
 	abstract protected void setupSpecifics();
 	protected void tickSpecifics(){
+		if(!isReady())
+			setupSpecifics();
 	}
 	protected void setupPlayer(){
 		//Skjermoverlegget
@@ -122,6 +126,8 @@ public abstract class CoffeeSceneTemplate{
 		});
 	}
 	protected void tickPlayer(){
+		if(!isReady())
+			setupPlayer();
 		
 		if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&
 				getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)!=0)
@@ -143,6 +149,8 @@ public abstract class CoffeeSceneTemplate{
 		});
 	}
 	protected void tickCamera(){
+		if(!isReady())
+			setupCamera();
 	}
 	
 	
@@ -176,10 +184,16 @@ public abstract class CoffeeSceneTemplate{
 		return manager.getScene(getSceneId());
 	}
 	protected GameObject getObject(String object){
-		return getScene().getObject(object);
+		GameObject res = getScene().getObject(object);
+		if(res==null)
+			throw new NullPointerException("Object \""+object+"\" not found!");
+		return res;
 	}
 	protected GameObject getAnyObject(String object){
-		return getScene().getAnyObject(object);
+		GameObject res = getScene().getAnyObject(object);
+		if(res==null)
+			throw new NullPointerException("Object \""+object+"\" not found!");
+		return res;
 	}
 	protected boolean performRaytest(String object,Vector3f startPoint){ //Skyter fra startPoint til objektet
 		return getScene().getPhysicsSystem().performRaytest(startPoint,object);
@@ -267,15 +281,21 @@ public abstract class CoffeeSceneTemplate{
 			return targetScl;
 		}
 		public void removeAll(){
-			objects.parallelStream().forEach(o -> o.getGameData().setBoolValue(PROPERTY_INSTANCE_DELETEME,true));
+			objects.parallelStream().forEach(o -> {
+				o.getGameModel().setDrawObject(false);
+				o.getGameData().setBoolValue(PROPERTY_INSTANCE_DELETEME,true);
+			});
 			objects.clear();
 		}
 	}
 	
 	private CoffeeText text = null;
-	protected List<CoffeeTextStruct> sentences = new ArrayList<>();
+	protected Map<String,CoffeeTextStruct> sentences = new HashMap<>();
 	public void initText(InstantiableObject source){
 		text = new CoffeeText(source);
+	}
+	public CoffeeText getTextObject(){
+		return text;
 	}
 	protected void writeLetter(CoffeeTextStruct textTarget,char lch){
 		if(text==null){

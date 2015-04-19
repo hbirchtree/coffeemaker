@@ -65,8 +65,8 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		}
 		if(fontObj!=null&&fontSrc!=null){
 			InstantiableObject textObject = manager.getScene(scene.getSceneId()).getInstantiable(fontObj);
-			textObject.getGameModel().getMaterial().setDiffuseTexture(fontSrc);
 			scene.initText(textObject);
+			scene.getTextObject().setFontSource(fontSrc);
 		}
 		scene.setupCamera();
 		scene.setupPlayer();
@@ -102,11 +102,11 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	
 	@Override
 	public void onGlfwFrameTick(double currentTime){
-		scene.onGlfwFrameTick(currentTime);
+		if(scene!=null)scene.onGlfwFrameTick(currentTime);
 	}
 	@Override
 	public void onGlfwFrameTick(float tickTime){
-		scene.onGlfwFrameTick(tickTime);
+		if(scene!=null)scene.onGlfwFrameTick(tickTime);
 	}
 	@Override
 	public List<Integer> getRegisteredKeys() {
@@ -114,29 +114,29 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	@Override
 	public void coffeeReceiveKeyRelease(int key){
-		if(scene!=null) scene.handleKeyRelease(key);
+		if(scene!=null)scene.handleKeyRelease(key);
 	}
 	@Override
 	public void coffeeReceiveMousePress(int btn){
-		if(scene!=null) scene.handleMousePress(btn);
+		if(scene!=null)scene.handleMousePress(btn);
 	}
 	@Override
 	public void coffeeReceiveMouseRelease(int btn){
-		if(scene!=null) scene.handleMouseRelease(btn);
+		if(scene!=null)scene.handleMouseRelease(btn);
 	}
 	@Override
 	public void coffeeReceiveMouseMove(double x,double y){
-		if(scene!=null) scene.handleMouseMove(x, y);
+		if(scene!=null)scene.handleMouseMove(x, y);
 	}
 	@Override
 	public void coffeeReceiveKeyPress(int key){
-		if(scene!=null) scene.handleKeyPress(key);
+		if(scene!=null)scene.handleKeyPress(key);
 	}
 	@Override
 	public boolean getMouseEvents(){return true;}
 	@Override
 	public void getCollisionNotification(String body1, String body2){
-		if(scene!=null) scene.handleCollisions(body1, body2);
+		if(scene!=null)scene.handleCollisions(body1, body2);
 	}
 	@Override
 	public void onGlfwQuit(){

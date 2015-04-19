@@ -36,8 +36,8 @@ public class ShaderBuilder {
 	
 	public int getUniform(String uniformName){
 		int uniform = GL20.glGetUniformLocation(programId,uniformName);
-		if(uniform<0)
-			System.err.println("Unable to acquire uniform "+uniformName+", this might be caused by optimizations done by the driver which removes unused uniforms.");
+//		if(uniform<0)
+//			System.err.println("Unable to acquire uniform "+uniformName+", this might be caused by optimizations done by the driver which removes unused uniforms.");
 		uniforms.put(uniformName, uniform);
 		return uniform;
 	}

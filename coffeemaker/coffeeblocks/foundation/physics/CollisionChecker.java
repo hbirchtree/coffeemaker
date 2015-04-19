@@ -310,7 +310,7 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		try{
 			createCollisionObject(object);
 		}catch(IllegalArgumentException e){
-			System.err.println(e.getMessage());
+//			System.err.println(e.getMessage());
 		}
 	}
 }

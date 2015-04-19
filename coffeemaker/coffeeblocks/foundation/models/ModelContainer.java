@@ -50,6 +50,7 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	}
 	
 	private boolean depthTest = true;
+	private boolean drawObject = true;
 
 	public synchronized void tick(){
 		super.tick();
@@ -203,5 +204,12 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	}
 	public void setDepthTest(boolean depthTest) {
 		this.depthTest = depthTest;
+	}
+	public void setDrawObject(boolean drawObject) {
+		this.drawObject = drawObject;
+	}
+	@Override
+	public boolean isDrawObject() {
+		return drawObject;
 	}
 }

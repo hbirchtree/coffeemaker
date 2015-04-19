@@ -273,9 +273,7 @@ public class CoffeeRenderer implements Runnable {
 			if(!obj.hasSource())
 				obj.genSource();
 		}
-		for(SoundObject obj : scene.getInstantiableSounds())
-			if(!obj.isBaked()&&!obj.initSound())
-				soundObjects.remove(obj);
+		if(scene!=null)scene.getInstantiableSounds().parallelStream().filter(o -> !o.isBaked()).sequential().filter(o -> !o.initSound()).forEach(obj -> soundObjects.remove(obj));
 		
 		AL10.alListener(AL10.AL_POSITION, VectorTools.vecToFloatBuffer(al_listen_position.getValue()));
 		AL10.alListener(AL10.AL_VELOCITY, VectorTools.vecToFloatBuffer(al_listen_position.getVelocity()));
@@ -348,7 +346,7 @@ public class CoffeeRenderer implements Runnable {
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 
 			//Under testing senket dette prosessorbruk i forhold til vanlige for-looper
-			listeners.parallelStream().forEach(listener -> {
+			listeners.stream().forEach(listener -> {
 				//Vi varsler lyttere om at et nytt tikk har skjedd
 				listener.onGlfwFrameTick();
 				//Vi vil ha oversikt over spilltiden i de andre trådene
@@ -384,8 +382,9 @@ public class CoffeeRenderer implements Runnable {
 	}
 	
 	public void cleanupAll(){
-		for(CoffeeRenderableObject object : scene.getRenderables())
-			cleanupObject(object);
+		if(scene!=null)
+			for(CoffeeRenderableObject object : scene.getRenderables())
+				cleanupObject(object);
 	}
 	
 	private void cleanupObject(CoffeeRenderableObject object){
@@ -411,6 +410,8 @@ public class CoffeeRenderer implements Runnable {
 		scene.getRenderablesOrdered().stream().sequential().forEach(e -> renderObject(e));
 	}
 	private void renderObject(CoffeeRenderableObject object){
+		if(!object.isDrawObject())
+			return;
 		if(!object.isBaked()){
 			ShaderHelper.compileShaders(object,textureRegister);
 		}

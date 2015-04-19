@@ -11,7 +11,9 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 public class ShaderHelper {
-	public static ShaderBuilder setupShader(CoffeeRenderableObject object){
+	public static void setupShader(CoffeeRenderableObject object){
+		if(object.getShader()!=null&&object.getShader().getProgramId()==0)
+			return;
 		ShaderBuilder shader = new ShaderBuilder();
 		try{
 			shader.buildShader(object.getVertShaderFilename(), object.getFragShaderFilename());
@@ -60,7 +62,6 @@ public class ShaderHelper {
 		}
 		GL20.glUseProgram(0);
 		
-		return shader;
 	}
 	public static void loadTextures(CoffeeRenderableObject object,Map<String,Integer> textureRegister){
 		//Vi vil slippe å laste inn samme tekstur flere ganger, derfor registrerer vi håndtaket for hver teksturfil

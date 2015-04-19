@@ -11,7 +11,9 @@ import coffeeblocks.foundation.logic.CoffeeShop.SceneApplier;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.Vector3Container;
+import coffeeblocks.metaobjects.Vector3Container.VectorOffsetCallback;
 import coffeeblocks.opengl.CoffeeAnimator;
+import coffeeblocks.opengl.components.CoffeeSprite;
 
 public class CoffeeMainScene extends CoffeeSceneTemplate {
 	
@@ -32,7 +34,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	protected static final String SCENE_ID_MAIN = "main";
 	protected static final String ANI_RUNCYCLE = "ani.runcycle";
 	
-	protected static final String OBJECT_ID_TESTBOX = "1.testbox";
 	protected static final String OBJECT_ID_WATER = "2.water";
 	protected static final String OBJECT_ID_SKYBOX = "skybox";
 	
@@ -41,7 +42,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		
 		private final int value;
 		private PlayerState(final int value){
-			this.value = value; 
+			this.value = value;
 		}
 		public int toInt(){
 			return value;
@@ -106,17 +107,14 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 	}
 	
-	CoffeeTextStruct testStruct = null;
 	@Override protected void setupPlayer() {
 		super.setupPlayer();
 		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 
-		//Vi initaliserer tekst-objektet vårt
-//		initText(getScene().getInstantiable("1.letter"));
 		//Vi skriver litt tekst
 		//Vi bruker en callback for å spare tid ved tick. Veldig nyttig!
-		testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
+		CoffeeTextStruct testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
 			@Override
 			public Vector3f getOffset() {
 				return getScene().getCamera().getCameraRightVec(1f);
@@ -127,7 +125,20 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		billboardContainer(testStruct.getRotation(),true);
 		writeSentence(testStruct,"Navi testing long strings?");
 		testStruct.getScale().setValue(new Vector3f(0.15f,0.15f,0.15f));
-		sentences.add(testStruct);
+		sentences.put("name",testStruct);
+		
+		CoffeeSprite test = new CoffeeSprite(getScene().getInstantiable("0.sprite"));
+		GameObject testO = test.createSprite("testgame/models/elements/heart.png");
+		testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+		billboardContainer(testO.getGameModel().getRotation(),true);
+		testO.getGameModel().getScale().setValue(new Vector3f(0.2f,0.2f,0.2f));
+		testO.getGameModel().getPosition().setOffsetCallback(new VectorOffsetCallback(){
+			@Override
+			public Vector3f getOffset() {
+				return Vector3f.add(getScene().getCamera().getCameraRightVec(-2f), getScene().getCamera().getUp(), null);
+			}
+		});
+		getScene().addInstance(testO);
 		
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W,false);
@@ -140,6 +151,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,24d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_SPEEDLIMIT,25d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
+		
 	}
 	@Override protected void tickPlayer() {
 		super.tickPlayer();
@@ -186,11 +198,11 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		new ArrayList<>(getScene().getInstanceList()).parallelStream().sequential().forEach(object -> {
 			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
 					clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
-				System.err.println("Object expired: "+object.getObjectId());
+//				System.err.println("Object expired: "+object.getObjectId());
 				getScene().deleteInstance(object.getObjectId());
 			}
 			if(object.getGameData().getBoolValue(PROPERTY_INSTANCE_DELETEME)){
-				System.err.println("Object deleted: "+object.getObjectId());
+//				System.err.println("Object deleted: "+object.getObjectId());
 				getScene().deleteInstance(object.getObjectId());
 			}
 		});
@@ -239,8 +251,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 					!getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_MOVE))
 				return;
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_IMPULSE,new Vector3f(0,0.5f,0));
-			testStruct.removeAll();
-			writeLetter(testStruct,'?');
+			sentences.get("name").removeAll();
+			writeSentence(sentences.get("name"),"!!!");
 			return;
 		}
 		}
@@ -319,7 +331,20 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	public void playerDieFull(String reason){
 		if(GAME_BOOL_GODMODE)
 			return;
-		System.out.println(reason);
+		
+		CoffeeTextStruct testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
+			@Override
+			public Vector3f getOffset() {
+				return getScene().getCamera().getCameraRightVec(1f);
+			}
+		});
+		testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+		testStruct.getPosition().setValueOffset(new Vector3f(0,2f,0));
+		billboardContainer(testStruct.getRotation(),true);
+		writeSentence(testStruct,"You died");
+		testStruct.getScale().setValue(new Vector3f(0.15f,0.15f,0.15f));
+		sentences.put("death-text",testStruct);
+		
 		super.playerDie();
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.DEAD.toInt());
@@ -328,6 +353,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		super.playerRespawn();
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,true);
 		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.ALIVE.toInt());
+		if(sentences.get("death-text")!=null)
+			sentences.remove("death-text").removeAll();
 	}
 	
 	//Ansvarlig for å inneholde informasjonen under kjøretid. Objektene opprettes og settes til riktige verdier før dette.
