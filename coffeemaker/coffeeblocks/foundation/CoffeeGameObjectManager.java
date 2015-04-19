@@ -69,6 +69,10 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		return new ArrayList<>(instances.values());
 	}
 	public void addInstance(GameObject instance){
+		String name = instance.getObjectId();
+		//Vi gjør dette for å unngå at bokstaver overskrives av hverandre. Vi kunne ha optimalisert det ved å bruke samme bokstav på to steder, men glemmer det nå.
+		while(instances.containsKey(instance.getObjectId()))
+			instance.setObjectId(name+(int)(Math.random()*1000));
 		instances.put(instance.getObjectId(),instance);
 		listeners.stream().forEach(listener -> listener.newGameObjectAdded(instance));
 	}

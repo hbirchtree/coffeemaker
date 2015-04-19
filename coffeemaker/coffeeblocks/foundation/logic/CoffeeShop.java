@@ -6,6 +6,7 @@ import java.util.List;
 import org.lwjgl.glfw.GLFW;
 
 import coffeeblocks.foundation.CoffeeSceneManager;
+import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.opengl.CoffeeAnimator;
 
 public class CoffeeShop extends CoffeeLogicLoop{
@@ -31,10 +32,22 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_3);
 	}
 
+	private String fontObj = null;
+	private String fontSrc = null;
+	public void setFont(String fontObj,String fontSrc){
+		this.fontObj = fontObj;
+		this.fontSrc = fontSrc;
+	}
+	
 	private void applyScene(CoffeeSceneTemplate scene){
 		if(this.scene!=null){
 			this.scene.cleanup();
 			this.scene.setReadyStatus(false);
+		}
+		if(fontObj!=null&&fontSrc!=null){
+			InstantiableObject textObject = manager.getScene(scene.getSceneId()).getInstantiable(fontObj);
+			textObject.getGameModel().getMaterial().setDiffuseTexture(fontSrc);
+			scene.initText(textObject);
 		}
 		manager.applyScene(scene.getSceneId());
 		manager.getRenderer().addSounds(scene.getScene()); //Yes, sound in the renderer.
@@ -71,11 +84,11 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	
 	@Override
 	public void onGlfwFrameTick(double currentTime){
-		if(scene!=null) scene.onGlfwFrameTick(currentTime);
+		scene.onGlfwFrameTick(currentTime);
 	}
 	@Override
 	public void onGlfwFrameTick(float tickTime){
-		if(scene!=null) scene.onGlfwFrameTick(tickTime);
+		scene.onGlfwFrameTick(tickTime);
 	}
 	@Override
 	public List<Integer> getRegisteredKeys() {

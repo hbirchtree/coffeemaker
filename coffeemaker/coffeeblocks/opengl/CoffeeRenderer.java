@@ -41,6 +41,8 @@ public class CoffeeRenderer implements Runnable {
 	private GLFWMouseButtonCallback mouseCallback;
 	private GLFWCursorPosCallback mousePosCallback;
 	
+	Map<String,Integer> textureRegister = new HashMap<>();
+	
 	private Vector4f clearColor = new Vector4f(0.8f,0.8f,1.0f,1f);
 	private CoffeeCamera camera = null;
 	private List<LimeLight> lights = null;
@@ -278,19 +280,6 @@ public class CoffeeRenderer implements Runnable {
 		AL10.alListener(AL10.AL_POSITION, VectorTools.vecToFloatBuffer(al_listen_position.getValue()));
 		AL10.alListener(AL10.AL_VELOCITY, VectorTools.vecToFloatBuffer(al_listen_position.getVelocity()));
 	}
-
-	private void fpsCount(){
-		if(fpscounter){
-			framecount++;
-			if(glfwGetTime()>=fpsTimer){
-				System.out.println("FPS: "+framecount+"\nTriangles: "+triCount
-						+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
-				framecount = 0;
-				triCount = 0;
-				fpsTimer = glfwGetTime()+1;
-			}
-		}
-	}
 	
 	private void toggleGrabMouse(){
 		if(!mouseGrabbed){
@@ -310,6 +299,22 @@ public class CoffeeRenderer implements Runnable {
 			toggleGrabMouse();
 	}
 	
+	private void fpsCount(){
+		if(fpscounter){
+			framecount++;
+			if(glfwGetTime()>=fpsTimer){
+				System.out.println("FPS: "+framecount+"\nTriangles: "+triCount
+						+"\nTick: "+String.format("%3f", tick*1000f)+"ms");
+				framecount = 0;
+				triCount = 0;
+				fpsTimer = glfwGetTime()+1;
+			}
+		}
+	}
+
+	double clockLoop = 0;
+	double tickLoop = 0;
+	double renderingLoop = 0;
 	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
@@ -362,7 +367,7 @@ public class CoffeeRenderer implements Runnable {
 			if(draw&&scene!=null){ //Slå av rendring av objekter, dermed kan vi ta vekk og bytte objekter som skal vises
 				for(CoffeeRenderableObject object : scene.getInstantiableModels()) //Vi vil forhåndslaste shaders og teksturer for disse objektene slik at de ikke forårsaker problemer
 					if(!object.isTextureLoaded()){
-						ShaderHelper.loadTextures(object);
+						ShaderHelper.loadTextures(object,textureRegister);
 						ShaderHelper.setupShader(object);
 					}
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
@@ -407,7 +412,7 @@ public class CoffeeRenderer implements Runnable {
 	}
 	private void renderObject(CoffeeRenderableObject object){
 		if(!object.isBaked()){
-			ShaderHelper.compileShaders(object);
+			ShaderHelper.compileShaders(object,textureRegister);
 		}
 		GL20.glUseProgram(object.getShader().getProgramId());
 		

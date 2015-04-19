@@ -1,11 +1,7 @@
 {
 	"font": {
-		"source": "models/elements/font.png",
-		"map": 0,
-		"mesh": "models/letter-test.obj",
-		"tile-size": 64,
-		"vshader": "shaders/vsh.txt",
-		"fshader": "shaders/fsh_nolight.txt"
+		"source": "models/elements/font_of_legend.png",
+		"object": "1.letter"
 	},
 	"scene:main":{
 		"clearcolor": [0.17,0.57,0.79,1],

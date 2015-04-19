@@ -107,21 +107,28 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 	}
 	
+	CoffeeTextStruct testStruct = null;
 	@Override protected void setupPlayer() {
 		super.setupPlayer();
 		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 
 		//Vi initaliserer tekst-objektet vårt
-		initText(getScene().getInstantiable("1.letter"));
+//		initText(getScene().getInstantiable("1.letter"));
 		//Vi skriver litt tekst
-		CoffeeTextStruct testStruct = new CoffeeTextStruct();
+		//Vi bruker en callback for å spare tid ved tick. Veldig nyttig!
+		testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
+			@Override
+			public Vector3f getOffset() {
+				return getScene().getCamera().getCameraRightVec(1f);
+			}
+		});
 		testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
-		testStruct.getRotation().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getRotation());
-		writeSentence(testStruct,"Hello!");
-		testStruct.getScale().setValue(new Vector3f(0.2f,0.2f,0.2f));
+		testStruct.getPosition().setValueOffset(new Vector3f(0,1.5f,0));
+		billboardContainer(testStruct.getRotation(),true);
+		writeSentence(testStruct,"Navi testing long strings?");
+		testStruct.getScale().setValue(new Vector3f(0.15f,0.15f,0.15f));
 		sentences.add(testStruct);
-		System.out.println(sentences);
 		
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W,false);
@@ -177,12 +184,14 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			e.onTick();
 		});
 
-		new ArrayList<>(getScene().getInstanceList()).stream().sequential().forEach(object -> {
+		new ArrayList<>(getScene().getInstanceList()).parallelStream().sequential().forEach(object -> {
 			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
 					clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
+				System.err.println("Object expired: "+object.getObjectId());
 				getScene().deleteInstance(object.getObjectId());
 			}
-			if(object.getGameData().getBoolValue(PROPERTY_INSTANCE_DELETEME)!=null){
+			if(object.getGameData().getBoolValue(PROPERTY_INSTANCE_DELETEME)){
+				System.err.println("Object deleted: "+object.getObjectId());
 				getScene().deleteInstance(object.getObjectId());
 			}
 		});
@@ -231,6 +240,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 					!getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_MOVE))
 				return;
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_IMPULSE,new Vector3f(0,0.5f,0));
+			testStruct.removeAll();
+			writeLetter(testStruct,'?');
 			return;
 		}
 		}
@@ -301,7 +312,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		});
 	}
 	@Override public void handleMouseRelease(int key) {
-		// TODO Auto-generated method stub
 		
 	}
 	public void playerDie(String reason){

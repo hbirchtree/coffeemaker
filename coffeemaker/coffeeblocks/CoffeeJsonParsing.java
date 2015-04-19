@@ -24,7 +24,9 @@ import org.lwjgl.util.vector.Vector4f;
 
 public class CoffeeJsonParsing {
 	@SuppressWarnings("unchecked")
-	public static void parseSceneStructure(String filepath,Map<String,Object> source, CoffeeSceneManager sceneManager){
+	public static void parseSceneStructure(String filepath,Map<String,Object> source, CoffeeSceneManager sceneManager,Map<String,String> startOpts){
+		String fontObj = "";
+		String fontSrc = "";
 		for(String key : source.keySet()){
 			Object item = source.get(key);
 			if(key.startsWith("scene:")&&item instanceof HashMap){
@@ -33,22 +35,19 @@ public class CoffeeJsonParsing {
 					continue;
 				parseSceneObject(key.split(":")[1],map,sceneManager,filepath);
 			}
-//			else if(key.equals("font")){
-//				Map<String,Object> map = ((HashMap<String,Object>)item);
-//				CoffeeText defaultText = new CoffeeText(ModelLoader.loadModel(filepath+(String)map.get("mesh")));
-//				for(String fkey : map.keySet()){
-//					if(fkey.equals("source"))
-//						defaultText.getMaterial().setDiffuseTexture(filepath+(String)map.get(fkey));
-//					else if(fkey.equals("tile-size"))
-//						defaultText.setTileSize((Integer)map.get(fkey));
-//				}
-//				if(map.containsKey("vshader")&&map.containsKey("fshader"))
-//					defaultText.setShaderFiles(filepath+(String)map.get("vshader"),filepath+(String)map.get("fshader"));
-//				defaultText.getPosition().setValue(new Vector3f(93.575f,83.24f,-138.666f));
-//				defaultText.getScale().setValue(new Vector3f(4,4,4));
-//				sceneManager.setTextObject(defaultText);
-//			}
+			else if(key.equals("font")){
+				Map<String,Object> map = ((HashMap<String,Object>)item);
+				for(String fkey : map.keySet()){
+					if(fkey.equals("source"))
+						fontSrc = filepath+(String)map.get(fkey);
+					else if(fkey.equals("object"))
+						fontObj = (String)map.get(fkey);
+				}
+				
+			}
 		}
+		startOpts.put("font.src", fontSrc);
+		startOpts.put("font.obj", fontObj);
 	}
 	@SuppressWarnings("unchecked")
 	public static void parseModels(Object source,String filepath,Map<String,Map<String,ModelContainer>> modelsIndex){

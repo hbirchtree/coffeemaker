@@ -23,7 +23,7 @@ public class CoffeeText{
 		int gridY = letter/gridSizeX;
 		GameObject out = letterSource.createInstance("."+letter, true);
 		float crd_min_x = (float)gridX*unitSizeX;
-		float crd_min_y = ((float)gridY)*(unitSizeY+1f/80f);
+		float crd_min_y = ((float)gridY)*(unitSizeY+1f/70f);
 		float crd_max_x = crd_min_x+unitSizeX;
 		float crd_max_y = crd_min_y+unitSizeY;
 		List<CoffeeVertex> verts = out.getGameModel().getVertices();

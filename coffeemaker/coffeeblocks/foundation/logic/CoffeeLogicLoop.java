@@ -10,5 +10,6 @@ public abstract class CoffeeLogicLoop implements CoffeeGlfwInputListener,CoffeeR
 	public CoffeeLogicLoop(CoffeeSceneManager manager){
 		this.manager = manager;
 	}
+	public abstract void setFont(String fontObj,String fontSrc);
 	public abstract void eventLoop() throws InterruptedException;
 }

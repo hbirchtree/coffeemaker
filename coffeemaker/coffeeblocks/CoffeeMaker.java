@@ -2,6 +2,7 @@ package coffeeblocks;
 
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.HashMap;
 import java.util.Map;
 
 import coffeeblocks.foundation.CoffeeSceneManager;
@@ -17,6 +18,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 	private CoffeeSceneManager sceneManager = new CoffeeSceneManager();
 	private CoffeeRenderer renderer = null;
 	private Thread renderingThread = null;
+	private CoffeeLogicLoop logic = null;
 	
 	private UncaughtExceptionHandler rendererEH = new UncaughtExceptionHandler() {
 			
@@ -46,14 +48,20 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		if(properties.isEmpty())
 			throw new IllegalStateException("Ingen data");
 		
-		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.indexOf("/", -1)+1),properties, sceneManager);
+		Map<String,String> startOpts = new HashMap<>();
+		long startTime = System.currentTimeMillis();
+		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.indexOf("/", -1)+1),properties, sceneManager, startOpts);
+		System.out.println("Parsing: "+(System.currentTimeMillis()-startTime));
 		if(sceneManager.getScenes().size()==0){
 			System.out.println("Kunne ikke finne noen scene å rendre!");
 			System.exit(1);
 		}
+
 		renderer = new CoffeeRenderer();
 		sceneManager.setRenderer(renderer);
 		renderer.addCoffeeListener(this);
+		logic = new CoffeeShop(sceneManager);
+		logic.setFont(startOpts.get("font.obj"), startOpts.get("font.src"));
 		
 		mayThyComputerNotBurn();
 	}
@@ -62,7 +70,6 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		renderingThread.setUncaughtExceptionHandler(rendererEH);
 		renderingThread.start();
 		
-		CoffeeLogicLoop logic = new CoffeeShop(sceneManager);
 		renderer.addCoffeeListener(logic);
 		try {
 			logic.eventLoop();

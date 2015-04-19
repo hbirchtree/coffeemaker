@@ -3,6 +3,7 @@ package coffeeblocks.opengl.components;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
@@ -61,14 +62,27 @@ public class ShaderHelper {
 		
 		return shader;
 	}
-	public static void loadTextures(CoffeeRenderableObject object){
+	public static void loadTextures(CoffeeRenderableObject object,Map<String,Integer> textureRegister){
+		//Vi vil slippe å laste inn samme tekstur flere ganger, derfor registrerer vi håndtaket for hver teksturfil
 		if(object.getMaterial().isMultitextured()){
 			List<Integer> textures = new ArrayList<>();
-			for(String file : object.getMaterial().getMultitexture())
-				textures.add(TextureHelper.genTexture(file));
+			for(String file : object.getMaterial().getMultitexture()){
+				if(!textureRegister.containsKey(file)){
+					int text = TextureHelper.genTexture(file);
+					textures.add(text);
+					textureRegister.put(file, text);
+					
+				}else
+					textures.add(textureRegister.get(file));
+			}
 			object.getMaterial().setTextureHandles(textures);
 		}else{
-			int texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture());
+			int texture = 0;
+			if(!textureRegister.containsKey(object.getMaterial().getDiffuseTexture())){
+				texture = TextureHelper.genTexture(object.getMaterial().getDiffuseTexture());
+				textureRegister.put(object.getMaterial().getDiffuseTexture(), texture);
+			}else
+				texture = textureRegister.get(object.getMaterial().getDiffuseTexture());
 			object.getMaterial().setTextureHandle(texture);
 		}
 		
@@ -95,10 +109,10 @@ public class ShaderHelper {
 		VAOHelper.genVAO(object,object.getVertexData(),shader.getAttrib("vert"),
 				shader.getAttrib("vertTexCoord"),shader.getAttrib("vertNormal"),shader.getAttrib("vertTangent"));
 	}
-	public static void compileShaders(CoffeeRenderableObject object){
+	public static void compileShaders(CoffeeRenderableObject object,Map<String,Integer> textureRegister){
 		if(!object.isTextureLoaded()){
 			setupShader(object);
-			loadTextures(object);
+			loadTextures(object,textureRegister);
 		}
 		
 		uploadVertices(object);

@@ -106,15 +106,23 @@ public abstract class CoffeeSceneTemplate{
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE,0l);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE,0l);
 		getObject(OBJECT_ID_PLAYER).getGameModel().setObjectDeactivation(false);
+
+		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
+			
+			@Override
+			public Vector3f getOffset() {
+				// TODO Auto-generated method stub
+				return getScene().getCamera().getCameraForwardVec(0.5f);
+			}
+		});
 	}
 	protected void tickPlayer(){
 		if(!isReady())
 			setupPlayer();
 		
 		//Vi oppdaterer tekstens posisjon med arbeidstråder
-		sentences.stream().forEach(t -> t.updateOffsets());
+//		sentences.stream().forEach(t -> t.updateOffsets());
 		
-		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().setValueOffset(getScene().getCamera().getCameraForwardVec(0.5f));
 		if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&
 				getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)!=0)
 			playerDie();
@@ -124,13 +132,19 @@ public abstract class CoffeeSceneTemplate{
 	}
 	protected void setupCamera(){
 		getScene().getCamera().getCameraPos().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+		//Vi lager en callback for å slippe å oppdatere den manuelt
+		getScene().getCamera().getCameraPos().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
+			@Override
+			public Vector3f getOffset() {
+				return Vector3f.add(
+						VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(-5f),null);
+			}
+		});
 	}
 	protected void tickCamera(){
 		if(!isReady())
 			setupCamera();
 		//Kameraets posisjon relativt til spilleren endrer seg, derfor må vi endre offset for kameraets posisjon for å holde det i bane rundt spilleren.
-		getScene().getCamera().getCameraPos().setValueOffset(Vector3f.add(
-				VectorTools.vectorMul(getScene().getCamera().getUp(),0.8f),getScene().getCamera().getCameraForwardVec(-5f),null));
 	}
 	
 	
@@ -203,33 +217,46 @@ public abstract class CoffeeSceneTemplate{
 		else
 			getAnyObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(0,-1,0));
 	}
-	
+	protected void billboardContainer(Vector3Container object,boolean spherical){
+		object.bindValue(getScene().getCamera().getCameraRotation());
+		if(spherical)
+			object.setValueMultiplier(new Vector3f(-1,-1,0));
+		else
+			object.setValueMultiplier(new Vector3f(0,-1,0));
+	}
 
 	protected class CoffeeTextStruct {
+		//Tar seg av bokstavelementene slik at vi enkelt kan endre de som vi vil
 		private Vector3Container targetPos = new Vector3Container();
 		private Vector3Container targetRot = new Vector3Container();
-		public float textSpacing = 1.5f;
+		public float textSpacing = 0.2f;
 		private Vector3Container targetScl = new Vector3Container(1,1,1);
-		private List<GameObject> objects = new ArrayList<>();
+		public List<GameObject> objects = new ArrayList<>();
+		private Vector3Container.VectorOffsetCallback offsetCallback = null;
+		public CoffeeTextStruct(Vector3Container.VectorOffsetCallback offsetCallback){
+			this.offsetCallback = offsetCallback;
+		}
 		public void addObject(GameObject obj){
 			obj.getGameModel().getPosition().bindValue(targetPos);
 			obj.getGameModel().getRotation().bindValue(targetRot);
 			obj.getGameModel().getScale().bindValue(targetScl);
+			updateObjects();
 			objects.add(obj);
-		}
-		public void updateOffsets(){
-			Vector3f base = getScene().getCamera().getCameraRightVec(targetScl.getValue().x);
-			float offset = -(float)objects.size()/2;
-			for(int i=0;i<objects.size();i++){
-				objects.get(i).getGameModel().getPosition().setValueOffset(VectorTools.vectorMul(base, i*textSpacing+offset));
-			}
 		}
 		public void updateObjects(){
 			//Her kan vi nyttegjøre oss av Java Streams med arbeidstråder! Wee!
+//			float offset = -(float)objects.size()/2;
+			float offset = 0;
 			objects.parallelStream().forEach(obj ->{
 				obj.getGameModel().getPosition().bindValue(targetPos);
 				obj.getGameModel().getRotation().bindValue(targetRot);
 				obj.getGameModel().getScale().bindValue(targetScl);
+				obj.getGameModel().getPosition().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
+					@Override
+					public Vector3f getOffset() {
+						return VectorTools.vectorMul(offsetCallback.getOffset(), objects.indexOf(obj)*textSpacing+offset);
+					}
+				});
 			});
 		}
 		public Vector3Container getPosition(){
@@ -249,16 +276,17 @@ public abstract class CoffeeSceneTemplate{
 	
 	private CoffeeText text = null;
 	protected List<CoffeeTextStruct> sentences = new ArrayList<>();
-	protected void initText(InstantiableObject source){
+	public void initText(InstantiableObject source){
 		text = new CoffeeText(source);
 	}
 	protected void writeLetter(CoffeeTextStruct textTarget,char lch){
-//		if(text==null)
-//			System.err.println("Text not initialized!");
-//		GameObject test = text.createLetter(lch);
-//		getScene().addInstance(test);
-//		textTarget.addObject(test);
-//		System.out.println("Added "+lch);
+		if(text==null){
+			System.err.println("Text not initialized!");
+			return;
+		}
+		GameObject test = text.createLetter(lch);
+		getScene().addInstance(test);
+		textTarget.addObject(test);
 	}
 	protected void writeSentence(CoffeeTextStruct textTarget,String sentence){
 		for(char l : sentence.toCharArray())

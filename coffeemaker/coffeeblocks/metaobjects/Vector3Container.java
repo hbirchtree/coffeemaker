@@ -24,9 +24,14 @@ public class Vector3Container {
 	public Vector3Container(float f, float g, float h) {
 		value.x = f;value.y=g;value.z=h;
 	}
+	
+	public interface VectorOffsetCallback {
+		public Vector3f getOffset();
+	}
 
 	private Vector3f value = new Vector3f();
 	private Vector3f valueOffset = null;
+	private VectorOffsetCallback offsetCallback = null;
 	private Vector3f valueMultiplier = null;
 	private Vector3f valueMin = null;
 	private Vector3f valueMax = null;
@@ -47,12 +52,20 @@ public class Vector3Container {
 			result = binding.getValue();
 		else
 			result = value;
-		if(valueOffset!=null)
-			result = Vector3f.add(result, valueOffset,null);
+		if(getValueOffset()!=null)
+		result = Vector3f.add(result, getValueOffset(),null);
 		if(valueMultiplier!=null)
 			result = VectorTools.vectorMul(result, valueMultiplier);
 		return result;
 	}
+	public VectorOffsetCallback getOffsetCallback() {
+		return offsetCallback;
+	}
+
+	public void setOffsetCallback(VectorOffsetCallback offsetCallback) {
+		this.offsetCallback = offsetCallback;
+	}
+
 	public Vector3f getRawValue(){
 		return value;
 	}
@@ -115,7 +128,10 @@ public class Vector3Container {
 	public void setAcceleration(javax.vecmath.Vector3f acceleration) {
 		setAcceleration(VectorTools.vmVec3ftoLwjgl(acceleration));
 	}
-	public Vector3f getValueOffset() {
+	private Vector3f emptyVec = new Vector3f(); //Vi vil absolutt ikke konstruere nye objekter hver millisekund.
+	public Vector3f getValueOffset(){
+		if(offsetCallback!=null)
+			return offsetCallback.getOffset();
 		return valueOffset;
 	}
 
