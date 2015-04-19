@@ -7,6 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
 
 import coffeeblocks.foundation.CoffeeSceneManager;
+import coffeeblocks.foundation.logic.CoffeeShop.SceneApplier;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
 import coffeeblocks.metaobjects.Vector3Container;
@@ -52,8 +53,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	
 	private List<GameCharacter> characters = new ArrayList<>();
 	
-	public CoffeeMainScene(CoffeeSceneManager manager, CoffeeAnimator animator) {
-		super(manager, animator);
+	public CoffeeMainScene(CoffeeSceneManager manager, CoffeeAnimator animator, SceneApplier sceneApplier) {
+		super(manager, animator, sceneApplier);
 	}
 	public String getSceneId(){
 		return SCENE_ID_MAIN;
@@ -88,8 +89,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	}
 	@Override protected void tickSpecifics() {
 		super.tickSpecifics();
-		if(!isReady())
-			setupSpecifics();
 		
 		//Miljø
 		if(getObject(OBJECT_ID_WATER).getGameData().getTimerValue(PROPERTY_TIMER_SWITCH)==null||
@@ -144,8 +143,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	}
 	@Override protected void tickPlayer() {
 		super.tickPlayer();
-		if(!isReady())
-			setupPlayer();
+//		if(!isReady())
+//			setupPlayer();
 		
 		//Spillervariabler
 		if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP)&&

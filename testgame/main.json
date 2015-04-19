@@ -232,5 +232,101 @@
 			"ambientcoeff": 0.007
 		}
 		]
+	},
+	"scene:second":{
+		"clearcolor": [0.17,0.57,0.79,1],
+		"camera": {
+			"fov": 85
+		},
+		"models":{
+			"canyon-scene": "models/canyon_scene.obj",
+			"quad": "models/quad.obj",
+			"playermesh": "models/playermesh.obj",
+			"overlay": "models/overlay.obj"
+		},
+		"objects": [
+		{
+			"object-id": "terrain.walkway",
+			"model-i": "canyon-scene:canyon.walkway",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 3,
+			"physics.collision": "models/canyon_walkway.obj",
+			"physics.mass": 0,
+			"physics.scale": [1,1,1],
+			"physics.friction": 1,
+			"physics.restitution": 0.0,
+			"physics.rotation": [0,1,0]
+		},
+		{
+			"object-id": "terrain.walls",
+			"model-i": "quad",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [0.0,0,0.0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1],
+			"physics.shape": 3,
+			"physics.collision": "models/canyon_walls.obj",
+			"physics.mass": 0,
+			"physics.scale": [1,1,1],
+			"physics.friction": 1,
+			"physics.restitution": 0.0,
+			"physics.rotation": [0,1,0]
+		},
+		{
+			"object-id": "player",
+			"model-i": "playermesh",
+			"poses": {
+				"run.1": "models/playermesh_run1.obj",
+				"run.2": "models/playermesh_run2.obj",
+				"walk.1": "models/playermesh_walk1.obj",
+				"walk.2": "models/playermesh_walk2.obj",
+				"jump": "models/playermesh_jump.obj"
+			},
+			"sounds": {
+			"test": "sounds/test.wav",
+			"test2": "sounds/test.wav"
+			},
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh.txt",
+			"position": [93.575,84.24,-138.666],
+			"stream-draw": true,
+			"notify-force": true,
+			"rotation": [0.0,0,0],
+			"scale": [0.20,0.20,0.20],
+			"physics.shape": 0
+		},
+		{
+			"object-id": "0.overlay",
+			"model-i": "overlay",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"position": [0,0,0],
+			"rotation": [0,0,0],
+			"scale": [1,1,1]
+		},
+		{
+			"instantiable": true,
+			"object-id": "1.letter",
+			"model": "models/letter-test.obj",
+			"vshader": "shaders/vsh.txt",
+			"fshader": "shaders/fsh_nolight.txt",
+			"depth-test": false,
+			"scale": [0.5,0.5,0.5]
+		}
+		],
+		"lights": [
+		{
+			"object-id": "light.sun",
+			"position": [0,125,0],
+			"color": "#ffffff",
+			"attenuation": 0.00005,
+			"ambientcoeff": 0.007
+		}
+		]
 	}
 }

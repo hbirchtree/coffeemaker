@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import coffeeblocks.metaobjects.Vector3Container;
 
 public class GameMetaData {

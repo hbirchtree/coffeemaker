@@ -16,9 +16,12 @@ import coffeeblocks.opengl.CoffeeAnimator;
 import coffeeblocks.opengl.components.CoffeeText;
 
 public abstract class CoffeeSceneTemplate{
-	public CoffeeSceneTemplate(CoffeeSceneManager manager,CoffeeAnimator animator){
+	
+	private CoffeeShop.SceneApplier sceneApplier = null;
+	public CoffeeSceneTemplate(CoffeeSceneManager manager,CoffeeAnimator animator,CoffeeShop.SceneApplier sceneApplier){
 		this.manager = manager;
 		this.animator = animator;
+		this.sceneApplier = sceneApplier;
 	}
 	protected CoffeeSceneManager manager = null;
 	protected CoffeeAnimator animator = null;
@@ -28,7 +31,8 @@ public abstract class CoffeeSceneTemplate{
 		clock = System.currentTimeMillis();
 	}
 	public void cleanup(){
-		manager.getRenderer().cleanupAll();
+		//Hvis vi gjør dette blir alle teksturene lastet ut. Alle.
+//		manager.getRenderer().cleanupAll();
 	}
 	protected boolean readyStatus = false;
 	public void setReadyStatus(boolean readyStatus){
@@ -36,6 +40,9 @@ public abstract class CoffeeSceneTemplate{
 	}
 	public boolean isReady(){
 		return readyStatus;
+	}
+	protected void applyScene(String id){
+		sceneApplier.gotoScene(id);
 	}
 
 	protected float mouseSensitivity = 0.1f;
@@ -84,14 +91,12 @@ public abstract class CoffeeSceneTemplate{
 		tickCamera();
 		tickSpecifics();
 		tickPlayer();
-		if(!isReady())
-			readyStatus = true;
+//		if(!isReady())
+//			readyStatus = true;
 	}
 	
 	abstract protected void setupSpecifics();
 	protected void tickSpecifics(){
-		if(!isReady())
-			setupSpecifics();
 	}
 	protected void setupPlayer(){
 		//Skjermoverlegget
@@ -117,11 +122,6 @@ public abstract class CoffeeSceneTemplate{
 		});
 	}
 	protected void tickPlayer(){
-		if(!isReady())
-			setupPlayer();
-		
-		//Vi oppdaterer tekstens posisjon med arbeidstråder
-//		sentences.stream().forEach(t -> t.updateOffsets());
 		
 		if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&
 				getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)!=0)
@@ -133,6 +133,7 @@ public abstract class CoffeeSceneTemplate{
 	protected void setupCamera(){
 		getScene().getCamera().getCameraPos().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		//Vi lager en callback for å slippe å oppdatere den manuelt
+		//Kameraets posisjon relativt til spilleren endrer seg, derfor må vi endre offset for kameraets posisjon for å holde det i bane rundt spilleren.
 		getScene().getCamera().getCameraPos().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
 			@Override
 			public Vector3f getOffset() {
@@ -142,9 +143,6 @@ public abstract class CoffeeSceneTemplate{
 		});
 	}
 	protected void tickCamera(){
-		if(!isReady())
-			setupCamera();
-		//Kameraets posisjon relativt til spilleren endrer seg, derfor må vi endre offset for kameraets posisjon for å holde det i bane rundt spilleren.
 	}
 	
 	

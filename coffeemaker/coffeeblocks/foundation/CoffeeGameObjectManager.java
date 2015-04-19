@@ -44,7 +44,7 @@ public class CoffeeGameObjectManager implements CollisionListener{
 	public Collection<InstantiableObject> getInstantiableList(){
 		return instantiables.values();
 	}
-	public void addInstantiableObject(String id,InstantiableObject object){
+	public synchronized void addInstantiableObject(String id,InstantiableObject object){
 		instantiables.put(id, object);
 	}
 	public Set<String> getInstantiableIdList(){

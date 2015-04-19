@@ -31,7 +31,7 @@ public class Vector3Container {
 
 	private Vector3f value = new Vector3f();
 	private Vector3f valueOffset = null;
-	private VectorOffsetCallback offsetCallback = null;
+	private VectorOffsetCallback offsetCallback = null; //Gir oss dynamisk offset! Kan sette det til kameraets ForwardVec, RightVec, eller noe annet
 	private Vector3f valueMultiplier = null;
 	private Vector3f valueMin = null;
 	private Vector3f valueMax = null;
@@ -78,7 +78,7 @@ public class Vector3Container {
 		this.value = value;
 	}
 	public void increaseValue(Vector3f value){
-		setValue(Vector3f.add(value, this.value, null));
+		setValue(Vector3f.add(this.value, value, null));
 	}
 	public Vector3f getVelocity() {
 		if(bound)
@@ -128,7 +128,6 @@ public class Vector3Container {
 	public void setAcceleration(javax.vecmath.Vector3f acceleration) {
 		setAcceleration(VectorTools.vmVec3ftoLwjgl(acceleration));
 	}
-	private Vector3f emptyVec = new Vector3f(); //Vi vil absolutt ikke konstruere nye objekter hver millisekund.
 	public Vector3f getValueOffset(){
 		if(offsetCallback!=null)
 			return offsetCallback.getOffset();
