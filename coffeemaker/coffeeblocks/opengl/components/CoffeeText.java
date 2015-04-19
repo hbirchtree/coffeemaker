@@ -10,7 +10,6 @@ public class CoffeeText{
 		letterSource = letter;
 		unitSizeX = 1/(float)gridSizeX;
 		unitSizeY = 1/(float)gridSizeY;
-		unitAspect = unitSizeX/unitSizeY;
 	}
 	//Vi gjør en implementasjon på høyt nivå fordi det er enklere i frohold 
 	private InstantiableObject letterSource = null;
@@ -18,16 +17,15 @@ public class CoffeeText{
 	private int gridSizeY = 20;
 	private float unitSizeX = 0f;
 	private float unitSizeY = 0f;
-	private float unitAspect = 1f;
 	
 	public GameObject createLetter(char letter){
 		int gridX = letter%gridSizeX;
-		int gridY = letter/gridSizeX+1;
+		int gridY = letter/gridSizeX;
 		GameObject out = letterSource.createInstance("."+letter, true);
-		float crd_min_x = (float)gridX/(float)gridSizeX;
-		float crd_min_y = (float)gridY/(float)gridSizeY;
-		float crd_max_x = (crd_min_x+unitSizeX);
-		float crd_max_y = (crd_min_y+unitSizeY);
+		float crd_min_x = (float)gridX*unitSizeX;
+		float crd_min_y = ((float)gridY)*(unitSizeY+1f/80f);
+		float crd_max_x = crd_min_x+unitSizeX;
+		float crd_max_y = crd_min_y+unitSizeY;
 		List<CoffeeVertex> verts = out.getGameModel().getVertices();
 		{
 			//Face 1

@@ -110,7 +110,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	public boolean getMouseEvents(){return true;}
 	@Override
 	public void getCollisionNotification(String body1, String body2){
-		scene.handleCollisions(body1, body2);
+		if(scene!=null) scene.handleCollisions(body1, body2);
 	}
 	@Override
 	public void onGlfwQuit(){

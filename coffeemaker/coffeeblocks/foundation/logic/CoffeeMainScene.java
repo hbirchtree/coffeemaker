@@ -9,10 +9,8 @@ import org.lwjgl.util.vector.Vector3f;
 import coffeeblocks.foundation.CoffeeSceneManager;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
-import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.CoffeeAnimator;
-import coffeeblocks.opengl.components.CoffeeText;
 
 public class CoffeeMainScene extends CoffeeSceneTemplate {
 	
@@ -109,23 +107,21 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 	}
 	
-
-	private CoffeeText text = null;
-	
 	@Override protected void setupPlayer() {
 		super.setupPlayer();
 		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
-	
 
-		InstantiableObject letter = getScene().getInstantiable("1.letter");
-		text = new CoffeeText(letter);
+		//Vi initaliserer tekst-objektet vårt
+		initText(getScene().getInstantiable("1.letter"));
+		//Vi skriver litt tekst
+		CoffeeTextStruct testStruct = new CoffeeTextStruct();
 		testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		testStruct.getRotation().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getRotation());
-		writeText('M');
-		writeText('E');
-		writeText('H');
-		testStruct.updateObjects();
+		writeSentence(testStruct,"Hello!");
+		testStruct.getScale().setValue(new Vector3f(0.2f,0.2f,0.2f));
+		sentences.add(testStruct);
+		System.out.println(sentences);
 		
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W,false);
@@ -143,8 +139,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		super.tickPlayer();
 		if(!isReady())
 			setupPlayer();
-		
-		testStruct.updateOffsets();
 		
 		//Spillervariabler
 		if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP)&&
@@ -178,17 +172,20 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_JUMP,false);
 		else
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_JUMP,true);
-		
+
 		characters.stream().forEach(e -> {
 			e.onTick();
 		});
-		
 
-		for(GameObject object : new ArrayList<>(getScene().getInstanceList()))
+		new ArrayList<>(getScene().getInstanceList()).stream().sequential().forEach(object -> {
 			if(object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)!=null&&
-			clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
+					clock>=object.getGameData().getTimerValue(PROPERTY_TIMER_EXPIRY)){
 				getScene().deleteInstance(object.getObjectId());
 			}
+			if(object.getGameData().getBoolValue(PROPERTY_INSTANCE_DELETEME)!=null){
+				getScene().deleteInstance(object.getObjectId());
+			}
+		});
 	}
 	@Override public void handleKeyPress(int key) {
 		super.handleKeyPress(key);
@@ -324,57 +321,11 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.ALIVE.toInt());
 	}
 	
-	CoffeeTextStruct testStruct = new CoffeeTextStruct();
-	private void writeText(char lch){
-		GameObject test = text.createLetter(lch);
-		getScene().addInstance(test);
-		testStruct.addObject(test);
-	}
-	
 	//Ansvarlig for å inneholde informasjonen under kjøretid. Objektene opprettes og settes til riktige verdier før dette.
 	private interface GameCharacter {
 		public void onTick();
 		public void handleCollision(String body);
 		public String getIdentifier();
-	}
-	
-	private class CoffeeTextStruct {
-		private Vector3Container targetPos = new Vector3Container();
-		private Vector3Container targetRot = new Vector3Container();
-		public float textSize = 0.5f;
-		public float textSpacing = 1.5f;
-		private Vector3Container targetScl = new Vector3Container(textSize,textSize,textSize);
-		private List<GameObject> objects = new ArrayList<>();
-		public void addObject(GameObject obj){
-			obj.getGameModel().getPosition().bindValue(targetPos);
-			obj.getGameModel().getRotation().bindValue(targetRot);
-			obj.getGameModel().getScale().bindValue(targetScl);
-			objects.add(obj);
-		}
-		public void updateOffsets(){
-			Vector3f base = getScene().getCamera().getCameraRightVec(textSize);
-			float offset = -(float)objects.size()/2;
-			for(int i=0;i<objects.size();i++){
-				objects.get(i).getGameModel().getPosition().setValueOffset(VectorTools.vectorMul(base, i*textSpacing+offset));
-			}
-		}
-		public void updateObjects(){
-			//Her kan vi nyttegjøre oss av Java Streams med arbeidstråder! Wee!
-			objects.parallelStream().forEach(obj ->{
-				obj.getGameModel().getPosition().bindValue(targetPos);
-				obj.getGameModel().getRotation().bindValue(targetRot);
-				obj.getGameModel().getScale().bindValue(targetScl);
-			});
-		}
-		public Vector3Container getPosition(){
-			return targetPos;
-		}
-		public Vector3Container getRotation(){
-			return targetRot;
-		}
-		public Vector3Container getScale(){
-			return targetScl;
-		}
 	}
 	
 	private class EnemyPursuer implements GameCharacter{

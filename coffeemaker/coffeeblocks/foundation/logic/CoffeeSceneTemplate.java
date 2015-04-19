@@ -1,5 +1,8 @@
 package coffeeblocks.foundation.logic;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -7,8 +10,10 @@ import coffeeblocks.foundation.CoffeeGameObjectManager;
 import coffeeblocks.foundation.CoffeeSceneManager;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.GameObject;
+import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.metaobjects.Vector3Container;
 import coffeeblocks.opengl.CoffeeAnimator;
+import coffeeblocks.opengl.components.CoffeeText;
 
 public abstract class CoffeeSceneTemplate{
 	public CoffeeSceneTemplate(CoffeeSceneManager manager,CoffeeAnimator animator){
@@ -40,6 +45,7 @@ public abstract class CoffeeSceneTemplate{
 	protected static final String PROPERTY_VECTOR_SPAWNPOSITION = "spawn-position";
 	protected static final String OBJECT_ID_OVERLAY = "0.overlay";
 	protected static final String OBJECT_ID_PLAYER = "player";
+	protected static final String PROPERTY_INSTANCE_DELETEME = "delete-me";
 	
 	abstract public String getSceneId();
 	public void handleMouseMove(double x, double y){
@@ -104,6 +110,10 @@ public abstract class CoffeeSceneTemplate{
 	protected void tickPlayer(){
 		if(!isReady())
 			setupPlayer();
+		
+		//Vi oppdaterer tekstens posisjon med arbeidstråder
+		sentences.stream().forEach(t -> t.updateOffsets());
+		
 		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().setValueOffset(getScene().getCamera().getCameraForwardVec(0.5f));
 		if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&
 				getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)!=0)
@@ -192,5 +202,67 @@ public abstract class CoffeeSceneTemplate{
 			getAnyObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(-1,-1,0));
 		else
 			getAnyObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(0,-1,0));
+	}
+	
+
+	protected class CoffeeTextStruct {
+		private Vector3Container targetPos = new Vector3Container();
+		private Vector3Container targetRot = new Vector3Container();
+		public float textSpacing = 1.5f;
+		private Vector3Container targetScl = new Vector3Container(1,1,1);
+		private List<GameObject> objects = new ArrayList<>();
+		public void addObject(GameObject obj){
+			obj.getGameModel().getPosition().bindValue(targetPos);
+			obj.getGameModel().getRotation().bindValue(targetRot);
+			obj.getGameModel().getScale().bindValue(targetScl);
+			objects.add(obj);
+		}
+		public void updateOffsets(){
+			Vector3f base = getScene().getCamera().getCameraRightVec(targetScl.getValue().x);
+			float offset = -(float)objects.size()/2;
+			for(int i=0;i<objects.size();i++){
+				objects.get(i).getGameModel().getPosition().setValueOffset(VectorTools.vectorMul(base, i*textSpacing+offset));
+			}
+		}
+		public void updateObjects(){
+			//Her kan vi nyttegjøre oss av Java Streams med arbeidstråder! Wee!
+			objects.parallelStream().forEach(obj ->{
+				obj.getGameModel().getPosition().bindValue(targetPos);
+				obj.getGameModel().getRotation().bindValue(targetRot);
+				obj.getGameModel().getScale().bindValue(targetScl);
+			});
+		}
+		public Vector3Container getPosition(){
+			return targetPos;
+		}
+		public Vector3Container getRotation(){
+			return targetRot;
+		}
+		public Vector3Container getScale(){
+			return targetScl;
+		}
+		public void removeAll(){
+			objects.parallelStream().forEach(o -> o.getGameData().setBoolValue(PROPERTY_INSTANCE_DELETEME,true));
+			objects.clear();
+		}
+	}
+	
+	private CoffeeText text = null;
+	protected List<CoffeeTextStruct> sentences = new ArrayList<>();
+	protected void initText(InstantiableObject source){
+		text = new CoffeeText(source);
+	}
+	protected void writeLetter(CoffeeTextStruct textTarget,char lch){
+//		if(text==null)
+//			System.err.println("Text not initialized!");
+//		GameObject test = text.createLetter(lch);
+//		getScene().addInstance(test);
+//		textTarget.addObject(test);
+//		System.out.println("Added "+lch);
+	}
+	protected void writeSentence(CoffeeTextStruct textTarget,String sentence){
+		for(char l : sentence.toCharArray())
+			writeLetter(textTarget,l);
+		textTarget.updateObjects();
 	}
 }
