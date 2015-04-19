@@ -124,12 +124,12 @@ public abstract class CoffeeSceneTemplate{
 	}
 	
 	
-	public void playerDie(){
+	protected void playerDie(){
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, 0l);
 		animator.addTransition(getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject(), 1f, CoffeeAnimator.TransitionType.ValueLinear, 300f);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, clock+1000);
 	}
-	public void playerRespawn(){
+	protected void playerRespawn(){
 		getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_POS,getObject(OBJECT_ID_PLAYER).getGameData().getVectorValue(PROPERTY_VECTOR_SPAWNPOSITION).getValue());
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
@@ -150,11 +150,14 @@ public abstract class CoffeeSceneTemplate{
 					return opt;
 		return null;
 	}
-	public CoffeeGameObjectManager getScene(){
+	protected CoffeeGameObjectManager getScene(){
 		return manager.getScene(getSceneId());
 	}
 	protected GameObject getObject(String object){
 		return getScene().getObject(object);
+	}
+	protected GameObject getAnyObject(String object){
+		return getScene().getAnyObject(object);
 	}
 	protected boolean performRaytest(String object,Vector3f startPoint){ //Skyter fra startPoint til objektet
 		return getScene().getPhysicsSystem().performRaytest(startPoint,object);
@@ -184,10 +187,10 @@ public abstract class CoffeeSceneTemplate{
 		return performRaytest(to,fromO.getGameModel().getPosition().getValue());
 	}
 	protected void billboard(String objectId,boolean spherical){
-		getObject(objectId).getGameModel().getRotation().bindValue(getScene().getCamera().getCameraRotation());
+		getAnyObject(objectId).getGameModel().getRotation().bindValue(getScene().getCamera().getCameraRotation());
 		if(spherical)
-			getObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(-1,-1,0));
+			getAnyObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(-1,-1,0));
 		else
-			getObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(0,-1,0));
+			getAnyObject(objectId).getGameModel().getRotation().setValueMultiplier(new Vector3f(0,-1,0));
 	}
 }

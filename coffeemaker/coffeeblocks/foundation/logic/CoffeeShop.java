@@ -71,11 +71,11 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	
 	@Override
 	public void onGlfwFrameTick(double currentTime){
-		scene.onGlfwFrameTick(currentTime);
+		if(scene!=null) scene.onGlfwFrameTick(currentTime);
 	}
 	@Override
 	public void onGlfwFrameTick(float tickTime){
-		scene.onGlfwFrameTick(tickTime);
+		if(scene!=null) scene.onGlfwFrameTick(tickTime);
 	}
 	@Override
 	public List<Integer> getRegisteredKeys() {
@@ -83,19 +83,19 @@ public class CoffeeShop extends CoffeeLogicLoop{
 	}
 	@Override
 	public void coffeeReceiveKeyRelease(int key){
-		scene.handleKeyRelease(key);
+		if(scene!=null) scene.handleKeyRelease(key);
 	}
 	@Override
 	public void coffeeReceiveMousePress(int btn){
-		scene.handleMousePress(btn);
+		if(scene!=null) scene.handleMousePress(btn);
 	}
 	@Override
 	public void coffeeReceiveMouseRelease(int btn){
-		scene.handleMouseRelease(btn);
+		if(scene!=null) scene.handleMouseRelease(btn);
 	}
 	@Override
 	public void coffeeReceiveMouseMove(double x,double y){
-		scene.handleMouseMove(x, y);
+		if(scene!=null) scene.handleMouseMove(x, y);
 	}
 	@Override
 	public void coffeeReceiveKeyPress(int key){
@@ -104,7 +104,7 @@ public class CoffeeShop extends CoffeeLogicLoop{
 			applyScene(mainScene);
 			return;
 		}
-		scene.handleKeyPress(key);
+		if(scene!=null) scene.handleKeyPress(key);
 	}
 	@Override
 	public boolean getMouseEvents(){return true;}

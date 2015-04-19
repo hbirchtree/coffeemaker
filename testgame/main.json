@@ -2,6 +2,7 @@
 	"font": {
 		"source": "models/elements/font.png",
 		"map": 0,
+		"mesh": "models/letter-test.obj",
 		"tile-size": 64,
 		"vshader": "shaders/vsh.txt",
 		"fshader": "shaders/fsh_nolight.txt"
@@ -130,13 +131,13 @@
 			"scale": [1,1,1]
 		},
 		{
-			"object-id": "0.test-letter",
+			"instantiable": true,
+			"object-id": "1.letter",
 			"model": "models/letter-test.obj",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh_nolight.txt",
-			"position": [93.575,83.24,-138.666],
-			"rotation": [0,0,0],
-			"scale": [1,1,1]
+			"depth-test": false,
+			"scale": [0.5,0.5,0.5]
 		},
 		{
 			"object-id": "2.water",

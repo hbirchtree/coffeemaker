@@ -46,7 +46,10 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 		objectDeactivation = model.getObjectDeactivation();
 		
 		objectBaked = false;
+		depthTest = model.isDepthTest();
 	}
+	
+	private boolean depthTest = true;
 
 	public synchronized void tick(){
 		super.tick();
@@ -194,5 +197,11 @@ public class ModelContainer extends PhysicsObject implements CoffeeRenderableObj
 	}
 	public void setTrackPhysics(boolean trackPhysics){
 		this.trackPhysics = trackPhysics;
+	}
+	public boolean isDepthTest() {
+		return depthTest;
+	}
+	public void setDepthTest(boolean depthTest) {
+		this.depthTest = depthTest;
 	}
 }

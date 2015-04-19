@@ -15,7 +15,6 @@ import coffeeblocks.metaobjects.InstantiableObject;
 import coffeeblocks.foundation.physics.PhysicsObject;
 import coffeeblocks.openal.SoundObject;
 import coffeeblocks.opengl.components.CoffeeCamera;
-import coffeeblocks.opengl.components.CoffeeText;
 import coffeeblocks.opengl.components.LimeLight;
 
 import org.lwjgl.util.vector.Vector3f;
@@ -33,23 +32,22 @@ public class CoffeeJsonParsing {
 				if(key.split(":").length<2)
 					continue;
 				parseSceneObject(key.split(":")[1],map,sceneManager,filepath);
-			}else if(key.equals("font")){
-				CoffeeText defaultText = new CoffeeText();
-				Map<String,Object> map = ((HashMap<String,Object>)item);
-				for(String fkey : map.keySet()){
-					if(fkey.equals("source"))
-						defaultText.getMaterial().setDiffuseTexture(filepath+(String)map.get(fkey));
-					else if(fkey.equals("tile-size"))
-						defaultText.setTileSize((Integer)map.get(fkey));
-					else if(fkey.equals("vshader"))
-						defaultText.setVertShader(filepath+(String)map.get(fkey));
-					else if(fkey.equals("fshader"))
-						defaultText.setFragShader(filepath+(String)map.get(fkey));
-				}
-				defaultText.getPosition().setValue(new Vector3f(0,25,0));
-				defaultText.getScale().setValue(new Vector3f(4,4,4));
-				sceneManager.setTextObject(defaultText);
 			}
+//			else if(key.equals("font")){
+//				Map<String,Object> map = ((HashMap<String,Object>)item);
+//				CoffeeText defaultText = new CoffeeText(ModelLoader.loadModel(filepath+(String)map.get("mesh")));
+//				for(String fkey : map.keySet()){
+//					if(fkey.equals("source"))
+//						defaultText.getMaterial().setDiffuseTexture(filepath+(String)map.get(fkey));
+//					else if(fkey.equals("tile-size"))
+//						defaultText.setTileSize((Integer)map.get(fkey));
+//				}
+//				if(map.containsKey("vshader")&&map.containsKey("fshader"))
+//					defaultText.setShaderFiles(filepath+(String)map.get("vshader"),filepath+(String)map.get("fshader"));
+//				defaultText.getPosition().setValue(new Vector3f(93.575f,83.24f,-138.666f));
+//				defaultText.getScale().setValue(new Vector3f(4,4,4));
+//				sceneManager.setTextObject(defaultText);
+//			}
 		}
 	}
 	@SuppressWarnings("unchecked")
@@ -156,6 +154,8 @@ public class CoffeeJsonParsing {
 				gobj.setInstancedObject((Boolean)obj);
 			}else if(key.equals("stream-draw")&&obj instanceof Boolean){ //Bestemmer om objektet kan animeres
 				gobj.getGameModel().getAnimationContainer().setStaticDraw(!(Boolean)obj);
+			}else if(key.equals("depth-test")&&obj instanceof Boolean){ //Bestemmer om objektet kan animeres
+				gobj.getGameModel().setDepthTest((Boolean)obj);
 			}else if(key.equals("notify-force")&&obj instanceof Boolean){ //Om kollisjonssystemet skal rapportere kraften påført objektet
 				gobj.getGameModel().setNotifyForce((Boolean)obj);
 			}else if(key.equals("scale")&&obj instanceof ArrayList){ //3D-modellens skala

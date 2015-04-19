@@ -6,7 +6,6 @@ import java.util.Map;
 
 import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
 import coffeeblocks.opengl.CoffeeRenderer;
-import coffeeblocks.opengl.components.CoffeeText;
 
 public class CoffeeSceneManager implements CoffeeRendererListener{
 	//CoffeeGameObjectManager inneholder en scene, fullstendig med objekter, kamera og lys.
@@ -14,19 +13,11 @@ public class CoffeeSceneManager implements CoffeeRendererListener{
 	private boolean sceneToBeApplied = false;
 	private String sceneApply = "";
 	
-	private CoffeeText textObject = null;
-	public void setTextObject(CoffeeText textObject){
-		this.textObject = textObject;
-		if(renderer!=null)
-			renderer.setDefaultTextObject(textObject);
-	}
 	private CoffeeRenderer renderer = null;
 	public void setRenderer(CoffeeRenderer renderer){
 		if(renderer==null)
 			throw new IllegalArgumentException("Cannot use null renderer!");
 		this.renderer = renderer;
-		if(textObject!=null)
-			renderer.setDefaultTextObject(textObject);
 	}
 	public CoffeeRenderer getRenderer(){
 		//OBS OBS! Ikke misbruk dette, takk

@@ -4,9 +4,12 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALContext;
 import org.lwjgl.opengl.*;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import coffeeblocks.foundation.CoffeeGameObjectManager;
+import coffeeblocks.foundation.models.ModelContainer;
+import coffeeblocks.foundation.models.ModelLoader;
 import coffeeblocks.general.VectorTools;
 import coffeeblocks.interfaces.listeners.CoffeeGlfwInputListener;
 import coffeeblocks.interfaces.listeners.CoffeeRendererListener;
@@ -56,14 +59,6 @@ public class CoffeeRenderer implements Runnable {
 	}
 	public void setLights(List<LimeLight> lights) {
 		this.lights = lights;
-	}
-	
-	private CoffeeText defaultTextObject = null;
-	public CoffeeText createTextObject(){
-		return new CoffeeText(defaultTextObject);
-	}
-	public void setDefaultTextObject(CoffeeText obj){
-		this.defaultTextObject = obj;
 	}
 
 	private double fpsTimer = 0;
@@ -374,11 +369,7 @@ public class CoffeeRenderer implements Runnable {
 						ShaderHelper.loadTextures(object);
 						ShaderHelper.setupShader(object);
 					}
-				
 				loopRenderObjects(); //Rendring av objektene, enten til et framebuffer eller direkte
-				if(defaultTextObject!=null){
-					renderObject(defaultTextObject);
-				}
 			}
 //			framebuffer.renderFramebuffer(windowres, lights);
 			
@@ -423,6 +414,9 @@ public class CoffeeRenderer implements Runnable {
 			ShaderHelper.compileShaders(object);
 		}
 		GL20.glUseProgram(object.getShader().getProgramId());
+		
+		if(!object.isDepthTest())
+			glDisable(GL_DEPTH_TEST);
 
 		//Animasjon ved å endre modellen fra en annen tråd
 		if(!object.isStaticDraw()){
@@ -484,6 +478,9 @@ public class CoffeeRenderer implements Runnable {
 		GL13.glActiveTexture(GL13.GL_TEXTURE4);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		GL20.glUseProgram(0);
+		
+		if(!object.isDepthTest())
+			glEnable(GL_DEPTH_TEST);
 	}
 	
 	private List<CoffeeRendererListener> listeners = new ArrayList<>();

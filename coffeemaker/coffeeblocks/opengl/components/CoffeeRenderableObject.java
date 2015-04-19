@@ -29,5 +29,6 @@ public interface CoffeeRenderableObject {
 	
 	public void cleanupObject();
 	public boolean isTextureLoaded();
+	public boolean isDepthTest();
 	public void setTextureLoaded(boolean textureLoaded);
 }

@@ -18,7 +18,9 @@ public class CoffeeAnimationContainer {
 	public CoffeeAnimationContainer(){}
 	public CoffeeAnimationContainer(CoffeeAnimationContainer animationContainer) {
 		this.staticDraw = animationContainer.isStaticallyDrawn();
-		this.base = animationContainer.getBaseMesh();
+		List<CoffeeVertex> m_base = new ArrayList<>();
+		animationContainer.getBaseMesh().stream().forEach(v -> m_base.add(new CoffeeVertex(v)));
+		this.base = m_base;
 		this.vboHandle = 0; //Vi vil ikke arve denne, animasjonene ville blitt de samme
 		this.states = animationContainer.states;
 	}
