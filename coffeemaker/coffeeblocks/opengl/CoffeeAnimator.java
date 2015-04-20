@@ -79,6 +79,7 @@ public class CoffeeAnimator {
 			transitional.transitionRestTime -= tickTime*1000f;
 			if(transitional.transitionRestTime<=0){
 				transitions.remove(transitional);
+				
 				break;
 			}
 			switch(transitional.animationType){
@@ -89,7 +90,8 @@ public class CoffeeAnimator {
 			case ValueIExpo:
 				break;
 			case ValueLinear:
-				transitional.increaseValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
+				System.out.println(transitional.transitionTime-transitional.transitionRestTime);
+				transitional.setValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
 				break;
 			default:
 				break;

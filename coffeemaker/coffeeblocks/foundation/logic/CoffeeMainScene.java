@@ -131,7 +131,13 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		GameObject testO = test.createSprite("testgame/models/elements/heart.png");
 		testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		billboardContainer(testO.getGameModel().getRotation(),true);
-		testO.getGameModel().getScale().setValue(new Vector3f(0.2f,0.2f,0.2f));
+//		testO.getGameModel().getScale().setValue(new Vector3f(1f,0.2f,0.2f));
+		testO.getGameModel().getScale().setOffsetCallback(new VectorOffsetCallback(){
+			@Override
+			public Vector3f getOffset() {
+				return getScene().getCamera().getCameraRightVec(1f);
+			}
+		});
 		testO.getGameModel().getPosition().setOffsetCallback(new VectorOffsetCallback(){
 			@Override
 			public Vector3f getOffset() {

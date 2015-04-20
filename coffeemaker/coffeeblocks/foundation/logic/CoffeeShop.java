@@ -39,6 +39,12 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		inputKeys.add(GLFW.GLFW_KEY_S);
 		inputKeys.add(GLFW.GLFW_KEY_D);
 		inputKeys.add(GLFW.GLFW_KEY_F);
+		inputKeys.add(GLFW.GLFW_KEY_J);
+		inputKeys.add(GLFW.GLFW_KEY_K);
+		inputKeys.add(GLFW.GLFW_KEY_E);
+		inputKeys.add(GLFW.GLFW_KEY_Q);
+		inputKeys.add(GLFW.GLFW_KEY_ENTER);
+		inputKeys.add(GLFW.GLFW_KEY_BACKSPACE);
 		inputKeys.add(GLFW.GLFW_KEY_KP_0);
 		inputKeys.add(GLFW.GLFW_KEY_KP_1);
 		inputKeys.add(GLFW.GLFW_KEY_KP_8);

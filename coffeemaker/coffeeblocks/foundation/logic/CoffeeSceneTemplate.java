@@ -27,7 +27,7 @@ public abstract class CoffeeSceneTemplate{
 	}
 	protected CoffeeSceneManager manager = null;
 	protected CoffeeAnimator animator = null;
-	protected Long clock = null;
+	protected long clock = 0;
 	
 	public void updateClock(){
 		clock = System.currentTimeMillis();
