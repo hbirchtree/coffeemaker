@@ -45,6 +45,7 @@ public class ShaderHelper {
 					"materialShininess",
 					"materialTransparencyValue",
 					"materialSpecularColor",
+					"colorMul",
 					
 					//Belysning					
 					"light.position",

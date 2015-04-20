@@ -306,6 +306,8 @@ public class CoffeeRenderer implements Runnable {
 				framecount = 0;
 				triCount = 0;
 				fpsTimer = glfwGetTime()+1;
+
+				glClearColor(clearColor.x,clearColor.y,clearColor.z,clearColor.w); //Vi sniker denne inn her for å unngå at den oppdateres for hvert bilde på skjermen
 			}
 		}
 	}
@@ -346,7 +348,7 @@ public class CoffeeRenderer implements Runnable {
 			tick = glfwGetTime(); //Måler mengden tid det tar for å rendre objektene
 
 			//Under testing senket dette prosessorbruk i forhold til vanlige for-looper
-			listeners.stream().forEach(listener -> {
+			listeners.parallelStream().forEach(listener -> {
 				//Vi varsler lyttere om at et nytt tikk har skjedd
 				listener.onGlfwFrameTick();
 				//Vi vil ha oversikt over spilltiden i de andre trådene
@@ -446,6 +448,7 @@ public class CoffeeRenderer implements Runnable {
 		object.getShader().setUniform("materialShininess", object.getMaterial().getShininess());
 		object.getShader().setUniform("materialSpecularColor", object.getMaterial().getSpecularColor());
 		object.getShader().setUniform("materialTransparencyValue", object.getMaterial().getTransparency());
+		object.getShader().setUniform("colorMul", object.getMaterial().getColorMultiplier());
 		
 		object.getShader().setUniform("fogParams.fDensity", fogDensity);
 		object.getShader().setUniform("fogParams.fColor", getClearColor());

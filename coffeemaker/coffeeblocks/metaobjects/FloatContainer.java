@@ -25,9 +25,11 @@ public class FloatContainer {
 		return (result+valueOffset)*valueMultiplier;
 	}
 	public void setValue(float value){
+		unbindValue();
 		this.value = value;
 	}
 	public void increaseValue(float value){
+		unbindValue();
 		this.value+=value;
 	}
 

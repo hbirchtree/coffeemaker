@@ -28,6 +28,11 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	protected static final String PROPERTY_DUBS_SPEEDLIMIT = "speed-limit";
 	protected static final String PROPERTY_INT_TEXTURE = "texture";
 	protected static final String PROPERTY_INT_STATE = "state";
+	
+	protected static final String PROPERTY_INT_HEALTH = "health";
+	protected static final String PROPERTY_INT_HEALTH_MAX = "health.max";
+	protected static final String PROPERTY_DUBS_HEALTH_MAX_SCALE = "health.max.scale";
+	
 	protected static final String PROPERTY_TIMER_SWITCH = "switch";
 	protected static final String PROPERTY_TIMER_JUMP_TO = "jump-to";
 	protected static final String PROPERTY_TIMER_EXPIRY = "expire-time";
@@ -49,7 +54,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		}
 	}
 	
-	private static final boolean GAME_BOOL_FALLDAMAGE = false;
+	private static final boolean GAME_BOOL_FALLDAMAGE = true;
 	private static final boolean GAME_BOOL_GODMODE = false;
 	
 	private List<GameCharacter> characters = new ArrayList<>();
@@ -69,24 +74,22 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		
 		getScene().getInstantiableList().stream().filter(e -> e.getObjectPreseedName().startsWith("monster")).forEach(e -> {
 			e.getGameData().setBoolValue(EnemyPursuer.MONSTER_PROP_BOOL_STATE, true);
+			e.getGameData().setIntValue(PROPERTY_INT_HEALTH, 1600);
+			e.getGameData().setIntValue(PROPERTY_INT_HEALTH_MAX, 1600);
+			e.getGameData().setDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE, 2.0);
 			e.getGameData().setTimerValue(EnemyPursuer.MONSTER_PROP_TIMER_DEATH, 0l);
 			e.getGameData().setStringValue(EnemyPursuer.MONSTER_PROP_STRING_TRACKING, null);
 			e.getGameData().setVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME, new Vector3Container());
 		});
 		
-		getScene().addInstance(getScene().getInstantiable("monster.golem").createInstance("monster.golem.1", false));
-		{
-			GameObject instance = getScene().getInstantiable("monster.golem").createInstance("monster.golem.2", false);
-			instance.getGameModel().getPosition().setValue(new Vector3f(0,40,0));
-			getScene().addInstance(instance);
+		for(int i=0;i<4;i++){
+			String id = "monster.golem."+i;
+			getScene().addInstance(getScene().getInstantiable("monster.golem").createInstance(id, false));
+			getAnyObject(id).getGameModel().getPosition().getValue().y = 30 + i*10;
+			getScene().getInstancedObject(id).getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
+					getScene().getInstancedObject(id).getGameModel().getPosition().getValue());
+			characters.add(new EnemyPursuer(id,OBJECT_ID_PLAYER));
 		}
-		getScene().getInstancedObject("monster.golem.1").getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
-				getScene().getInstancedObject("monster.golem.1").getGameModel().getPosition().getValue());
-		getScene().getInstancedObject("monster.golem.2").getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
-				getScene().getInstancedObject("monster.golem.2").getGameModel().getPosition().getValue());
-		
-		characters.add(new EnemyPursuer("monster.golem.1",OBJECT_ID_PLAYER));
-		characters.add(new EnemyPursuer("monster.golem.2",OBJECT_ID_PLAYER));
 	}
 	@Override protected void tickSpecifics() {
 		super.tickSpecifics();
@@ -109,42 +112,40 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	
 	@Override protected void setupPlayer() {
 		super.setupPlayer();
+		activateScreenOverlay();
 		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 
 		//Vi skriver litt tekst
 		//Vi bruker en callback for å spare tid ved tick. Veldig nyttig!
-		CoffeeTextStruct testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
-			@Override
-			public Vector3f getOffset() {
-				return getScene().getCamera().getCameraRightVec(1f);
-			}
-		});
-		testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
-		testStruct.getPosition().setValueOffset(new Vector3f(0,1.5f,0));
-		billboardContainer(testStruct.getRotation(),true);
-		writeSentence(testStruct,"Navi testing long strings?");
-		testStruct.getScale().setValue(new Vector3f(0.15f,0.15f,0.15f));
-		sentences.put("name",testStruct);
-		
-		CoffeeSprite test = new CoffeeSprite(getScene().getInstantiable("0.sprite"));
-		GameObject testO = test.createSprite("testgame/models/elements/heart.png");
-		testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
-		billboardContainer(testO.getGameModel().getRotation(),true);
-//		testO.getGameModel().getScale().setValue(new Vector3f(1f,0.2f,0.2f));
-		testO.getGameModel().getScale().setOffsetCallback(new VectorOffsetCallback(){
-			@Override
-			public Vector3f getOffset() {
-				return getScene().getCamera().getCameraRightVec(1f);
-			}
-		});
-		testO.getGameModel().getPosition().setOffsetCallback(new VectorOffsetCallback(){
-			@Override
-			public Vector3f getOffset() {
-				return Vector3f.add(getScene().getCamera().getCameraRightVec(-2f), getScene().getCamera().getUp(), null);
-			}
-		});
-		getScene().addInstance(testO);
+		{
+			CoffeeTextStruct testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
+				@Override
+				public Vector3f getOffset() {
+					return getScene().getCamera().getCameraRightVec(1f);
+				}
+			});
+			testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+			testStruct.getPosition().setValueOffset(new Vector3f(0,1.5f,0));
+			billboardContainer(testStruct.getRotation(),true);
+			writeSentence(testStruct,"Bruk WASD for å bevege deg");
+			testStruct.getScale().setValue(new Vector3f(0.13f,0.13f,0.13f));
+			sentences.put("help",testStruct);
+		}
+		{
+			CoffeeTextStruct testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
+				@Override
+				public Vector3f getOffset() {
+					return getScene().getCamera().getCameraRightVec(0.5f);
+				}
+			});
+			testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+			testStruct.getPosition().setValueOffset(new Vector3f(0,1.3f,0));
+			billboardContainer(testStruct.getRotation(),true);
+			writeSentence(testStruct,"Skyt monstrene!");
+			testStruct.getScale().setValue(new Vector3f(0.1f,0.1f,0.1f));
+			sentences.put("help.shoot",testStruct);
+		}
 		
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W,false);
@@ -154,15 +155,48 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_JUMP,false);
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,true);
 		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.ALIVE.toInt());
+		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_HEALTH,100);
+		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_HEALTH_MAX,100);
+		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE,2.0);
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,24d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_SPEEDLIMIT,25d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
-		
+
+		CoffeeSprite test = new CoffeeSprite(getScene().getInstantiable("0.sprite"));
+		{
+			GameObject testO = test.createSprite("hp","testgame/models/elements/healthbar.png");
+			object_id_healthbar = testO.getObjectId();
+			testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+			billboardContainer(testO.getGameModel().getRotation(),false);
+			float _health_scale = getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE).floatValue();
+			testO.getGameModel().getScale().setValue(new Vector3f(_health_scale,0.2f,_health_scale));
+			testO.getGameModel().getRotation().setValueOffset(new Vector3f(0,-15,0));
+			testO.getGameModel().getPosition().setOffsetCallback(new VectorOffsetCallback(){
+				@Override
+				public Vector3f getOffset() {
+					return Vector3f.add(getScene().getCamera().getCameraRightVec(-2f), getScene().getCamera().getCameraUpVec(1f), null);
+				}
+			});
+			getScene().addInstance(testO);
+		}
+		{
+			GameObject testO = test.createSprite("heart","testgame/models/elements/heart.png");
+			testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+			billboardContainer(testO.getGameModel().getRotation(),false);
+			testO.getGameModel().getScale().setValue(new Vector3f(0.3f,0.3f,0.3f));
+			testO.getGameModel().getRotation().setValueOffset(new Vector3f(0,-10,0));
+			testO.getGameModel().getPosition().setOffsetCallback(new VectorOffsetCallback(){
+				@Override
+				public Vector3f getOffset() {
+					return Vector3f.add(getScene().getCamera().getCameraRightVec(-4.1f),getScene().getCamera().getCameraUpVec(0.9f), null);
+				}
+			});
+			getScene().addInstance(testO);
+		}
 	}
+	private String object_id_healthbar = null;
 	@Override protected void tickPlayer() {
 		super.tickPlayer();
-//		if(!isReady())
-//			setupPlayer();
 		
 		//Spillervariabler
 		if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP)&&
@@ -179,10 +213,12 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			else
 				getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("run.2", 0.01f);
 		}else if(!getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_JUMP)&&
-				getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP))
+				getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_JUMP)){
 			//Uten dette vil spilleren gli overalt, hvilket er ekstremt plagsomt.
 			//Bi-effekten er at spilleren har en stor massetreghet som om den var uendelig tung, og kan derfor ikke dyttes av andre objekter.
-			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null); 
+//			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
+			
+		}
 		if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_JUMP)) //Hopping prioriteres over gå-animasjonen
 			getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("jump", 0.01f);
 		getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().morphToState();
@@ -215,6 +251,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	}
 	@Override public void handleKeyPress(int key) {
 		super.handleKeyPress(key);
+		sentences.get("help").removeAll();
+		sentences.get("help.shoot").removeAll();
 		switch(key){
 		case GLFW.GLFW_KEY_W:{
 			if(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().length()>getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_SPEEDLIMIT).floatValue()||
@@ -257,8 +295,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 					!getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_CAN_MOVE))
 				return;
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_IMPULSE,new Vector3f(0,0.5f,0));
-			sentences.get("name").removeAll();
-			writeSentence(sentences.get("name"),"!!!");
 			return;
 		}
 		}
@@ -271,23 +307,60 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 				multiplier*getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_WALK_PACE).floatValue());
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_ACCEL,accel);
 	}
+	public void playerSeizeMovement(PlayerMovementDirection direction){
+		Vector3f vec = null;
+		switch(direction){
+		case East:
+			vec = getScene().getCamera().getCameraRightVec(1f);
+			break;
+		case North:
+			vec = getScene().getCamera().getCameraForwardVec(1f);
+			break;
+		case South:
+			vec = getScene().getCamera().getCameraForwardVec(-1f);
+			break;
+		case West:
+			vec = getScene().getCamera().getCameraRightVec(-1f);
+			break;
+		}		
+		vec.y = 0;
+		vec.normalise();
+		float scalar = getObject(OBJECT_ID_PLAYER).getGameModel().getPhysicalMass()*Vector3f.dot(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity(), vec)*0.5f;
+		vec = VectorTools.vectorMul(vec, scalar);
+		vec.negate();
+		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_IMPULSE,vec);
+	}
+	private enum PlayerMovementDirection{
+		North,South,East,West
+	}
 	@Override public void handleKeyRelease(int key) {
 		switch(key){
 		case GLFW.GLFW_KEY_W:{
+			if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_RUN_W))
+				playerSeizeMovement(PlayerMovementDirection.North);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_W, false);
 			return;
 		}
 		case GLFW.GLFW_KEY_A:{
+			if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_RUN_A))
+				playerSeizeMovement(PlayerMovementDirection.West);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_A, false);
 			return;
 		}
 		case GLFW.GLFW_KEY_S:{
+			if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_RUN_S))
+				playerSeizeMovement(PlayerMovementDirection.South);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_S, false);
 			return;
 		}
 		case GLFW.GLFW_KEY_D:{
+			if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_RUN_D))
+				playerSeizeMovement(PlayerMovementDirection.East);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_D, false);
 			return;
+		}
+		case GLFW.GLFW_KEY_SPACE:{
+			break;
 		}
 		}
 	}
@@ -308,17 +381,23 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		obj.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY, clock+500);
 		getScene().addInstance(obj);
 	}
-	@SuppressWarnings("unused") @Override public void handleCollisions(String body1, String body2) {
+	private static final String DEATH_REASON_FALL_HIGH = "Did you not learn the Prefect way of flight?";
+	private static final String DEATH_REASON_FALL_LOW = "You didn't learn to fly in time!";
+	private static final String DEATH_REASON_BULLET = "Stop hitting yourself to death!";
+	private static final String DEATH_REASON_GOLEM = "YOU DIED.";
+	@Override public void handleCollisions(String body1, String body2) {
 		if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"death")&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
 			if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_LIVE)) //Slik at tiden ikke utvider seg uendelig. Hvis dødstimeren allerede er aktivert vil den ikke sette den på nytt.
 				getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, clock+250);
 		}else if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain")||doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain.walkway")){
 			if(GAME_BOOL_FALLDAMAGE&&Math.abs(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().y)>30)
-				playerDieFull("You didn't learn to fly in time!");
+				playerTakeDamage(DEATH_REASON_FALL_HIGH,-50);
+			else if(GAME_BOOL_FALLDAMAGE&&Math.abs(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().y)>20)
+				playerTakeDamage(DEATH_REASON_FALL_LOW,-40);
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_JUMP, true);
 			getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_JUMP_TO, clock+150);
 		}else if(doTypedBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"bullet.")){
-			playerDie();
+			playerTakeDamage(DEATH_REASON_BULLET,-30);
 		}
 		
 		characters.stream().forEach(e -> {
@@ -331,12 +410,33 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	@Override public void handleMouseRelease(int key) {
 		
 	}
+	public void playerTakeDamage(String reason, int amount){
+		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_HEALTH, getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_HEALTH)+amount);
+		if(getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_HEALTH)<=0)
+			playerDieFull(reason);
+		if(getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_HEALTH)<0)
+			getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_HEALTH, 0);
+		updateHealth();
+	}
+	public void updateHealth(){
+		Vector3f vec = getAnyObject(object_id_healthbar).getGameModel().getScale().getValue();
+		float max_scale = getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE).floatValue();
+		float curr_hlth = getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_HEALTH).floatValue();
+		vec.x = max_scale*curr_hlth/100f;
+		vec.z = max_scale*curr_hlth/100f;
+		Vector3f col = getAnyObject(object_id_healthbar).getGameModel().getMaterial().getColorMultiplier();
+		col.y = curr_hlth/100f;
+		col.z = curr_hlth/100f;
+		col.normalise();
+	}
 	public void playerDie(String reason){
 		playerDieFull("You were killed by "+reason+"!");
 	}
 	public void playerDieFull(String reason){
 		if(GAME_BOOL_GODMODE)
 			return;
+		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,false);
+		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.DEAD.toInt());
 		
 		CoffeeTextStruct testStruct = new CoffeeTextStruct(new Vector3Container.VectorOffsetCallback() {
 			@Override
@@ -347,20 +447,21 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		testStruct.getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 		testStruct.getPosition().setValueOffset(new Vector3f(0,2f,0));
 		billboardContainer(testStruct.getRotation(),true);
-		writeSentence(testStruct,"You died");
+		writeSentence(testStruct,reason);
 		testStruct.getScale().setValue(new Vector3f(0.15f,0.15f,0.15f));
 		sentences.put("death-text",testStruct);
 		
 		super.playerDie();
-		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,false);
-		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.DEAD.toInt());
 	}
 	@Override public void playerRespawn(){
 		super.playerRespawn();
+		writeSentence(sentences.get("help"),"!!!");
 		getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_CAN_MOVE,true);
 		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_STATE,PlayerState.ALIVE.toInt());
 		if(sentences.get("death-text")!=null)
 			sentences.remove("death-text").removeAll();
+		getObject(OBJECT_ID_PLAYER).getGameData().setIntValue(PROPERTY_INT_HEALTH, getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_HEALTH_MAX));
+		updateHealth();
 	}
 	
 	//Ansvarlig for å inneholde informasjonen under kjøretid. Objektene opprettes og settes til riktige verdier før dette.
@@ -388,6 +489,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			return target.getObjectId();
 		}
 		public void onTick(){
+			if(!target.getGameData().getBoolValue(MONSTER_PROP_BOOL_STATE))
+				return;
 			//Monstere får påført en kraft i retning av spilleren dersom de kan se spilleren
 			//Dersom spilleren er innenfor rekkevidde, sett dette som mål
 			if(logic_objectCanSeeOtherInRange(target.getObjectId(),primaryVictim,range)){
@@ -433,12 +536,29 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			}
 			target.getGameModel().getAnimationContainer().morphToState();
 		}
+		public void enemyDie(){
+			target.getGameData().setBoolValue(MONSTER_PROP_BOOL_STATE,false); //Vi setter verdien for monsterets levestatus
+			target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
+			animator.addTransition(target.getGameModel().getMaterial().getTransparencyObject(), 0.0f, CoffeeAnimator.TransitionType.ValueLinear, 500);
+			target.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY,clock+500);
+			playerTakeDamage("... Healed to death? NOOOOOO!!",50);
+		}
+		public void enemyTakeDamage(int amount){
+			target.getGameData().setIntValue(PROPERTY_INT_HEALTH, target.getGameData().getIntValue(PROPERTY_INT_HEALTH)+amount);
+			if(target.getGameData().getIntValue(PROPERTY_INT_HEALTH)<=0)
+				enemyDie();
+			if(target.getGameData().getIntValue(PROPERTY_INT_HEALTH)<0)
+				target.getGameData().setIntValue(PROPERTY_INT_HEALTH, 0);
+		}
 		public void handleCollision(String body){
+			if(!target.getGameData().getBoolValue(MONSTER_PROP_BOOL_STATE))
+				return;
 			if(body.equals(OBJECT_ID_PLAYER)&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
-				playerDie("the rock people");
+				playerTakeDamage(DEATH_REASON_GOLEM,-40);
 			}else if(body.startsWith("bullet.")){
 				this.target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,OBJECT_ID_PLAYER);
 				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
+				enemyTakeDamage(-40);
 				getScene().requestObjectUpdate(this.target.getObjectId(),GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
 			}
 		}

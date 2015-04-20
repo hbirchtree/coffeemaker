@@ -2,6 +2,7 @@
 
 uniform mat4 camera;
 uniform mat4 model;
+uniform vec3 colorMul;
 
 // material settings
 uniform sampler2D materialTex;
@@ -17,7 +18,7 @@ void main() {
     vec4 surfaceColor = texture(materialTex, fragTexCoord);
 
     //diffuse
-    vec3 diffuse = surfaceColor.rgb;
+    vec3 diffuse = surfaceColor.rgb*colorMul;
 
     //linear color (color before gamma correction)
     vec3 linearColor = diffuse;

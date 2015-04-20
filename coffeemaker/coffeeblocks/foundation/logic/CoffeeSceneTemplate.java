@@ -102,12 +102,26 @@ public abstract class CoffeeSceneTemplate{
 		if(!isReady())
 			setupSpecifics();
 	}
+	protected void activateScreenOverlay(){
+		try{
+			getScene().addInstance(getScene().getInstantiable(OBJECT_ID_OVERLAY).createInstance(OBJECT_ID_OVERLAY, false));
+		}catch(NullPointerException e){
+			System.err.println("Could not find screen overlay object! Make sure that object "+OBJECT_ID_OVERLAY+" is instantiable!");
+			System.out.println(getScene().getInstantiableIdList());
+		}
+		billboard(OBJECT_ID_OVERLAY, true);
+		getAnyObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().bindValue(getScene().getCamera().getCameraPos());
+		getAnyObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
+		System.out.println(getAnyObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().getValue());
+		getAnyObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
+			@Override
+			public Vector3f getOffset() {
+				return getScene().getCamera().getCameraForwardVec(0.5f);
+			}
+		});
+	}
 	protected void setupPlayer(){
 		//Skjermoverlegget
-		billboard(OBJECT_ID_OVERLAY, true);
-		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().bindValue(getScene().getCamera().getCameraPos());
-		getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
-		
 		billboard(OBJECT_ID_PLAYER, false); //Vi vil at spilleren skal vende seg fra kameraet, dette ved å binde rotasjonen mot kameraet
 		getObject(OBJECT_ID_PLAYER).getGameData().setVectorValue(PROPERTY_VECTOR_SPAWNPOSITION,
 				new Vector3Container(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue()));
@@ -115,15 +129,6 @@ public abstract class CoffeeSceneTemplate{
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE,0l);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE,0l);
 		getObject(OBJECT_ID_PLAYER).getGameModel().setObjectDeactivation(false);
-
-		getObject(OBJECT_ID_OVERLAY).getGameModel().getPosition().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
-			
-			@Override
-			public Vector3f getOffset() {
-				// TODO Auto-generated method stub
-				return getScene().getCamera().getCameraForwardVec(0.5f);
-			}
-		});
 	}
 	protected void tickPlayer(){
 		if(!isReady())
@@ -155,12 +160,14 @@ public abstract class CoffeeSceneTemplate{
 	
 	
 	protected void playerDie(){
+		if(getAnyObject(OBJECT_ID_OVERLAY)!=null)
+			animator.addTransition(getAnyObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject(), 1f, CoffeeAnimator.TransitionType.ValueLinear, 300f);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, 0l);
-		animator.addTransition(getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject(), 1f, CoffeeAnimator.TransitionType.ValueLinear, 300f);
-		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, clock+1000);
+		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, clock+3000);
 	}
 	protected void playerRespawn(){
-		getObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
+		if(getAnyObject(OBJECT_ID_OVERLAY)!=null)
+			getAnyObject(OBJECT_ID_OVERLAY).getGameModel().getMaterial().getTransparencyObject().setValue(0f);
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_POS,getObject(OBJECT_ID_PLAYER).getGameData().getVectorValue(PROPERTY_VECTOR_SPAWNPOSITION).getValue());
 		getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_LIVE, 0l);
@@ -255,10 +262,9 @@ public abstract class CoffeeSceneTemplate{
 			updateObjects();
 			objects.add(obj);
 		}
-		public void updateObjects(){
+		private void updateObjects(){
 			//Her kan vi nyttegjøre oss av Java Streams med arbeidstråder! Wee!
-//			float offset = -(float)objects.size()/2;
-			float offset = 0;
+			float offset = (objects.size()<15 ? -1 : -1.5f);
 			objects.parallelStream().forEach(obj ->{
 				obj.getGameModel().getPosition().bindValue(targetPos);
 				obj.getGameModel().getRotation().bindValue(targetRot);

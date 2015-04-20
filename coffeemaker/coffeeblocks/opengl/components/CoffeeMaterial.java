@@ -10,7 +10,7 @@ import coffeeblocks.metaobjects.FloatContainer;
 public class CoffeeMaterial {
 	public CoffeeMaterial(){}
 	public CoffeeMaterial(CoffeeMaterial material){
-		this.textureHandles = material.getTextureHandles();
+		this.textureHandles = new ArrayList<>(material.getTextureHandles());
 		this.multitextured = material.isMultitextured();
 		this.multitexture = material.getMultitexture();
 		
@@ -25,8 +25,8 @@ public class CoffeeMaterial {
 		this.specularTextureHandle = material.getSpecularTextureHandle();
 		this.highlightTextureHandle = material.getHighlightTextureHandle();
 		
-		this.shininess = material.getShininessObject();
-		this.transparency = material.getTransparencyObject();
+		this.shininess = new FloatContainer(material.getShininessObject());
+		this.transparency = new FloatContainer(material.getTransparencyObject());
 		this.dissolution = material.dissolution;
 		this.illum = material.illum;
 		
@@ -53,6 +53,8 @@ public class CoffeeMaterial {
 	private Vector3f specularColor = new Vector3f(1,1,1);
 	public Vector3f ambientColor = new Vector3f(1,1,1); //Unimplemented
 	public Vector3f diffuseColor = new Vector3f(1,1,1); //Unimplemented
+	
+	private Vector3f colorMultiplier = new Vector3f(1,1,1);
 	
 	private int specularTextureHandle = 0;
 	private int transparencyTextureHandle = 0;
@@ -201,5 +203,11 @@ public class CoffeeMaterial {
 	}
 	public void setBumpTexture(String bumpTexture) {
 		this.bumpTexture = bumpTexture;
+	}
+	public Vector3f getColorMultiplier() {
+		return colorMultiplier;
+	}
+	public void setColorMultiplier(Vector3f colorMultiplier) {
+		this.colorMultiplier = colorMultiplier;
 	}
 }

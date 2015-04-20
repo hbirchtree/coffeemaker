@@ -7,6 +7,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import coffeeblocks.general.VectorTools;
 import coffeeblocks.metaobjects.FloatContainer;
 import coffeeblocks.metaobjects.Vector3Container;
 
@@ -77,6 +78,13 @@ public class CoffeeCamera {
 		displace.y = direction.y*scalar;
 		displace.z = direction.z*scalar;
 		return displace;
+	}
+	public Vector3f getCameraUpVec(float scalar){
+		Matrix4f forward = new Matrix4f();
+		Matrix4f.invert(getOrientation(), forward);
+		Vector4f forwardVec = new Vector4f();
+		Matrix4f.transform(forward,new Vector4f(0,1,0,1),forwardVec);
+		return VectorTools.vectorMul(new Vector3f(forwardVec),scalar);
 	}
 	
 	public void offsetPosition(Vector3f offset){

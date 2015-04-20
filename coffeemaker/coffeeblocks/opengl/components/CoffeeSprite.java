@@ -8,8 +8,8 @@ public class CoffeeSprite {
 		this.sourceObject = source;
 	}
 	private InstantiableObject sourceObject = null;
-	public GameObject createSprite(String texture){
-		GameObject out = sourceObject.createInstance("."+Math.random(), true);
+	public GameObject createSprite(String id,String texture){
+		GameObject out = sourceObject.createInstance("."+id+(int)Math.random()*1000, true);
 		out.getGameModel().getMaterial().setDiffuseTexture(texture);
 		return out;
 	}

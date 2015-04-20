@@ -118,6 +118,7 @@
 			"physics.update-rotation": false
 		},
 		{
+			"instantiable":true,
 			"object-id": "1.overlay",
 			"model-i": "overlay",
 			"vshader": "shaders/vsh.txt",
@@ -243,7 +244,7 @@
 		]
 	},
 	"scene:second":{
-		"clearcolor": [0.17,0.57,0.79,1],
+		"clearcolor": [0,0,0,1],
 		"camera": {
 			"fov": 85
 		},
@@ -275,19 +276,12 @@
 			"model-i": "playermesh",
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
-			"position": [0,0,0],
+			"position": [10,6.9,-10],
 			"rotation": [0,90,0],
 			"scale": [0.20,0.20,0.20],
-			"physics.shape": 0
-		},
-		{
-			"object-id": "1.overlay",
-			"model-i": "overlay",
-			"vshader": "shaders/vsh.txt",
-			"fshader": "shaders/fsh_nolight.txt",
-			"position": [0,0,0],
-			"rotation": [0,0,0],
-			"scale": [1,1,1]
+			"physics.shape": 1,
+			"physics.scale": [1,1.5,1],
+			"update-rotation":false
 		},
 		{
 			"instantiable": true,
@@ -304,7 +298,7 @@
 			"object-id": "light.sun",
 			"position": [0,125,0],
 			"color": "#ffffff",
-			"attenuation": 0.00005,
+			"attenuation": 0.05,
 			"ambientcoeff": 0.007
 		}
 		]
