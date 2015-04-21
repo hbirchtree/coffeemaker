@@ -22,8 +22,8 @@ public class ModelLoader {
 		ModelReader reader = null;
 		if(filename.endsWith(".obj"))
 			reader = new WavefrontModelReader();
-		else if(filename.endsWith(".md5mesh"))
-			reader = new MD5ModelReader();
+//		else if(filename.endsWith(".md5mesh")) //Ikke implementert!
+//			reader = new MD5ModelReader();
 		reader.setTargetObject(container);
 		try{
 			ModelIntermediate mdl = reader.interpretFile(data,filename);
