@@ -55,7 +55,7 @@ public class WavefrontModelReader implements ModelReader{
 			while(it.hasNext()){
 				itv = it.next();
 				if(itv.startsWith("mtllib ")){
-					parseMtlFile(FileImporter.getBasename(filename)+"/"+itv.substring(7));
+					parseMtlFile(FileImporter.getBasename(filename)+itv.substring(7));
 					continue;
 				}
 				else while(itv.startsWith("o ")&&it.hasNext()){
@@ -140,17 +140,17 @@ public class WavefrontModelReader implements ModelReader{
 					if(line.startsWith("Ks "))
 						mtl.setSpecularColor(VectorTools.parseStrVector(line.substring(3,line.length())," "));
 					if(line.startsWith("map_Kd "))
-						mtl.setDiffuseTexture(FileImporter.getBasename(filename)+"/"+line.substring(7,line.length()));
+						mtl.setDiffuseTexture(FileImporter.getBasename(filename)+line.substring(7,line.length()));
 					if(line.startsWith("map_Ks "))
-						mtl.setSpecularTexture(FileImporter.getBasename(filename)+"/"+line.substring(7,line.length()));
+						mtl.setSpecularTexture(FileImporter.getBasename(filename)+line.substring(7,line.length()));
 					if(line.startsWith("map_Ns "))
-						mtl.setHighlightTexture(FileImporter.getBasename(filename)+"/"+line.substring(7,line.length()));
+						mtl.setHighlightTexture(FileImporter.getBasename(filename)+line.substring(7,line.length()));
 					if(line.startsWith("map_d "))
-						mtl.setTransparencyTexture(FileImporter.getBasename(filename)+"/"+line.substring(6,line.length()));
+						mtl.setTransparencyTexture(FileImporter.getBasename(filename)+line.substring(6,line.length()));
 					if(line.startsWith("map_Bump "))
-						mtl.setBumpTexture(FileImporter.getBasename(filename)+"/"+line.substring(9,line.length()));
+						mtl.setBumpTexture(FileImporter.getBasename(filename)+line.substring(9,line.length()));
 					if(line.startsWith("bump "))
-						mtl.setBumpTexture(FileImporter.getBasename(filename)+"/"+line.substring(5,line.length()));
+						mtl.setBumpTexture(FileImporter.getBasename(filename)+line.substring(5,line.length()));
 					if(line.startsWith("newmtl "))
 						break;
 				}

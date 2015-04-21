@@ -178,7 +178,7 @@ public class CoffeeJsonParsing {
 			}else if(key.equals("physics.shape")&&(obj instanceof Integer)){ //Form, enumerert i PhysicsObject
 				gobj.getGameModel().setPhysicsType(PhysicsObject.PhysicsType.values()[Integer.valueOf(obj.toString())]);
 			}else if(key.equals("physics.collision")&&(obj instanceof String)){ //Kollisjonsmodell ved PhysicsType.Complex
-				gobj.getGameModel().setCollisionMeshFile(filepath+"/"+(String)obj);
+				gobj.getGameModel().setCollisionMeshFile(filepath+(String)obj);
 			}else if(key.equals("textures")&&obj instanceof ArrayList){ //Alternative teksturer for objektet, kan byttes til via CoffeeMaterial-klassen
 				List<Object> textures = ((ArrayList<Object>)obj);
 				for(Object text : textures)
@@ -195,7 +195,7 @@ public class CoffeeJsonParsing {
 			}else if(key.equals("sounds")&&obj instanceof HashMap){ //Lydeffekter/musikk for dette objektet, posisjoneres ved dette objektets posisjon i det 3-dimensjonale rommet.
 				Map<String,Object> sounds = ((HashMap<String, Object>)obj);
 				for(String sound : sounds.keySet()){
-					String soundfile = filepath+"/"+(String)sounds.get(sound);
+					String soundfile = filepath+(String)sounds.get(sound);
 					gobj.addSoundBox(new SoundObject(sound,soundfile));
 				}
 			}

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class FileImporter {
 	public static String getBasename(String filename){
-		return filename.substring(0,filename.lastIndexOf('/'));
+		return filename.substring(0,filename.lastIndexOf('/')+1);
 	}
 	public static List<String> readFile(String filename){
 		List<String> result = new ArrayList<>();
