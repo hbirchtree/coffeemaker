@@ -53,7 +53,6 @@ public class CoffeeMenuScene extends CoffeeSceneTemplate{
 			}
 		});
 		rotationTimer = System.currentTimeMillis()+1000;
-//		System.out.println(getScene().getCamera().getCameraRotation().getValue().toString());
 	}
 
 	private long rotationTimer = 0l;

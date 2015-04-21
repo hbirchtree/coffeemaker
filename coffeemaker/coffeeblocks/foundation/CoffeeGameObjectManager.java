@@ -77,8 +77,10 @@ public class CoffeeGameObjectManager implements CollisionListener{
 		listeners.stream().forEach(listener -> listener.newGameObjectAdded(instance));
 	}
 	public void deleteInstance(String objectId){
-		if(instances.containsKey(objectId))
+		if(instances.containsKey(objectId)){
 			instances.remove(objectId);
+			getPhysicsSystem().deleteObject(objectId);
+		}
 	}
 	public GameObject getInstancedObject(String objectId){
 		return instances.get(objectId);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -72,7 +73,6 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		dynamicsWorld.setInternalTickCallback(new InternalTickCallback(){
 			@Override
 			public void internalTick(DynamicsWorld world, float timeStep) {
-				// TODO Auto-generated method stub
 				Dispatcher dispatch = world.getDispatcher();
 				for(int i=0;i<dispatch.getNumManifolds();i++){
 					PersistentManifold man = dispatch.getManifoldByIndexInternal(i);
@@ -84,16 +84,12 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 					String g2 = o2.getObjectId();
 					for(int a=0;a<man.getNumContacts();a++){
 						ManifoldPoint cPoint = man.getContactPoint(a);
-						if(cPoint.getDistance()<0f){
+						if(cPoint.getDistance()<0f)
 							for(CollisionListener listener : listeners)
 								listener.getCollisionNotification(g1, g2);
-//							if(o1.getGameModel().isNotifyForce()||o2.getGameModel().isNotifyForce())
-//								for(CollisionListener listener : listeners){
-//									listener.getCollisionNotification(g1, g2, org.lwjgl.util.vector.Vector3f.sub(, right, null));
-//								}
-						}
 					}
 				}
+				world.getCollisionObjectArray().stream().sequential().forEach(updateGameObjectByPointer());
 			}
 		}, null);
 	}
@@ -157,20 +153,16 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 		return t;
 	}
 	
-	private List<String> expired = new ArrayList<>();
-	@Override
-	public void onGlfwFrameTick(float tickTime){
-		dynamicsWorld.stepSimulation(tickTime*100f);
-		objects.keySet().parallelStream().forEach(id -> {
-			GameObject object = manager.getObject(id);
-			if(object==null)
-				object = manager.getInstancedObject(id);
+	private Consumer<? super CollisionObject> updateGameObjectByPointer(){
+		return (collisionObject) -> {
+			//Hold my beer. Please.
+			RigidBody body = (RigidBody)collisionObject;
+			GameObject object = ((GameObject)body.getUserPointer());
 			if(object==null){
-				expired.add(id);
+				expired.add(body);
 				return;
 			}
 			if(object.getGameModel().doTrackPhysics()){
-				RigidBody body = objects.get(id);
 				object.getGameModel().getPosition().setValue(VectorTools.vmVec3ftoLwjgl(body.getWorldTransform(new Transform()).origin));
 				Vector3f out = new Vector3f();
 				body.getLinearVelocity(out);
@@ -183,11 +175,22 @@ public class CollisionChecker implements CoffeeGameObjectManagerListener,CoffeeR
 					object.getGameModel().getRotation().setVelocity(VectorTools.vmVec3ftoLwjgl(new Vector3f(out)));
 				}
 				for(CollisionListener listener : listeners)
-					listener.updateObject(id);
+					listener.updateObject(object.getObjectId());
 			}
-		});
-		expired.stream().sequential().forEach(e -> objects.remove(e));
+		};
+	}
+	
+	private void removeExpired(){
+		expired.stream().sequential().forEach(e -> dynamicsWorld.removeRigidBody(objects.remove(e)));
 		expired.clear();
+	}
+	
+	private List<RigidBody> expired = new ArrayList<>();
+	@Override
+	public void onGlfwFrameTick(float tickTime){
+		dynamicsWorld.stepSimulation(tickTime*100f);
+//		objects.values().parallelStream().forEach(updateGameObjectByPointer());
+		removeExpired();
 	}
 	
 	private List<CollisionListener> listeners = new ArrayList<>();

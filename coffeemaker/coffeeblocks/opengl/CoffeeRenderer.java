@@ -74,7 +74,7 @@ public class CoffeeRenderer implements Runnable {
 	private boolean draw = true;
 	private boolean doMouseGrab = true;
 	private boolean mouseGrabbed = false;
-	private int rendering_swaps = 0;
+	private int rendering_swaps = 1;
 	public void setSwapping(int swapping){
 		this.rendering_swaps = swapping;
 	}
@@ -232,7 +232,7 @@ public class CoffeeRenderer implements Runnable {
 		alContext = ALContext.create();
 		alContext.makeCurrent();
 		// Enable v-sync
-		glfwSwapInterval(this.rendering_swaps);
+		glfwSwapInterval(1);
 		
 		if(doMouseGrab)
 			toggleGrabMouse();

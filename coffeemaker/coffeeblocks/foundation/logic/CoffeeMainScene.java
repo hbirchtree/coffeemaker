@@ -317,6 +317,10 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_IMPULSE,new Vector3f(0,0.5f,0));
 			return;
 		}
+		case GLFW.GLFW_KEY_KP_5:{
+			spawnMonster(new Vector3f(clock%10,30,clock%30));
+			return;
+		}
 		}
 	}
 	private void playerWalkDirection(Vector3f source, float multiplier){
@@ -379,9 +383,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_RUN_D, false);
 			return;
 		}
-		case GLFW.GLFW_KEY_SPACE:{
-			break;
-		}
 		}
 	}
 	@Override public void handleMousePress(int key) {
@@ -404,7 +405,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	private static final String DEATH_REASON_FALL_HIGH = "Did you not learn the Prefect way of flight?";
 	private static final String DEATH_REASON_FALL_LOW = "You didn't learn to fly in time!";
 	private static final String DEATH_REASON_BULLET = "Stop hitting yourself to death!";
-	private static final String DEATH_REASON_GOLEM = "YOU DIED.";
 	@Override public void handleCollisions(String body1, String body2) {
 		if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"death")&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
 			if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_LIVE)) //Slik at tiden ikke utvider seg uendelig. Hvis dødstimeren allerede er aktivert vil den ikke sette den på nytt.
@@ -442,15 +442,18 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		Vector3f vec = getAnyObject(object_id_healthbar).getGameModel().getScale().getValue();
 		float max_scale = getObject(OBJECT_ID_PLAYER).getGameData().getDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE).floatValue();
 		float curr_hlth = getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_HEALTH).floatValue();
-		vec.x = max_scale*curr_hlth/100f;
-		vec.z = max_scale*curr_hlth/100f;
+		float scale = max_scale*curr_hlth/100f;
+		if(scale>max_scale)
+			scale = max_scale;
+		vec.x = scale;
+		vec.z = scale;
 		Vector3f col = getAnyObject(object_id_healthbar).getGameModel().getMaterial().getColorMultiplier();
 		//Vi gir den ulik farge avhengig av mengden
 		if(curr_hlth>100){
 			col.x = 0;
 			col.y = 1;
 			col.z = 0;
-		}else if(curr_hlth<100&&curr_hlth>60){
+		}else if(curr_hlth<100&&curr_hlth>=60){
 			col.x = 1;
 			col.y = 1;
 			col.z = 1;
@@ -462,7 +465,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			col.x = 1;
 			col.y = 0;
 			col.z = 0;
-		}else if(curr_hlth<=0){
+		}else if(curr_hlth<0){
 			col.x = 0;
 			col.y = 0;
 			col.z = 0;
@@ -511,32 +514,93 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		public String getIdentifier();
 	}
 	
-	private class EnemyPursuer implements GameCharacter{
-		//Forfølger spilleren når den kommer innenfor rekkevidde eller blir forstyrret fra avstand
+	private class EnemyBase implements GameCharacter{
 		protected static final String MONSTER_PROP_BOOL_STATE = "state";
 		protected static final String MONSTER_PROP_TIMER_DEATH = "deadtime";
 		protected static final String MONSTER_PROP_STRING_TRACKING = "deadtime";
 		protected static final String MONSTER_PROP_VECTOR_HOME = "home";
+		protected static final String MONSTER_PROP_DREASON = "You died.";
 		protected GameObject target = null;
 		protected String primaryVictim = null;
 		protected float range = 30f;
 		
-		public EnemyPursuer(String target,String victim){
+		public EnemyBase(String target,String victim){
 			this.target = getScene().getAnyObject(target);
 			this.primaryVictim = victim;
 		}
 		public String getIdentifier(){
 			return target.getObjectId();
 		}
-		public void onTick(){
-			if(!target.getGameData().getBoolValue(MONSTER_PROP_BOOL_STATE))
+		public void enemyTakeDamage(int amount){
+			target.getGameData().setIntValue(PROPERTY_INT_HEALTH, target.getGameData().getIntValue(PROPERTY_INT_HEALTH)+amount);
+			if(target.getGameData().getIntValue(PROPERTY_INT_HEALTH)<=0)
+				enemyDie();
+			if(target.getGameData().getIntValue(PROPERTY_INT_HEALTH)<0)
+				target.getGameData().setIntValue(PROPERTY_INT_HEALTH, 0);
+		}
+		public void enemyDie(){
+			target.getGameData().setBoolValue(MONSTER_PROP_BOOL_STATE,false); //Vi setter verdien for monsterets levestatus
+			target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
+			animator.addTransition(target.getGameModel().getMaterial().getTransparencyObject(), 0.0f, CoffeeAnimator.TransitionType.ValueLinear, 500);
+		}
+		@Override
+		public void onTick() {
+			if(!isAlive()) //Vi legger sannsynligvis til mer her senere
 				return;
-			//Monstere får påført en kraft i retning av spilleren dersom de kan se spilleren
-			//Dersom spilleren er innenfor rekkevidde, sett dette som mål
+		}
+		public boolean isAlive(){
+			return target.getGameData().getBoolValue(MONSTER_PROP_BOOL_STATE);
+		}
+		public boolean checkCanSeeVictim(){
 			if(logic_objectCanSeeOtherInRange(target.getObjectId(),primaryVictim,range)){
 				target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,OBJECT_ID_PLAYER);
-				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.1f);
+				return true;
 			}
+			return false;
+		}
+
+		public void handleCollision(String body){
+			if(!isAlive())
+				return;
+			if(body.equals(OBJECT_ID_PLAYER)&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
+				playerTakeDamage(MONSTER_PROP_DREASON,-40);
+			}
+		}
+	}
+	
+	private class EnemyPursuer extends EnemyBase{
+		//Forfølger spilleren når den kommer innenfor rekkevidde eller blir forstyrret fra avstand
+		
+		public EnemyPursuer(String target,String victim){
+			super(target,victim);
+		}
+		@Override public void enemyDie(){
+			super.enemyDie();
+			target.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY,clock+500);
+			playerTakeDamage("... Healed to death? NOOOOOO!!",50);
+			
+			spawnMonster(target.getGameModel().getPosition().getValue());
+			spawnMonster(target.getGameModel().getPosition().getValue());
+			playerTakeDamage("The enemy has evolved!",0);
+		}
+		@Override public void handleCollision(String body){
+			if(!isAlive())
+				return;
+			super.handleCollision(body);
+			if(body.startsWith("bullet.")){
+				this.target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,OBJECT_ID_PLAYER);
+				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
+				enemyTakeDamage(-40);
+				getScene().requestObjectUpdate(this.target.getObjectId(),GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
+			}
+		}
+		@Override public void onTick(){
+			if(!isAlive())
+				return;
+			super.onTick();
+			
+			if(checkCanSeeVictim())
+				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.1f);
 
 			//Dersom den skal følge noe, påfør en kraft
 			if(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING)!=null&&
@@ -576,10 +640,15 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			}
 			target.getGameModel().getAnimationContainer().morphToState();
 		}
-		public void enemyDie(){
-			target.getGameData().setBoolValue(MONSTER_PROP_BOOL_STATE,false); //Vi setter verdien for monsterets levestatus
-			target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
-			animator.addTransition(target.getGameModel().getMaterial().getTransparencyObject(), 0.0f, CoffeeAnimator.TransitionType.ValueLinear, 500);
+	}
+	private class EnemyTurret extends EnemyBase{
+		
+		public EnemyTurret(String target, String victim) {
+			super(target, victim);
+		}
+
+		@Override public void enemyDie(){
+			super.enemyDie();
 			target.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY,clock+500);
 			playerTakeDamage("... Healed to death? NOOOOOO!!",50);
 			
@@ -587,46 +656,61 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			spawnMonster(target.getGameModel().getPosition().getValue());
 			playerTakeDamage("The enemy has evolved!",0);
 		}
-		public void enemyTakeDamage(int amount){
-			target.getGameData().setIntValue(PROPERTY_INT_HEALTH, target.getGameData().getIntValue(PROPERTY_INT_HEALTH)+amount);
-			if(target.getGameData().getIntValue(PROPERTY_INT_HEALTH)<=0)
-				enemyDie();
-			if(target.getGameData().getIntValue(PROPERTY_INT_HEALTH)<0)
-				target.getGameData().setIntValue(PROPERTY_INT_HEALTH, 0);
-		}
-		public void handleCollision(String body){
-			if(!target.getGameData().getBoolValue(MONSTER_PROP_BOOL_STATE))
+		@Override public void handleCollision(String body){
+			if(!isAlive())
 				return;
-			if(body.equals(OBJECT_ID_PLAYER)&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
-				playerTakeDamage(DEATH_REASON_GOLEM,-40);
-			}else if(body.startsWith("bullet.")){
+			super.handleCollision(body);
+			if(body.startsWith("bullet.")){
 				this.target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,OBJECT_ID_PLAYER);
 				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
 				enemyTakeDamage(-40);
 				getScene().requestObjectUpdate(this.target.getObjectId(),GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
 			}
 		}
-	}
-	private class EnemyTurret implements GameCharacter {
-		GameObject target;
-		public EnemyTurret(GameObject target){
-			this.target = target;
-		}
-		
-		@Override
-		public void onTick() {
+		@Override public void onTick(){
+			if(!isAlive())
+				return;
+			super.onTick();
 			
-		}
+			if(checkCanSeeVictim())
+				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.1f);
 
-		@Override
-		public void handleCollision(String body) {
-			
-		}
+			//Dersom den skal følge noe, påfør en kraft
+			if(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING)!=null&&
+					getObject(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING))!=null){
+				if(logic_objectCanSeeOther(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING),target.getObjectId())){
 
-		@Override
-		public String getIdentifier() {
-			return null;
+					if(clock%800>400)
+						target.getGameModel().getAnimationContainer().setAnimationState("stand.1", 0.01f);
+					else
+						target.getGameModel().getAnimationContainer().setAnimationState("stand.2", 0.01f);
+					float distance = pingDistance(target.getObjectId(),target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING));
+					
+					if(distance<200){
+						Vector3f vec = Vector3f.sub(getObject(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING)).getGameModel().getPosition().getValue(),
+								target.getGameModel().getPosition().getValue(), null);
+						vec.y = 0;
+						vec.normalise(); //Skal ikke skalere med avstand
+						spawnProjectile("bullet","."+clock,300f);
+					}
+					
+				}else{
+					//Hvis ikke innenfor synsfelt, slutt
+					target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,null);
+				}
+			}else if(pingDistance(target.getObjectId(),target.getGameData().getVectorValue(MONSTER_PROP_VECTOR_HOME).getValue())>30){
+				target.getGameModel().getAnimationContainer().setAnimationState(null, 0.01f);
+				//Hvis ingenting å gjøre, gå hjem
+				Vector3f vec = Vector3f.sub(target.getGameData().getVectorValue(MONSTER_PROP_VECTOR_HOME).getValue(),
+						target.getGameModel().getPosition().getValue(), null);
+				vec.y = 0;
+				vec.normalise(); //Skal ikke skalere med avstand
+				getScene().requestObjectUpdate(target.getObjectId(), GameObject.PropertyEnumeration.PHYS_ACCEL, 
+						VectorTools.vectorMul(vec,400));
+			}else{
+				target.getGameModel().getAnimationContainer().setAnimationState(null, 0.01f);
+			}
+			target.getGameModel().getAnimationContainer().morphToState();
 		}
-		
 	}
 }

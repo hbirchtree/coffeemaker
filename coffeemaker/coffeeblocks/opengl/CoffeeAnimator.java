@@ -90,7 +90,6 @@ public class CoffeeAnimator {
 			case ValueIExpo:
 				break;
 			case ValueLinear:
-				System.out.println(transitional.transitionTime-transitional.transitionRestTime);
 				transitional.setValue(VectorTools.vectorMul(transitional.animationIncrement,transitional.transitionTime-transitional.transitionRestTime));
 				break;
 			default:
