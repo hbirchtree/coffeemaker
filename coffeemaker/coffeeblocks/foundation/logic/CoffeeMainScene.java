@@ -32,6 +32,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	protected static final String PROPERTY_INT_HEALTH = "health";
 	protected static final String PROPERTY_INT_HEALTH_MAX = "health.max";
 	protected static final String PROPERTY_DUBS_HEALTH_MAX_SCALE = "health.max.scale";
+	protected static final String PROPERTY_STRING_HEALTHBARID = "health.id";
 	
 	protected static final String PROPERTY_TIMER_SWITCH = "switch";
 	protected static final String PROPERTY_TIMER_JUMP_TO = "jump-to";
@@ -74,9 +75,10 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		
 		getScene().getInstantiableList().stream().filter(e -> e.getObjectPreseedName().startsWith("monster")).forEach(e -> {
 			e.getGameData().setBoolValue(EnemyPursuer.MONSTER_PROP_BOOL_STATE, true);
-			e.getGameData().setIntValue(PROPERTY_INT_HEALTH, 1600);
-			e.getGameData().setIntValue(PROPERTY_INT_HEALTH_MAX, 1600);
-			e.getGameData().setDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE, 2.0);
+			e.getGameData().setIntValue(PROPERTY_INT_HEALTH, 4000);
+			e.getGameData().setIntValue(PROPERTY_INT_HEALTH_MAX, 4000);
+			e.getGameData().setDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE, 5.0);
+			e.getGameData().setStringValue(PROPERTY_STRING_HEALTHBARID, "");
 			e.getGameData().setTimerValue(EnemyPursuer.MONSTER_PROP_TIMER_DEATH, 0l);
 			e.getGameData().setStringValue(EnemyPursuer.MONSTER_PROP_STRING_TRACKING, null);
 			e.getGameData().setVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME, new Vector3Container());
@@ -105,6 +107,22 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getScene().getInstancedObject(id).getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
 				getScene().getInstancedObject(id).getGameModel().getPosition().getValue());
 		getCharacters().add(new EnemyPursuer(id,OBJECT_ID_PLAYER));
+		{
+			GameObject testO = generic_sprite.createSprite("hp"+o.getObjectId(),"testgame/models/elements/healthbar.png");
+			o.getGameData().setStringValue(PROPERTY_STRING_HEALTHBARID, testO.getObjectId());
+			testO.getGameModel().getPosition().bindValue(o.getGameModel().getPosition());
+			billboardContainer(testO.getGameModel().getRotation(),false);
+			float _health_scale = testO.getGameData().getDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE).floatValue();
+			testO.getGameModel().getScale().setValue(new Vector3f(_health_scale,2f,_health_scale));
+			testO.getGameModel().getRotation().setValueOffset(new Vector3f(0,0,0));
+			testO.getGameModel().getPosition().setOffsetCallback(new VectorOffsetCallback(){
+				@Override
+				public Vector3f getOffset() {
+					return Vector3f.add(getScene().getCamera().getCameraRightVec(-5f), getScene().getCamera().getCameraUpVec(1f), null);
+				}
+			});
+			getScene().addInstance(testO);
+		}
 		monster_ticker++;
 	}
 	private synchronized List<GameCharacter> getCharacters(){
@@ -181,10 +199,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,24d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_SPEEDLIMIT,25d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
-
-		CoffeeSprite test = new CoffeeSprite(getScene().getInstantiable("0.sprite"));
 		{
-			GameObject testO = test.createSprite("hp","testgame/models/elements/healthbar.png");
+			GameObject testO = generic_sprite.createSprite("hp","testgame/models/elements/healthbar.png");
 			object_id_healthbar = testO.getObjectId();
 			testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 			billboardContainer(testO.getGameModel().getRotation(),false);
@@ -200,7 +216,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getScene().addInstance(testO);
 		}
 		{
-			GameObject testO = test.createSprite("heart","testgame/models/elements/heart.png");
+			GameObject testO = generic_sprite.createSprite("heart","testgame/models/elements/heart.png");
 			testO.getGameModel().getPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
 			billboardContainer(testO.getGameModel().getRotation(),false);
 			testO.getGameModel().getScale().setValue(new Vector3f(0.3f,0.3f,0.3f));
@@ -214,6 +230,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getScene().addInstance(testO);
 		}
 	}
+	private CoffeeSprite generic_sprite = new CoffeeSprite(getScene().getInstantiable("0.sprite"));
 	private String object_id_healthbar = null;
 	@Override protected void tickPlayer() {
 		super.tickPlayer();
@@ -317,8 +334,12 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			getScene().requestObjectUpdate(OBJECT_ID_PLAYER, GameObject.PropertyEnumeration.PHYS_IMPULSE,new Vector3f(0,0.5f,0));
 			return;
 		}
-		case GLFW.GLFW_KEY_KP_5:{
-			spawnMonster(new Vector3f(clock%10,30,clock%30));
+		case GLFW.GLFW_KEY_KP_0:{
+			playerDieFull(DEATH_REASON_SUICIDE);
+			return;
+		}
+		case GLFW.GLFW_KEY_KP_1:{
+			manager.getRenderer().al_playSound("test");
 			return;
 		}
 		}
@@ -388,21 +409,36 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	@Override public void handleMousePress(int key) {
 		if(key==GLFW.GLFW_MOUSE_BUTTON_1){
 			//Hvis flere objekter opprettes i samme millisekund vil den ene bli overskrevet. Sånt skjer (ikke).
-			spawnProjectile("bullet","."+clock,300f);
+			Vector3f origin = Vector3f.add(getScene().getCamera().getCameraForwardVec(8f),getObject(OBJECT_ID_PLAYER).getGameModel().getPositionVector(),null);
+			Vector3f dir = getScene().getCamera().getCameraForwardVec(3f);
+			dir.y = 0;
+			spawnProjectile("bullet","."+clock,origin,dir,1000f);
 		}
 	}
-	public void spawnProjectile(String instanceId,String identifier,float speed){
+	public void spawnProjectile(String instanceId,String identifier, Vector3f origin, Vector3f direction,float speed){
 		GameObject obj = getScene().getInstantiable(instanceId).createInstance(identifier,true);
-		Vector3f dir = getScene().getCamera().getCameraForwardVec(1f);
-		dir.y = 0f;
-		dir.normalise(); //Vi normaliserer vektoren for å få en jevn avstand fra spilleren uavhengig av vinkel kameraet kan ha
-		obj.getGameModel().getPosition().setValue(Vector3f.add(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getValue(),VectorTools.vectorMul(dir, 3f),null));
-		obj.getGameModel().getPosition().setVelocity(VectorTools.vectorMul(dir, speed));
-		obj.getGameModel().getRotation().setValue(getObject(OBJECT_ID_PLAYER).getGameModel().getRotation().getValue());
+		direction.normalise(); //Vi normaliserer vektoren for å få en jevn avstand fra spilleren uavhengig av vinkel kameraet kan ha
+		obj.getGameModel().getPosition().setValue(origin);
+		obj.getGameModel().getPosition().setVelocity(VectorTools.vectorMul(direction, speed));
+		//GRASPING BEER TIGHLTY - kanskje kan vi rotere kulene etter hvilken fart de har
+//		obj.getGameModel().getRotation().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
+//			@Override
+//			public Vector3f getOffset() {
+//				Vector3f vec = obj.getGameModel().getPosition().getVelocity();
+//				vec.normalise();
+//				Vector3f pos = obj.getGameModel().getPositionVector();
+//				return new Vector3f(0,
+//						VectorTools.getEuclideanRotationAngle(
+//						Vector3f.sub(Vector3f.add(pos,vec,null),pos,null),pos, false),
+//								0);
+//			}
+//		});
+		obj.getGameModel().getRotation().setValue(new Vector3f(0,VectorTools.getEuclideanRotationAngle(Vector3f.add(origin, direction, null),origin, false),0));
 		obj.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY, clock+500);
 		getScene().addInstance(obj);
 	}
 	private static final String DEATH_REASON_FALL_HIGH = "Did you not learn the Prefect way of flight?";
+	private static final String DEATH_REASON_SUICIDE = "Did you choose this to avoid taxes?";
 	private static final String DEATH_REASON_FALL_LOW = "You didn't learn to fly in time!";
 	private static final String DEATH_REASON_BULLET = "Stop hitting yourself to death!";
 	@Override public void handleCollisions(String body1, String body2) {
@@ -453,7 +489,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			col.x = 0;
 			col.y = 1;
 			col.z = 0;
-		}else if(curr_hlth<100&&curr_hlth>=60){
+		}else if(curr_hlth<=100&&curr_hlth>=60){
 			col.x = 1;
 			col.y = 1;
 			col.z = 1;
@@ -591,6 +627,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 				this.target.getGameData().setStringValue(MONSTER_PROP_STRING_TRACKING,OBJECT_ID_PLAYER);
 				target.getGameModel().getAnimationContainer().setAnimationState("detect", 0.2f);
 				enemyTakeDamage(-40);
+				this.updateHealth();
 				getScene().requestObjectUpdate(this.target.getObjectId(),GameObject.PropertyEnumeration.PHYS_CLEARFORCE,null);
 			}
 		}
@@ -638,7 +675,46 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			}else{
 				target.getGameModel().getAnimationContainer().setAnimationState(null, 0.01f);
 			}
+			if(target.getGameData().getStringValue(MONSTER_PROP_STRING_TRACKING)==null)
+				getAnyObject(target.getGameData().getStringValue(PROPERTY_STRING_HEALTHBARID)).getGameModel().setDrawObject(false);
 			target.getGameModel().getAnimationContainer().morphToState();
+		}
+		public void updateHealth(){
+			getAnyObject(target.getGameData().getStringValue(PROPERTY_STRING_HEALTHBARID)).getGameModel().setDrawObject(true);
+			Vector3f vec = getAnyObject(target.getGameData().getStringValue(PROPERTY_STRING_HEALTHBARID)).getGameModel().getScale().getValue();
+			float max_scale = target.getGameData().getDoubleValue(PROPERTY_DUBS_HEALTH_MAX_SCALE).floatValue();
+			float curr_hlth = target.getGameData().getIntValue(PROPERTY_INT_HEALTH).floatValue();
+			float scale = max_scale*curr_hlth/4000f;
+			System.out.println(scale);
+			if(scale>max_scale)
+				scale = max_scale;
+			vec.x = scale;
+			vec.z = scale;
+			
+			Vector3f col = getAnyObject(target.getGameData().getStringValue(PROPERTY_STRING_HEALTHBARID)).getGameModel().getMaterial().getColorMultiplier();
+			//Vi gir den ulik farge avhengig av mengden
+			if(curr_hlth>4000){
+				col.x = 0;
+				col.y = 1;
+				col.z = 0;
+			}else if(curr_hlth<=4000&&curr_hlth>=2000){
+				col.x = 1;
+				col.y = 1;
+				col.z = 1;
+			}else if(curr_hlth<2000&&curr_hlth>=1000){
+				col.x = 1;
+				col.y = 1;
+				col.z = 0;
+			}else if(curr_hlth<1000&&curr_hlth>=500){
+				col.x = 1;
+				col.y = 0;
+				col.z = 0;
+			}else if(curr_hlth<0){
+				col.x = 0;
+				col.y = 0;
+				col.z = 0;
+			}
+			col.normalise();
 		}
 	}
 	private class EnemyTurret extends EnemyBase{
@@ -691,7 +767,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 								target.getGameModel().getPosition().getValue(), null);
 						vec.y = 0;
 						vec.normalise(); //Skal ikke skalere med avstand
-						spawnProjectile("bullet","."+clock,300f);
+//						spawnProjectile("bullet","."+clock,300f);
 					}
 					
 				}else{

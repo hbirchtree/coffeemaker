@@ -74,14 +74,6 @@ public abstract class CoffeeSceneTemplate{
 			manager.getRenderer().requestClose();
 			return;
 		}
-		case GLFW.GLFW_KEY_KP_0:{
-			playerDie();
-			return;
-		}
-		case GLFW.GLFW_KEY_KP_1:{
-			manager.getRenderer().al_playSound("test");
-			return;
-		}
 		}
 	}
 	
