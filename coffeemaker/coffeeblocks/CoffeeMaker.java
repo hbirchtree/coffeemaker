@@ -1,10 +1,25 @@
 package coffeeblocks;
 
+import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.lwjgl.opengl.ContextCapabilities;
+import org.lwjgl.opengl.GLContext;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 import coffeeblocks.foundation.CoffeeSceneManager;
 import coffeeblocks.foundation.logic.CoffeeLogicLoop;
 import coffeeblocks.foundation.logic.CoffeeShop;
@@ -29,7 +44,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 				System.exit(1);
 			}
 		};
-	
+
 	public static void main(String[] args){
 		CoffeeMaker main = new CoffeeMaker();
 		if(args.length<1||args[0].isEmpty()){
@@ -38,6 +53,33 @@ public class CoffeeMaker implements CoffeeRendererListener{
 			return;
 		}
 		main.lhcStart(args[0]);
+	}
+	public static void testSystem(){
+		//Systemet behøver OpenGL 3.3 for å kjøre spillet
+		System.out.println("Testing system capabilities...");
+		long window;
+		try {
+			if(glfwInit()!=GL_TRUE)
+				throw new IllegalStateException("Unable to initialize GLFW");
+
+			glfwDefaultWindowHints();
+			glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+			glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+			
+			window = glfwCreateWindow(1, 1, "Café OpenGL test", NULL, NULL);
+			if(window==NULL)
+				throw new RuntimeException("Failed to create the GLFW window");
+			glfwMakeContextCurrent(window);
+			GLContext ctxt = GLContext.createFromCurrent();
+			ContextCapabilities caps = ctxt.getCapabilities();
+			if(!caps.OpenGL33)
+				throw new IllegalStateException("Ooops! This system does *not* seem to report OpenGL 3.3 compatiblity. You will probably encounter problems. :(");
+
+			System.out.println("If you are seeing this, you passed the critical test! Yay!");
+			glfwDestroyWindow(window);
+		} finally {
+			glfwTerminate();
+		}
 	}
 	public void lhcStart(String filename){
 		//Viktig! Brukes for å hente LWJGL's biblioteker uten å spesifisere obskure argumenter til Java hver gang!

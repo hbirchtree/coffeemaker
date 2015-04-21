@@ -99,7 +99,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 							);
 				}
 			});
-			System.out.println(o.getGameModel().getRotation().getValue().toString());
 			getScene().getInstancedObject(id).getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
 					getScene().getInstancedObject(id).getGameModel().getPosition().getValue());
 			characters.add(new EnemyPursuer(id,OBJECT_ID_PLAYER));
@@ -402,7 +401,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	@Override public void handleCollisions(String body1, String body2) {
 		if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"death")&&getObject(OBJECT_ID_PLAYER).getGameData().getIntValue(PROPERTY_INT_STATE)==PlayerState.ALIVE.toInt()){
 			if(clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_DIE)&&clock>=getObject(OBJECT_ID_PLAYER).getGameData().getTimerValue(PROPERTY_TIMER_TIME_TO_LIVE)) //Slik at tiden ikke utvider seg uendelig. Hvis dødstimeren allerede er aktivert vil den ikke sette den på nytt.
-				getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(PROPERTY_TIMER_TIME_TO_DIE, clock+250);
+				playerDieFull("Why did you do that?");
 		}else if(doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain")||doBodiesCollide(body1,body2,OBJECT_ID_PLAYER,"terrain.walkway")){
 			if(GAME_BOOL_FALLDAMAGE&&Math.abs(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition().getVelocity().y)>30)
 				playerTakeDamage(DEATH_REASON_FALL_HIGH,-50);

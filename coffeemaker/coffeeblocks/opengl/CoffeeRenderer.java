@@ -1,5 +1,6 @@
 package coffeeblocks.opengl;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALContext;
@@ -170,7 +171,7 @@ public class CoffeeRenderer implements Runnable {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 		int WIDTH = (int)windowres.x;
 		int HEIGHT = (int)windowres.y;
@@ -321,7 +322,23 @@ public class CoffeeRenderer implements Runnable {
 		// LWJGL detects the context that is current in the current thread,
 		// creates the ContextCapabilities instance and makes the OpenGL
 		// bindings available for use.
-		GLContext.createFromCurrent();
+		GLContext ctxt = GLContext.createFromCurrent();
+		ContextCapabilities caps = ctxt.getCapabilities();
+		if(!caps.OpenGL33)
+			System.err.println("ERROR: Ooops! This context does *not* report OpenGL 3.3 compatiblity. You will probably encounter problems.");
+		
+		System.out.println(
+				"///////////////////"
+				+"\n::System details::"
+				+"\nJava vendor: "+System.getProperty("java.vendor")
+				+"\nJava version: "+System.getProperty("java.version")
+				+"\nOperating system/kernel: "+System.getProperty("os.name")
+				+"\nOS version: "+System.getProperty("os.version")
+				+"\nOS architecture: "+System.getProperty("os.arch")
+				+"\nLWJGL version: "+Sys.getVersion()
+				+"\nActive OpenGL version: "+glGetString(GL_VERSION)
+				+"\n//////////////////"
+				);
 		
 		// Set the clear color
 		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
