@@ -171,7 +171,7 @@ public class CoffeeRenderer implements Runnable {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 		int WIDTH = (int)windowres.x;
 		int HEIGHT = (int)windowres.y;
