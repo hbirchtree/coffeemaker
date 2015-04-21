@@ -91,7 +91,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 			throw new IllegalStateException("Ingen data");
 		
 		Map<String,String> startOpts = new HashMap<>();
-		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.indexOf("/", -1)+1),properties, sceneManager, startOpts);
+		CoffeeJsonParsing.parseSceneStructure(filename.substring(0, filename.lastIndexOf("/")+1),properties, sceneManager, startOpts);
 		if(sceneManager.getScenes().size()==0){
 			System.out.println("Kunne ikke finne noen scene å rendre!");
 			System.exit(1);
