@@ -56,6 +56,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 	}
 	public static void testSystem(){
 		//Systemet behøver OpenGL 3.3 for å kjøre spillet
+		System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
 		System.out.println("Testing system capabilities...");
 		long window;
 		try {

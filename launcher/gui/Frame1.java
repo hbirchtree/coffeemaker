@@ -78,8 +78,6 @@ public class Frame1 {
 			}
 		});
 		
-//		JOptionPane.showMessageDialog(null, "Hello");
-		
 		JButton btnKnapp = new JButton("Test System");
 		btnKnapp.setBounds(268, 209, 89, 23);
 		btnKnapp.addActionListener(new ActionListener() {
