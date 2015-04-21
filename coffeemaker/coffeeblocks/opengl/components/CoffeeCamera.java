@@ -130,7 +130,7 @@ public class CoffeeCamera {
 	}
 	public FloatBuffer matrixOrtho(){
 		Matrix4f matrix = new Matrix4f();
-		Matrix4f.mul(getProjection(), new Matrix4f(), matrix);
+		Matrix4f.mul(getOrthographic(), getView(), matrix);
 		FloatBuffer matBuf = BufferUtils.createFloatBuffer(16);
 		matrix.store(matBuf);
 		matBuf.flip();
@@ -149,6 +149,10 @@ public class CoffeeCamera {
 	
 	public Matrix4f getProjection(){
 		return CoffeeCamera.gluPerspective(aspect,fieldOfView.getValue(),zNear,zFar);
+	}
+	
+	public Matrix4f getOrthographic(){
+		return gluOrtho(0,0,800,600,0,300);
 	}
 	
 	public void normalizeAngles(){
@@ -189,6 +193,22 @@ public class CoffeeCamera {
 		m.m23 = -1;
 		m.m32 = -((2 * znear * zfar) / frustum_length);
 		m.m33 = 0;
+		
+		return m;
+	}
+	
+	public static Matrix4f gluOrtho(float xmin, float ymin, float xmax,float ymax, float znear, float zfar){
+		Matrix4f m = new Matrix4f();
+		
+		float width = xmax-xmin;
+		float height = ymax-ymin;
+		
+		m.m00 = 2f/width;
+		m.m11 = 2f/height;
+		m.m22 = -1;
+		
+		m.m30 = -(xmin+xmax)/width;
+		m.m31 = -(ymin+ymax)/height;
 		
 		return m;
 	}

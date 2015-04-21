@@ -8,6 +8,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector3f;
 
 public class VectorTools {
+	//Vector3f-klassen har ikke skalarmultiplikasjon
 	public static Vector3f vectorMul(Vector3f vec, float scalar){
 		Vector3f ovec = new Vector3f(vec);
 		ovec.x *= scalar;
@@ -68,6 +69,15 @@ public class VectorTools {
 		buf.put(statfloats);
 		buf.flip();
 		return buf;
+	}
+	//Brukes for å rotere et objekt mot en posisjon i rommet
+	public static float getEuclideanRotationAngle(Vector3f from, Vector3f to,boolean pitch){
+		Vector3f direction = Vector3f.sub(to, from, null);
+		direction.normalise();
+		if(pitch)
+			return -(float)Math.asin(-direction.y)*180/(float)Math.PI;
+		else
+			return -(float)Math.atan2(-direction.x,direction.z)*180/(float)Math.PI;
 	}
 	public static javax.vecmath.Vector3f quaternionToEulerVM(Quat4f quat){
 		return lwjglToVMVec3f(quaternionToEuler(quat));

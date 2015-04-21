@@ -74,7 +74,7 @@ public class Vector3Container {
 		if(valueMax!=null)
 			value = VectorTools.vectorLimitMax(value, valueMax);
 		if(valueMin!=null)
-			value = VectorTools.vectorLimitMax(value, valueMin);
+			value = VectorTools.vectorLimitMin(value, valueMin);
 		this.value = value;
 	}
 	public void increaseValue(Vector3f value){
