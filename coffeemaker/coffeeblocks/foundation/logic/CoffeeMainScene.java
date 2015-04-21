@@ -83,27 +83,34 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		});
 		
 		for(int i=0;i<4;i++){
-			String id = "monster.golem."+i;
-			getScene().addInstance(getScene().getInstantiable("monster.golem").createInstance(id, false));
-			GameObject o = getAnyObject(id);
-			o.getGameModel().getPosition().getValue().x = i*30;
-			o.getGameModel().getPosition().getValue().y = 30;
-			o.getGameModel().getRotation().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
-				@Override
-				public Vector3f getOffset() {
-					return new Vector3f(
-							0,
-							VectorTools.getEuclideanRotationAngle(o.getGameModel().getPositionVector(),
-									getObject(OBJECT_ID_PLAYER).getGameModel().getPositionVector(), false)-90,
-							0
-							);
-				}
-			});
-			getScene().getInstancedObject(id).getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
-					getScene().getInstancedObject(id).getGameModel().getPosition().getValue());
-			characters.add(new EnemyPursuer(id,OBJECT_ID_PLAYER));
+			spawnMonster(new Vector3f(0,30+i*2,0));
 		}
 	}
+	private void spawnMonster(Vector3f pos){ //i enumererer monsteret
+		String id = "monster.golem."+monster_ticker;
+		getScene().addInstance(getScene().getInstantiable("monster.golem").createInstance(id, false));
+		GameObject o = getAnyObject(id);
+		o.getGameModel().getPosition().setValue(pos);
+		o.getGameModel().getRotation().setOffsetCallback(new Vector3Container.VectorOffsetCallback() {
+			@Override
+			public Vector3f getOffset() {
+				return new Vector3f(
+						0,
+						VectorTools.getEuclideanRotationAngle(o.getGameModel().getPositionVector(),
+								getObject(OBJECT_ID_PLAYER).getGameModel().getPositionVector(), false)-90,
+						0
+						);
+			}
+		});
+		getScene().getInstancedObject(id).getGameData().getVectorValue(EnemyPursuer.MONSTER_PROP_VECTOR_HOME).setValue(
+				getScene().getInstancedObject(id).getGameModel().getPosition().getValue());
+		getCharacters().add(new EnemyPursuer(id,OBJECT_ID_PLAYER));
+		monster_ticker++;
+	}
+	private synchronized List<GameCharacter> getCharacters(){
+		return characters;
+	}
+	private int monster_ticker = 0;
 	@Override protected void tickSpecifics() {
 		super.tickSpecifics();
 		
@@ -246,7 +253,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		else
 			getObject(OBJECT_ID_PLAYER).getGameData().setBoolValue(PROPERTY_BOOL_JUMP,true);
 
-		characters.stream().forEach(e -> {
+		new ArrayList<>(getCharacters()).stream().forEach(e -> {
 			e.onTick();
 		});
 
@@ -413,7 +420,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			playerTakeDamage(DEATH_REASON_BULLET,-30);
 		}
 		
-		characters.stream().forEach(e -> {
+		new ArrayList<>(getCharacters()).stream().forEach(e -> {
 			if(body1.equals(e.getIdentifier()))
 				e.handleCollision(body2);
 			else if(body2.equals(e.getIdentifier()))
@@ -443,15 +450,15 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			col.x = 0;
 			col.y = 1;
 			col.z = 0;
-		}else if(curr_hlth<100){
+		}else if(curr_hlth<100&&curr_hlth>60){
 			col.x = 1;
 			col.y = 1;
 			col.z = 1;
-		}else if(curr_hlth<60){
+		}else if(curr_hlth<60&&curr_hlth>=30){
 			col.x = 1;
 			col.y = 1;
 			col.z = 0;
-		}else if(curr_hlth<30){
+		}else if(curr_hlth<30&&curr_hlth>=0){
 			col.x = 1;
 			col.y = 0;
 			col.z = 0;
@@ -460,8 +467,6 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			col.y = 0;
 			col.z = 0;
 		}
-		col.y = curr_hlth/100f;
-		col.z = curr_hlth/100f;
 		col.normalise();
 	}
 	public void playerDie(String reason){
@@ -577,6 +582,10 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			animator.addTransition(target.getGameModel().getMaterial().getTransparencyObject(), 0.0f, CoffeeAnimator.TransitionType.ValueLinear, 500);
 			target.getGameData().setTimerValue(PROPERTY_TIMER_EXPIRY,clock+500);
 			playerTakeDamage("... Healed to death? NOOOOOO!!",50);
+			
+			spawnMonster(target.getGameModel().getPosition().getValue());
+			spawnMonster(target.getGameModel().getPosition().getValue());
+			playerTakeDamage("The enemy has evolved!",0);
 		}
 		public void enemyTakeDamage(int amount){
 			target.getGameData().setIntValue(PROPERTY_INT_HEALTH, target.getGameData().getIntValue(PROPERTY_INT_HEALTH)+amount);
