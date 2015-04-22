@@ -83,7 +83,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 		}
 	}
 	public void lhcStart(File mainfile){
-		String filename = mainfile.getAbsolutePath().toString();
+		String filename = mainfile.getAbsolutePath();
 		
 		if(System.getProperty("os.name").startsWith("Windows"))
 			filename = filename.replace('\\', '/'); //Fordi Java ikke vil konvertere navnet den får :(
