@@ -72,8 +72,8 @@
 				"run.1": "models/playermesh_run1.obj",
 				"run.2": "models/playermesh_run2.obj",
 				"walk.1": "models/playermesh_walk1.obj",
-				"walk.2": "models/playermesh_walk2.obj",
-				"jump": "models/playermesh_jump.obj"
+				"jump": "models/playermesh_jump.obj",
+				"shoot": "models/playermesh_shoot.obj"
 			},
 			"sounds": {
 			"test": "sounds/test.wav",

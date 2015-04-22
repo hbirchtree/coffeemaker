@@ -199,6 +199,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_WALK_PACE,24d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setDoubleValue(PROPERTY_DUBS_SPEEDLIMIT,25d);
 		getObject(OBJECT_ID_PLAYER).getGameData().setTimerValue(ANI_RUNCYCLE, 0l);
+		getObject(OBJECT_ID_PLAYER).getGameModel().getRotation().setValueOffset(new Vector3f(0,180,0));
 		{
 			GameObject testO = generic_sprite.createSprite("hp","testgame/models/elements/healthbar.png");
 			object_id_healthbar = testO.getObjectId();
@@ -259,7 +260,10 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 		if(getObject(OBJECT_ID_PLAYER).getGameData().getBoolValue(PROPERTY_BOOL_JUMP)) //Hopping prioriteres over gå-animasjonen
 			getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("jump", 0.01f);
 		getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().morphToState();
-		getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState(null); //tilbakestiller modellen for å unngå at animasjoner gjentas unødvendig
+		if(clock%500>250)
+			getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState(null); //tilbakestiller modellen for å unngå at animasjoner gjentas unødvendig
+		else
+			getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("walk.1",0.01f);
 	}
 	@Override public void onGlfwFrameTick(double currentTime) {
 		//Denne operasjonen er lagt i render-loopen for å kjøre på et tidspunkt hvor fysikk-systemet ikke har tick.
@@ -412,6 +416,7 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 			Vector3f origin = Vector3f.add(getScene().getCamera().getCameraForwardVec(8f),getObject(OBJECT_ID_PLAYER).getGameModel().getPositionVector(),null);
 			Vector3f dir = getScene().getCamera().getCameraForwardVec(3f);
 			dir.y = 0;
+			getObject(OBJECT_ID_PLAYER).getGameModel().getAnimationContainer().setAnimationState("shoot",0.01f);
 			spawnProjectile("bullet","."+clock,origin,dir,1000f);
 		}
 	}
