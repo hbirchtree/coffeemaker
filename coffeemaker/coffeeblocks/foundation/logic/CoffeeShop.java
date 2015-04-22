@@ -38,24 +38,11 @@ public class CoffeeShop extends CoffeeLogicLoop{
 		inputKeys.add(GLFW.GLFW_KEY_A);
 		inputKeys.add(GLFW.GLFW_KEY_S);
 		inputKeys.add(GLFW.GLFW_KEY_D);
-		inputKeys.add(GLFW.GLFW_KEY_F);
-		inputKeys.add(GLFW.GLFW_KEY_J);
-		inputKeys.add(GLFW.GLFW_KEY_K);
-		inputKeys.add(GLFW.GLFW_KEY_E);
-		inputKeys.add(GLFW.GLFW_KEY_Q);
 		inputKeys.add(GLFW.GLFW_KEY_ENTER);
-		inputKeys.add(GLFW.GLFW_KEY_BACKSPACE);
-		inputKeys.add(GLFW.GLFW_KEY_KP_0);
-		inputKeys.add(GLFW.GLFW_KEY_KP_1);
-		inputKeys.add(GLFW.GLFW_KEY_KP_5);
-		inputKeys.add(GLFW.GLFW_KEY_KP_8);
-		inputKeys.add(GLFW.GLFW_KEY_KP_9);
 		inputKeys.add(GLFW.GLFW_KEY_SPACE);
 		inputKeys.add(GLFW.GLFW_KEY_ESCAPE);
 		
 		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_1);
-		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_2);
-		inputButtons.add(GLFW.GLFW_MOUSE_BUTTON_3);
 	}
 
 	private String fontObj = null;

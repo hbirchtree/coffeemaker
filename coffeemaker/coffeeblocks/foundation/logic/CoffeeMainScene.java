@@ -151,8 +151,8 @@ public class CoffeeMainScene extends CoffeeSceneTemplate {
 	@Override protected void setupPlayer() {
 		super.setupPlayer();
 		activateScreenOverlay();
-		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
-		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
+//		manager.getRenderer().getAlListenPosition().bindValue(getObject(OBJECT_ID_PLAYER).getGameModel().getPosition());
+//		getObject(OBJECT_ID_PLAYER).getSoundBox().get(0).getPosition().setValue(new Vector3f(25,0,0));
 
 		//Vi skriver litt tekst
 		//Vi bruker en callback for å spare tid ved tick. Veldig nyttig!

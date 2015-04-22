@@ -75,10 +75,6 @@
 				"jump": "models/playermesh_jump.obj",
 				"shoot": "models/playermesh_shoot.obj"
 			},
-			"sounds": {
-			"test": "sounds/test.wav",
-			"test2": "sounds/test.wav"
-			},
 			"vshader": "shaders/vsh.txt",
 			"fshader": "shaders/fsh.txt",
 			"position": [93.575,84.24,-138.666],
