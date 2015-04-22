@@ -52,7 +52,7 @@ public class CoffeeMaker implements CoffeeRendererListener{
 					+"Vær vennlig og spesifiser en slik fil, ofte under navnet main.json");
 			return;
 		}
-		main.lhcStart(args[0]);
+		main.lhcStart(new File(args[0]));
 	}
 	public static void testSystem(){
 		//Systemet behøver OpenGL 3.3 for å kjøre spillet
@@ -82,7 +82,12 @@ public class CoffeeMaker implements CoffeeRendererListener{
 			glfwTerminate();
 		}
 	}
-	public void lhcStart(String filename){
+	public void lhcStart(File mainfile){
+		String filename = mainfile.getAbsolutePath().toString();
+		
+		if(System.getProperty("os.name").startsWith("Windows"))
+			filename = filename.replace('\\', '/'); //Fordi Java ikke vil konvertere navnet den får :(
+		
 		//Viktig! Brukes for å hente LWJGL's biblioteker uten å spesifisere obskure argumenter til Java hver gang!
 		System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
 		

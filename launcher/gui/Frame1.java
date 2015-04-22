@@ -70,8 +70,7 @@ public class Frame1 {
 				
 				int returnVal = opener.showOpenDialog(frame);
 				if(returnVal==JFileChooser.APPROVE_OPTION){
-					System.out.println(opener.getSelectedFile().getAbsolutePath());
-					main.lhcStart(opener.getSelectedFile().getAbsolutePath());
+					main.lhcStart(opener.getSelectedFile());
 				}
 				
 				frame.setVisible(true);
